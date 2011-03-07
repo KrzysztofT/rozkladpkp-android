@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:padding="5dp">
+        <org.tyszecki.rozkladpkp.StationSpinner
+        	android:id="@+id/selectStation"
+        	android:layout_width="fill_parent"
+        	android:layout_height="wrap_content"/>
+        <org.tyszecki.rozkladpkp.TimeButton
+        	android:id="@+id/boards2TimeBut"
+        	android:layout_width="fill_parent"
+        	android:layout_height="wrap_content"
+        	/>
+        <org.tyszecki.rozkladpkp.DateButton
+        	android:id="@+id/boards2DateBut"
+        	android:layout_width="fill_parent"
+        	android:layout_height="wrap_content"
+			/>
+		<org.tyszecki.rozkladpkp.BoardTypeButton
+        	android:id="@+id/boards2TypeBut"
+        	android:layout_width="fill_parent"
+        	android:layout_height="wrap_content"
+			/>
+		<org.tyszecki.rozkladpkp.ProductsButton
+        	android:id="@+id/boards2ProdBut"
+        	android:layout_width="fill_parent"
+        	android:layout_height="wrap_content"
+			/>
+        <Button
+        	android:id="@+id/ok"
+        	android:layout_width="fill_parent"
+        	android:layout_height="wrap_content"
+        	android:text="OK" />  		
+</LinearLayout>

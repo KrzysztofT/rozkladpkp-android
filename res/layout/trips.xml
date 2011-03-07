@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:padding="5dp">
+        <org.tyszecki.rozkladpkp.StationEdit
+        	android:id="@+id/tripsDepEdit"
+        	android:layout_width="fill_parent"
+        	android:layout_height="wrap_content"/>
+        <org.tyszecki.rozkladpkp.StationEdit
+        	android:id="@+id/tripsArrEdit"
+        	android:layout_width="fill_parent"
+        	android:layout_height="wrap_content"/>
+        <org.tyszecki.rozkladpkp.TimeButton
+        	android:id="@+id/tripsTimeBut"
+        	android:layout_width="fill_parent"
+        	android:layout_height="wrap_content"
+        	/>
+        <org.tyszecki.rozkladpkp.DateButton
+        	android:id="@+id/tripsDateBut"
+        	android:layout_width="fill_parent"
+        	android:layout_height="wrap_content"
+			/>
+		<org.tyszecki.rozkladpkp.ProductsButton
+        	android:id="@+id/tripsProdBut"
+        	android:layout_width="fill_parent"
+        	android:layout_height="wrap_content"
+			/>
+        <Button
+        	android:id="@+id/tripsOK"
+        	android:layout_width="fill_parent"
+        	android:layout_height="wrap_content"
+        	android:text="OK" />
+</LinearLayout>
