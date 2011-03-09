@@ -57,8 +57,11 @@ public class BoardActivity extends Activity {
         setContentView(R.layout.board);
         
         SID = getIntent().getExtras().getString("SID");
+        
         Log.i("Sitkol",SID);
         dep = getIntent().getExtras().getString("Type").equals("dep");
+
+        setTitle((dep?"Odjazdy z ":"Przyjazdy do ")+getIntent().getExtras().getString("Station"));
         
         m_items = new ArrayList<BoardItem>();
         

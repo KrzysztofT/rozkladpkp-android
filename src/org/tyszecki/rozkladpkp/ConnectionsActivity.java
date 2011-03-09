@@ -15,11 +15,14 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.tyszecki.rozkladpkp.ConnectionItem.TripItem;
+import org.tyszecki.rozkladpkp.PLN.Station;
 import org.tyszecki.rozkladpkp.PLN.Trip;
 import org.tyszecki.rozkladpkp.PLN.TripIterator;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
@@ -102,6 +105,13 @@ public class ConnectionsActivity extends Activity {
         @Override
         public void run() {
         	
+        	Station dep = pln.departureStation();
+        	Station arr = pln.arrivalStation();
+        	
+        	if(arr != null && dep != null)
+        		setTitle(dep.name+" - "+arr.name);
+        	
+        	
         	ConnectionItem c = new ConnectionItem();
         	String lastDate = "";
         	TripIterator it = pln.tripIterator();
@@ -123,7 +133,8 @@ public class ConnectionsActivity extends Activity {
         		items.add(ti);
         		i++;
         	}
-        		
+        	if(i == 0)
+        		noConnectionsAlert();
         	
         	adapter.notifyDataSetChanged();
         	
@@ -132,7 +143,21 @@ public class ConnectionsActivity extends Activity {
         }
       };
       
-	
+	protected void noConnectionsAlert() {
+		//Pokazuje okno dialogowe informujące o braku połączeń i umożliwia powrót do wcześniejszej aktywności.
+		AlertDialog alertDialog;
+    	alertDialog = new AlertDialog.Builder(this).create();
+    	alertDialog.setTitle("Brak połączeń!");
+    	alertDialog.setMessage("Nie istenieje połączenie między wybranymi stacjami.");
+    	alertDialog.setCancelable(false);
+    	
+    	alertDialog.setButton("Powrót", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface arg0, int arg1) {
+				ConnectionsActivity.this.finish();
+			}
+		});
+    	alertDialog.show();
+	}
       
 	
 	protected void getConnections() throws Exception {
@@ -179,6 +204,22 @@ public class ConnectionsActivity extends Activity {
         plndata = content.toByteArray();
         Log.i("RozkladPKP", "jestPLN");
         pln = new PLN(plndata);
+        
+        /*File f = new File(Environment.getExternalStorageDirectory(),"PLN");
+		FileOutputStream w = null;
+		try {
+			w = new FileOutputStream(f);
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		try {
+			w.write(pln.data);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
+		
         Log.i("RozkladPKP", "pln parsed");
 		runOnUiThread(loadData);
 	}

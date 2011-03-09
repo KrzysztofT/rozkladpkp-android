@@ -90,6 +90,7 @@ public class BoardsActivity extends Activity {
 				{
 					ni = new Intent(arg0.getContext(),BoardActivity.class);
 					ni.putExtra("SID", sid);
+					ni.putExtra("Station", autoComplete.getText().toString());
 				}
 				
 				

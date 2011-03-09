@@ -73,6 +73,11 @@ public class StationSpinner extends Spinner {
 		return stations[getSelectedItemPosition()][1];
 	}
 	
+	public String getText()
+	{
+		return stations[getSelectedItemPosition()][0];
+	}
+	
 	private Runnable showUpdate = new Runnable(){
 		
 	    public void run(){

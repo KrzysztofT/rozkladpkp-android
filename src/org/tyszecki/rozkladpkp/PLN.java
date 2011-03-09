@@ -29,6 +29,7 @@ public class PLN {
 	
 	public Connection[] connections;
 	private Station[] stations;
+	private Station dep,arr; 
 	private HashMap<Integer,Availability> availabilities;
 	
 	Pattern p = Pattern.compile("(TLK|D|EN|EC|KD|IR|RE|EIC).*");
@@ -82,7 +83,6 @@ public class PLN {
 			msg = m;
 			dOffset = dayOffset;
 			days	= new BitSet(len*8);
-			int v = 128;
 			int ix = 0;
 			
 			for(int i = 0; i < len; i++)
@@ -174,12 +174,18 @@ public class PLN {
 		
 		@Override
 		public boolean hasNext() {
+			
+			//Nie ma żadnych połączeń
+			if(conCnt == 0) 
+				return false;
+			
 			int cix = pos%conCnt;
 			int dix = pos/conCnt;
 			int max = conCnt*16;
 			
 			while(pos < max)
 			{
+				
 				if(connections[cix].availability != null && connections[cix].availability.available(dix))
 					return true;
 				else
@@ -189,6 +195,7 @@ public class PLN {
 					dix = pos/conCnt;
 				}
 			}
+			
 			return false;
 		}
 
@@ -218,8 +225,7 @@ public class PLN {
 		strings = new HashMap<Integer, String>();
 		attributes = new HashMap<Integer, String[]>();
 		
-		
-		
+
 		stationsStart	= readint(0x36);
 		attributesStart	= readint(0x3a);
 		attributesEnd	= readint(0x3e);
@@ -230,6 +236,7 @@ public class PLN {
 		readStringTable();
 		Log.i("PLN","Stacje...");
 		readStations();
+		readHeaderStations();
 		Log.i("PLN","Atrybuty...");
 		readAttributes();
 		Log.i("PLN","Dostępność...");
@@ -242,7 +249,14 @@ public class PLN {
 	public TripIterator tripIterator(){
 		return new TripIterator();
 	}
+	
+	public Station departureStation(){
+		return dep;
+	}
 
+	public Station arrivalStation(){
+		return arr;
+	}
 
 	private int readint(int pos)
 	{
@@ -252,7 +266,8 @@ public class PLN {
 		return r;
 	}
 	
-	//In theory, this method should 'long', but IDs and gps coordinates never go so big
+	//In theory, this method should return 'long', but IDs and gps coordinates never go so big
+	
 	private int readLong(int pos)
 	{
 		int r =  (int) (data[pos] & 0x000000FF);
@@ -267,8 +282,7 @@ public class PLN {
 	private String getString(int pos)
 	{
 		int start = pos; 
-		
-		
+			
 		while(data[pos] != 0)
 			pos++;
 		
@@ -354,7 +368,29 @@ public class PLN {
 		}
 	}
 	
+	private void readHeaderStations()
+	{
+		dep = readHeaderStation(2);
+		arr = readHeaderStation(0x10);
+	}
+	
+	private Station readHeaderStation(int offset)
+	{
+		int nameLoc = readint(offset);
+		if(nameLoc == 0)
+			return null;
+		
+		Station ret = new Station();
+		
+		ret.name = strings.get(nameLoc);
+		ret.x = readLong(offset+6);
+		ret.y = readLong(offset+10);
+		
+		return ret;
+	}
+	
 	private void readStations() {
+			
 		stations = new Station[(attributesStart-stationsStart)/StationSize];
 	
 		for(int i = 0, pos = stationsStart; pos < attributesStart; pos += StationSize, i++)

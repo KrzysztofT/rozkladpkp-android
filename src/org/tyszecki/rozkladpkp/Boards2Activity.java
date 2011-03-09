@@ -67,6 +67,7 @@ public class Boards2Activity extends Activity{
 			public void onClick(View arg0) {
 				Intent ni = new Intent(arg0.getContext(),BoardActivity.class);
 				ni.putExtra("SID", sp.getCurrentSID());
+				ni.putExtra("Station", sp.getText());
 				
 				ni.putExtra("Time", timeb.getTime());
 				ni.putExtra("Date", dateb.getDate());
