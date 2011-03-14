@@ -70,28 +70,29 @@ public final class R {
         public static final int conn_time_icon=0x7f060012;
         public static final int connview=0x7f060017;
         public static final int edittext=0x7f060001;
-        public static final int info_timetable=0x7f06001c;
-        public static final int item01=0x7f06002d;
+        public static final int info_timetable=0x7f06001d;
+        public static final int item01=0x7f06002e;
         public static final int ok=0x7f060006;
         public static final int output=0x7f060007;
-        public static final int savepln=0x7f06002e;
+        public static final int savepln=0x7f06002f;
+        public static final int scrollitem_text=0x7f06001c;
         public static final int selectStation=0x7f060008;
-        public static final int timetable_arr=0x7f06001e;
-        public static final int timetable_dep=0x7f06001f;
-        public static final int timetable_icon=0x7f06001d;
-        public static final int timetable_station=0x7f060020;
-        public static final int trips2Arr=0x7f060028;
-        public static final int trips2DateBut=0x7f06002a;
-        public static final int trips2Dep=0x7f060027;
-        public static final int trips2OK=0x7f06002c;
-        public static final int trips2ProdBut=0x7f06002b;
-        public static final int trips2TimeBut=0x7f060029;
-        public static final int tripsArrEdit=0x7f060022;
-        public static final int tripsDateBut=0x7f060024;
-        public static final int tripsDepEdit=0x7f060021;
-        public static final int tripsOK=0x7f060026;
-        public static final int tripsProdBut=0x7f060025;
-        public static final int tripsTimeBut=0x7f060023;
+        public static final int timetable_arr=0x7f06001f;
+        public static final int timetable_dep=0x7f060020;
+        public static final int timetable_icon=0x7f06001e;
+        public static final int timetable_station=0x7f060021;
+        public static final int trips2Arr=0x7f060029;
+        public static final int trips2DateBut=0x7f06002b;
+        public static final int trips2Dep=0x7f060028;
+        public static final int trips2OK=0x7f06002d;
+        public static final int trips2ProdBut=0x7f06002c;
+        public static final int trips2TimeBut=0x7f06002a;
+        public static final int tripsArrEdit=0x7f060023;
+        public static final int tripsDateBut=0x7f060025;
+        public static final int tripsDepEdit=0x7f060022;
+        public static final int tripsOK=0x7f060027;
+        public static final int tripsProdBut=0x7f060026;
+        public static final int tripsTimeBut=0x7f060024;
     }
     public static final class layout {
         public static final int board=0x7f030000;
@@ -102,11 +103,12 @@ public final class R {
         public static final int connections=0x7f030005;
         public static final int main=0x7f030006;
         public static final int row=0x7f030007;
-        public static final int stationedititem=0x7f030008;
-        public static final int timetable=0x7f030009;
-        public static final int timetablerow=0x7f03000a;
-        public static final int trips=0x7f03000b;
-        public static final int trips2=0x7f03000c;
+        public static final int scrollitem=0x7f030008;
+        public static final int stationedititem=0x7f030009;
+        public static final int timetable=0x7f03000a;
+        public static final int timetablerow=0x7f03000b;
+        public static final int trips=0x7f03000c;
+        public static final int trips2=0x7f03000d;
     }
     public static final class menu {
         public static final int boards=0x7f050000;
