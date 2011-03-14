@@ -1,15 +1,23 @@
 package org.tyszecki.rozkladpkp;
 
+import java.io.IOException;
+
 import org.tyszecki.rozkladpkp.R;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.Selection;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 public class TripsActivity extends Activity {
@@ -18,14 +26,23 @@ public class TripsActivity extends Activity {
 	private DateButton dateb;
 	private ProductsButton prodb;
 	private SharedPreferences pref;
+	private ImageButton mButtonLocation;
 	
 	private StationEdit depEdit,arrEdit;
+	
+	
+	
+	private Resources res;
 
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.trips);
         
+        res = getResources();
+        
         initializeGui();
+        
+        
     }
 
 	private void initializeGui() {
@@ -115,6 +132,18 @@ public class TripsActivity extends Activity {
 				startActivity(ni);
 			}
 		});
+        
+        mButtonLocation = (ImageButton) findViewById(R.id.tripsLocation);
+        mButtonLocation.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+
+				new GetLocationTask().execute();
+					
+
+			}
+		});
 	}
 	
 	@Override
@@ -128,5 +157,46 @@ public class TripsActivity extends Activity {
 	    	return prodb.getDialog();
 	    }
 	    return null;
+	}
+	
+	private class GetLocationTask extends AsyncTask<Void, Void, String> {
+		
+		private ProgressDialog mProgress;
+		
+		@Override
+		protected void onPostExecute(String result) {
+			mProgress.dismiss();
+			if(result == null || result == "") {
+				Toast.makeText(TripsActivity.this, 
+						res.getText(R.string.toastLocationError), 
+						Toast.LENGTH_LONG)
+						.show();
+			} else {
+				depEdit.setText(result);
+				//set cursor at end of text
+				final Editable etext = depEdit.getText();
+				final int position = etext.length();  // end of buffer, for instance
+				Selection.setSelection(etext, position);
+			}
+		}
+
+
+		@Override
+		protected void onPreExecute() {
+			mProgress = ProgressDialog.show(TripsActivity.this, 
+					res.getText(R.string.progressTitle), 
+					res.getText(R.string.progressBodyLocation));
+		}
+
+
+		@Override
+		protected String doInBackground(Void... params) {
+			try {
+				return ((PKPApplication)getApplication()).getLocation();
+			} catch (IOException e) {
+				return null;
+			}
+		}
+		
 	}
 }
