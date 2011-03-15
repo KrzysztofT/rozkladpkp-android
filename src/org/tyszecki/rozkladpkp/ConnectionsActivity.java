@@ -93,8 +93,10 @@ public class ConnectionsActivity extends Activity {
 				
 				if(b instanceof TripItem){
 					Intent ni = new Intent(arg0.getContext(),ConnectionInfoActivity.class);
-					ni.putExtra("PLN",plndata);
-					ni.putExtra("Index",pos);
+					
+					ni.putExtra("PLNData",plndata);
+					ni.putExtra("ConnectionIndex",((TripItem)b).t.conidx);
+					ni.putExtra("StartDate",((TripItem)b).t.date);
 					
 					startActivity(ni);
 				}

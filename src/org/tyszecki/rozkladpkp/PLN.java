@@ -161,12 +161,15 @@ public class PLN {
 	}
 	
 	public class Trip {
-		public Trip(Connection connection, String d) {
+		public Trip(Connection connection, int idx, String d) {
 			con = connection;
 			date = d; 
+			conidx = idx;
 		}
 		String date;
 		Connection con;
+		//FIXME: Wymyśleć, jak zastąpić to, żeby było ładnie.
+		int conidx;
 	}
 	
 	public class TripIterator implements Iterator<Trip>{
@@ -208,7 +211,7 @@ public class PLN {
 				GregorianCalendar cal = (GregorianCalendar) sdate.clone();
 				cal.add(Calendar.DAY_OF_MONTH, dix);
 				pos++;
-				return new Trip(connections[cix], new SimpleDateFormat("dd.MM.yyyy").format(cal.getTime()));
+				return new Trip(connections[cix], cix, new SimpleDateFormat("dd.MM.yyyy").format(cal.getTime()));
 			}
 			else
 				return null;
