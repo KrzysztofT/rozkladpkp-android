@@ -4,10 +4,22 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:padding="5dp">
-        <org.tyszecki.rozkladpkp.StationEdit
-        	android:id="@+id/tripsDepEdit"
-        	android:layout_width="fill_parent"
-        	android:layout_height="wrap_content"/>
+        
+        <RelativeLayout 
+        	android:layout_width="match_parent"
+        	android:layout_height="wrap_content">
+			<org.tyszecki.rozkladpkp.StationEdit
+	        	android:id="@+id/tripsDepEdit"
+	        	android:layout_width="fill_parent"
+	        	android:layout_height="wrap_content"
+				android:layout_toLeftOf="@+id/tripsLocation"
+				/>
+			<ImageButton android:src="@drawable/ic_mylocation"
+				android:id="@+id/tripsLocation" android:layout_width="50dp"
+				android:layout_height="50dp" android:layout_alignParentRight="true" />
+		</RelativeLayout>
+
+        
         <org.tyszecki.rozkladpkp.StationEdit
         	android:id="@+id/tripsArrEdit"
         	android:layout_width="fill_parent"

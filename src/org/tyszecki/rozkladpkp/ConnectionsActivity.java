@@ -6,7 +6,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.zip.GZIPInputStream;
 
@@ -44,7 +43,8 @@ public class ConnectionsActivity extends Activity {
 	private ProgressDialog m_ProgressDialog;
 	private static byte[] sBuffer = new byte[512];
 	private byte[] plndata;
-	PLN pln,pln2;
+	private int seqnr = 0;
+	PLN pln;
 	private ArrayList<ConnectionItem> items;
 	private ConnectionItemAdapter adapter;
 
@@ -62,6 +62,7 @@ public class ConnectionsActivity extends Activity {
         
         if(savedInstanceState != null && savedInstanceState.containsKey("PLNData")){
         	pln = new PLN(savedInstanceState.getByteArray("PLNData"));
+        	seqnr = savedInstanceState.getInt("SeqNr");
         	runOnUiThread(loadData);
         }
         else
@@ -88,7 +89,7 @@ public class ConnectionsActivity extends Activity {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View v, int pos, long id) {
 				
-				ConnectionItem b =  items.get(pos);
+				final ConnectionItem b =  items.get(pos);
 				
 				if(b instanceof TripItem){
 					Intent ni = new Intent(arg0.getContext(),ConnectionInfoActivity.class);
@@ -104,7 +105,7 @@ public class ConnectionsActivity extends Activity {
 				            @Override
 				            public void run() {
 				                try {
-									getEarlier();
+									getMore(((ScrollItem)b).up);
 								} catch (Exception e) {
 									e.printStackTrace();
 								}
@@ -125,7 +126,7 @@ public class ConnectionsActivity extends Activity {
 
         @Override
         public void run() {
-        	
+        	items.clear();
         	Station dep = pln.departureStation();
         	Station arr = pln.arrivalStation();
         	
@@ -187,8 +188,7 @@ public class ConnectionsActivity extends Activity {
       
 	
 	protected void getConnections() throws Exception {
-		DefaultHttpClient client = new DefaultHttpClient();
-		//String url = "http://192.168.1.101/test/dane.php";
+		
 		String SID = getIntent().getExtras().getString("SID");
 		String ZID = getIntent().getExtras().getString("ZID");
 		
@@ -204,62 +204,25 @@ public class ConnectionsActivity extends Activity {
 		
 		String data = "ignoreMinuteRound=yes&REQ0JourneyProduct_prod_list_1="+prod+"&date="+date+"&ZID="+ZID+"&h2g-direct=1&time="+time+"&SID="+SID+"@&start=1";
     	String url  = "http://rozklad.sitkol.pl/bin/query.exe/pn" ;
-    	//String url  = "http://192.168.1.101/bin/query.exe/pn" ;
     	
-		HttpPost request = new HttpPost(url);
-		client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestExpectContinue.class);
-        client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestUserAgent.class);
-        request.addHeader("Content-Type", "text/plain");
-        request.setEntity(new StringEntity(data));
-        
-        HttpResponse response = client.execute(request);
-         
-        // Pull content stream from response
-        HttpEntity entity = response.getEntity();
-        InputStream inputStream = entity.getContent();
-        GZIPInputStream in = new GZIPInputStream(inputStream);
-        ByteArrayOutputStream content = new ByteArrayOutputStream();
-
-        // Read response into a buffered stream
-        int readBytes = 0;
-        while ((readBytes = in.read(sBuffer)) != -1) {
-            content.write(sBuffer, 0, readBytes);
-        }
-
-        // Return result from buffered stream
-        plndata = content.toByteArray();
-        Log.i("RozkladPKP", "jestPLN");
-        pln = new PLN(plndata);
-        
-        /*File f = new File(Environment.getExternalStorageDirectory(),"PLN");
-		FileOutputStream w = null;
-		try {
-			w = new FileOutputStream(f);
-		} catch (FileNotFoundException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		try {
-			w.write(pln.data);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}*/
-		
-        Log.i("RozkladPKP", "pln parsed");
-		runOnUiThread(loadData);
+    	
+		PLNRequest(url, data);
 	}
 	
-	public void getEarlier() throws Exception
+	public void getMore(boolean earlier) throws Exception
+	{
+		String dir = earlier ? "2" : "1";
+		seqnr++;
+		String data = "seqnr="+Integer.toString(seqnr)+"&h2g-direct=1&ident="+pln.id()+"&REQ0HafasScrollDir="+dir+"&hcount=1&ignoreMinuteRound=yes&androidversion=1.1.4";
+    	String url  = "http://rozklad.sitkol.pl/bin/query.exe/pn" ;
+    	
+		PLNRequest(url,data);
+	}
+	
+	private void PLNRequest(String url, String data) throws Exception
 	{
 		DefaultHttpClient client = new DefaultHttpClient();
 		
-		Log.i("ROzkladPKP", pln.id());
-		
-		String data = "seqnr=1&h2g-direct=1&ident="+pln.id()+"&REQ0HafasScrollDir=2&hcount=1&ignoreMinuteRound=yes&androidversion=1.1.4";
-    	String url  = "http://rozklad.sitkol.pl/bin/query.exe/pn" ;
-    	//String url  = "http://192.168.1.101/bin/query.exe/pn" ;
-    	
 		HttpPost request = new HttpPost(url);
 		client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestExpectContinue.class);
         client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestUserAgent.class);
@@ -285,21 +248,6 @@ public class ConnectionsActivity extends Activity {
         Log.i("RozkladPKP", "jestPLN");
         pln = new PLN(plndata);
         
-        File f = new File(Environment.getExternalStorageDirectory(),"PLN");
-		FileOutputStream w = null;
-		try {
-			w = new FileOutputStream(f);
-		} catch (FileNotFoundException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		try {
-			w.write(pln.data);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
         Log.i("RozkladPKP", "pln parsed");
 		runOnUiThread(loadData);
 	}
@@ -336,6 +284,7 @@ public class ConnectionsActivity extends Activity {
 		super.onSaveInstanceState(state);
 		
 		state.putByteArray("PLNData", pln.data);
+		state.putInt("SeqNr", seqnr);
 	}
 	
 	
