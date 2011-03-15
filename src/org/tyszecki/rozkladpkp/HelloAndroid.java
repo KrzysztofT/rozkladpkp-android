@@ -25,20 +25,20 @@ public class HelloAndroid extends TabActivity {
 
         // Initialize a TabSpec for each tab and add it to the TabHost
         spec = tabHost.newTabSpec("remembered").setIndicator("Zapamiętane",
-                          res.getDrawable(R.drawable.ic))
+                          res.getDrawable(R.drawable.ic_love))
                       .setContent(intent);
         tabHost.addTab(spec);
 
         // Do the same for the other tabs
         intent = new Intent().setClass(this, TripsActivity.class);
         spec = tabHost.newTabSpec("trips").setIndicator("Połączenia",
-                          res.getDrawable(R.drawable.ic))
+                          res.getDrawable(R.drawable.ic_menu_change_order))
                       .setContent(intent);
         tabHost.addTab(spec);
 
         intent = new Intent().setClass(this, BoardsActivity.class);
         spec = tabHost.newTabSpec("boards").setIndicator("Rozkłady",
-                          res.getDrawable(R.drawable.ic))
+                          res.getDrawable(R.drawable.ic_menu_show_list))
                       .setContent(intent);
         tabHost.addTab(spec);
 
