@@ -257,6 +257,11 @@ public class PLN {
 	public Station arrivalStation(){
 		return arr;
 	}
+	
+	public String id()
+	{
+		return strings.get(10);
+	}
 
 	private int readint(int pos)
 	{

@@ -1,6 +1,8 @@
 package org.tyszecki.rozkladpkp;
 import java.util.ArrayList;
 
+import org.tyszecki.rozkladpkp.ConnectionItem.DateItem;
+import org.tyszecki.rozkladpkp.ConnectionItem.ScrollItem;
 import org.tyszecki.rozkladpkp.ConnectionItem.TripItem;
 import org.tyszecki.rozkladpkp.PLN.Connection;
 
@@ -22,6 +24,7 @@ public class ConnectionItemAdapter extends BaseAdapter {
 
 	final int HEADER = 0;
 	final int NORMAL = 1;
+	final int SCROLL = 2;
 	
 	private ArrayList<ConnectionItem> items;
 	Context c;
@@ -38,8 +41,10 @@ public class ConnectionItemAdapter extends BaseAdapter {
             LayoutInflater vi = (LayoutInflater)c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             if(con instanceof TripItem) 
             	v = vi.inflate(R.layout.connectionrow, null);
-            else
+            else if(con instanceof DateItem)
             	v = vi.inflate(R.layout.connectionheaderrow, null);
+            else 
+            	v = vi.inflate(R.layout.scrollitem, null);
         }
         
         if (con instanceof TripItem) {
@@ -100,10 +105,18 @@ public class ConnectionItemAdapter extends BaseAdapter {
                 }
                 
         }
-        else
+        else if (con instanceof DateItem)
         {
         	TextView head = (TextView) v.findViewById(R.id.conn_header);
             head.setText(((ConnectionItem.DateItem)con).date);
+        }
+        else
+        {
+        	TextView head = (TextView) v.findViewById(R.id.scrollitem_text);
+        	if(((ScrollItem)con).up)
+        		head.setText("Wcześniejsze połączenia");
+        	else
+        		head.setText("Późniejsze połączenia");
         }
         return v;
 	}
@@ -125,12 +138,18 @@ public class ConnectionItemAdapter extends BaseAdapter {
 
 	@Override
 	public int getItemViewType(int arg0) {
-		return items.get(arg0) instanceof ConnectionItem.DateItem ? HEADER : NORMAL;
+		
+		if(items.get(arg0) instanceof ConnectionItem.DateItem)
+			return HEADER;
+		else if(items.get(arg0) instanceof ConnectionItem.TripItem)
+			return NORMAL;
+		else
+			return SCROLL;
 	}
 
 	@Override
 	public int getViewTypeCount() {
-		return 2;
+		return 3;
 	}
 
 	@Override

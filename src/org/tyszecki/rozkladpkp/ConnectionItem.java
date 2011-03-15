@@ -9,4 +9,11 @@ public class ConnectionItem {
 	public class TripItem extends ConnectionItem{
 		Trip t;
 	}
+	public class ScrollItem extends ConnectionItem{
+		public ScrollItem(boolean up)
+		{
+			this.up = up;
+		}
+		boolean up;
+	}
 }

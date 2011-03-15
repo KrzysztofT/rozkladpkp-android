@@ -25,7 +25,9 @@ import org.xml.sax.InputSource;
 import org.tyszecki.rozkladpkp.R;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -253,12 +255,34 @@ public class BoardActivity extends Activity {
           }
           runOnUiThread(returnRes);
     }
+	
+	private void noDataAlert()
+	{
+		AlertDialog alertDialog;
+    	alertDialog = new AlertDialog.Builder(this).create();
+    	alertDialog.setTitle("Brak połączeń!");
+    	if(dep)
+    		alertDialog.setMessage("W wybranym terminie nie odjeżdżają ze stacji żadne pociągi.");
+    	else
+    		alertDialog.setMessage("W wybranym terminie nie przyjeżdżają do stacji żadne pociągi.");
+    	alertDialog.setCancelable(false);
+    	
+    	alertDialog.setButton("Powrót", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface arg0, int arg1) {
+				BoardActivity.this.finish();
+			}
+		});
+    	alertDialog.show();
+	}
+	
 	private Runnable returnRes = new Runnable() {
 
         @Override
         public void run() {
-            //if(m_items != null && m_items.size() > 0){
+            if(m_items != null && m_items.size() > 0)
                 m_adapter.notifyDataSetChanged();
+            else
+            	noDataAlert();
             
             m_ProgressDialog.dismiss();
         }

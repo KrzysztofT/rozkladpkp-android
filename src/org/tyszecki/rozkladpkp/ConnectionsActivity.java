@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.zip.GZIPInputStream;
 
@@ -14,6 +15,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.tyszecki.rozkladpkp.ConnectionItem.ScrollItem;
 import org.tyszecki.rozkladpkp.ConnectionItem.TripItem;
 import org.tyszecki.rozkladpkp.PLN.Station;
 import org.tyszecki.rozkladpkp.PLN.Trip;
@@ -42,7 +44,7 @@ public class ConnectionsActivity extends Activity {
 	private ProgressDialog m_ProgressDialog;
 	private static byte[] sBuffer = new byte[512];
 	private byte[] plndata;
-	PLN pln;
+	PLN pln,pln2;
 	private ArrayList<ConnectionItem> items;
 	private ConnectionItemAdapter adapter;
 
@@ -95,6 +97,25 @@ public class ConnectionsActivity extends Activity {
 					
 					startActivity(ni);
 				}
+				else if(b instanceof ScrollItem)
+				{
+					//Pobierz wcześniejsze/póxniejsze
+					 viewConn = new Runnable(){
+				            @Override
+				            public void run() {
+				                try {
+									getEarlier();
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+				            }
+				        };
+				        
+				        Thread thread =  new Thread(null, viewConn, "MagentoBackground");
+				        thread.start();
+				        m_ProgressDialog = ProgressDialog.show(ConnectionsActivity.this,    
+				              "Czekaj...", "Pobieranie rozkładu...", true);
+				}
 				
 			}
 		});
@@ -116,25 +137,30 @@ public class ConnectionsActivity extends Activity {
         	String lastDate = "";
         	TripIterator it = pln.tripIterator();
         	
-        	int i = 0;
-        	while(it.hasNext())
-        	{
-        		Trip t = it.next();
-        		if(!t.date.equals(lastDate))
-        		{
-        			ConnectionItem.DateItem d = c.new DateItem();
-        			d.date = t.date;
-        			items.add(d);
-        			lastDate = t.date;
-        		}
-        		
-        		TripItem ti = c.new TripItem();
-        		ti.t = t;
-        		items.add(ti);
-        		i++;
-        	}
-        	if(i == 0)
+        	if(!it.hasNext())
         		noConnectionsAlert();
+        	else
+        	{
+        		items.add(c.new ScrollItem(true));
+	        	int i = 0;
+	        	while(it.hasNext())
+	        	{
+	        		Trip t = it.next();
+	        		if(!t.date.equals(lastDate))
+	        		{
+	        			ConnectionItem.DateItem d = c.new DateItem();
+	        			d.date = t.date;
+	        			items.add(d);
+	        			lastDate = t.date;
+	        		}
+	        		
+	        		TripItem ti = c.new TripItem();
+	        		ti.t = t;
+	        		items.add(ti);
+	        		i++;
+	        	}
+	        	items.add(c.new ScrollItem(false));	
+        	}
         	
         	adapter.notifyDataSetChanged();
         	
@@ -148,7 +174,7 @@ public class ConnectionsActivity extends Activity {
 		AlertDialog alertDialog;
     	alertDialog = new AlertDialog.Builder(this).create();
     	alertDialog.setTitle("Brak połączeń!");
-    	alertDialog.setMessage("Nie istenieje połączenie między wybranymi stacjami.");
+    	alertDialog.setMessage("Nie istnieje połączenie między wybranymi stacjami.");
     	alertDialog.setCancelable(false);
     	
     	alertDialog.setButton("Powrót", new DialogInterface.OnClickListener() {
@@ -219,6 +245,60 @@ public class ConnectionsActivity extends Activity {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}*/
+		
+        Log.i("RozkladPKP", "pln parsed");
+		runOnUiThread(loadData);
+	}
+	
+	public void getEarlier() throws Exception
+	{
+		DefaultHttpClient client = new DefaultHttpClient();
+		
+		Log.i("ROzkladPKP", pln.id());
+		
+		String data = "seqnr=1&h2g-direct=1&ident="+pln.id()+"&REQ0HafasScrollDir=2&hcount=1&ignoreMinuteRound=yes&androidversion=1.1.4";
+    	String url  = "http://rozklad.sitkol.pl/bin/query.exe/pn" ;
+    	//String url  = "http://192.168.1.101/bin/query.exe/pn" ;
+    	
+		HttpPost request = new HttpPost(url);
+		client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestExpectContinue.class);
+        client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestUserAgent.class);
+        request.addHeader("Content-Type", "text/plain");
+        request.setEntity(new StringEntity(data));
+        
+        HttpResponse response = client.execute(request);
+         
+        // Pull content stream from response
+        HttpEntity entity = response.getEntity();
+        InputStream inputStream = entity.getContent();
+        GZIPInputStream in = new GZIPInputStream(inputStream);
+        ByteArrayOutputStream content = new ByteArrayOutputStream();
+
+        // Read response into a buffered stream
+        int readBytes = 0;
+        while ((readBytes = in.read(sBuffer)) != -1) {
+            content.write(sBuffer, 0, readBytes);
+        }
+
+        // Return result from buffered stream
+        plndata = content.toByteArray();
+        Log.i("RozkladPKP", "jestPLN");
+        pln = new PLN(plndata);
+        
+        File f = new File(Environment.getExternalStorageDirectory(),"PLN");
+		FileOutputStream w = null;
+		try {
+			w = new FileOutputStream(f);
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		try {
+			w.write(pln.data);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
         Log.i("RozkladPKP", "pln parsed");
 		runOnUiThread(loadData);
