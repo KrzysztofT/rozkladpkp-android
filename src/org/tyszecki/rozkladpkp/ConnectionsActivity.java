@@ -202,9 +202,10 @@ public class ConnectionsActivity extends Activity {
 		String time = getIntent().getExtras().getString("Time");
 		String date = getIntent().getExtras().getString("Date");
 		String prod = getIntent().getExtras().getString("Products");
+		String attr = getIntent().getExtras().getString("Attributes");
 		
 		
-		String data = "ignoreMinuteRound=yes&REQ0JourneyProduct_prod_list_1="+prod+"&date="+date+"&ZID="+ZID+"&h2g-direct=1&time="+time+"&SID="+SID+"@&start=1";
+		String data = "ignoreMinuteRound=yes&"+attr+"&REQ0JourneyProduct_prod_list_1="+prod+"&date="+date+"&ZID="+ZID+"&h2g-direct=1&time="+time+"&SID="+SID+"@&start=1";
     	String url  = "http://rozklad.sitkol.pl/bin/query.exe/pn" ;
     	
     	

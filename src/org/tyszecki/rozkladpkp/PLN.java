@@ -39,7 +39,7 @@ public class PLN {
 	byte[] data;
 	private Calendar sdate,edate,today;
 	
-	String combine(String[] s, String glue)
+	public static String combine(String[] s, String glue)
 	{
 		if (s == null)
 			return "[null]";

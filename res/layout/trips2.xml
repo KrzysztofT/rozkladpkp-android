@@ -35,6 +35,11 @@
         	android:layout_width="fill_parent"
         	android:layout_height="wrap_content"
 			/>
+		<org.tyszecki.rozkladpkp.AttributesButton
+        	android:id="@+id/trips2AttrBut"
+        	android:layout_width="fill_parent"
+        	android:layout_height="wrap_content"
+			/>
         <Button
         	android:id="@+id/trips2OK"
         	android:layout_width="fill_parent"

@@ -21,6 +21,7 @@ public class Trips2Activity extends Activity {
 	private ProgressDialog progressDialog;
 	
 	private StationSpinner depEdit,arrEdit;
+	private AttributesButton attrb;
 	
 	
 	public void onCreate(Bundle savedInstanceState) {
@@ -61,6 +62,17 @@ public class Trips2Activity extends Activity {
 			@Override
 			public void onClick(View arg0) {
 				showDialog(2);
+				
+			}
+		});
+        
+        attrb = (AttributesButton) findViewById(R.id.trips2AttrBut);
+        attrb.setRequestString(getIntent().getExtras().getString("Attributes"));
+        attrb.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View arg0) {
+				showDialog(3);
 				
 			}
 		});
@@ -106,6 +118,7 @@ public class Trips2Activity extends Activity {
 				ni.putExtra("Products", prodb.getProductString());
 				ni.putExtra("ZID", arrEdit.getCurrentSID());
 				ni.putExtra("SID", depEdit.getCurrentSID());
+				ni.putExtra("Attributes", attrb.getRequestString());
 				
 				startActivity(ni);
 			}
@@ -121,6 +134,8 @@ public class Trips2Activity extends Activity {
 	    	return dateb.dateDialog();
 	    case 2:
 	    	return prodb.getDialog();
+	    case 3:
+	    	return attrb.getDialog();
 	    }
 	    return null;
 	}

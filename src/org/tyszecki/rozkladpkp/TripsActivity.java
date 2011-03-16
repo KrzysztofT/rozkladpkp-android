@@ -25,6 +25,7 @@ public class TripsActivity extends Activity {
 	private TimeButton timeb;
 	private DateButton dateb;
 	private ProductsButton prodb;
+	private AttributesButton attrb;
 	private SharedPreferences pref;
 	private ImageButton mButtonLocation;
 	
@@ -73,6 +74,17 @@ public class TripsActivity extends Activity {
 			@Override
 			public void onClick(View arg0) {
 				showDialog(2);
+				
+			}
+		});
+        
+        attrb = (AttributesButton) findViewById(R.id.tripsAttrBut);
+        attrb.setRequestString("");
+        attrb.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View arg0) {
+				showDialog(3);
 				
 			}
 		});
@@ -129,6 +141,7 @@ public class TripsActivity extends Activity {
 				ni.putExtra("Time", timeb.getTime());
 				ni.putExtra("Date", dateb.getDate());
 				ni.putExtra("Products", prodb.getProductString());
+				ni.putExtra("Attributes", attrb.getRequestString());
 				startActivity(ni);
 			}
 		});
@@ -155,6 +168,8 @@ public class TripsActivity extends Activity {
 	    	return dateb.dateDialog();
 	    case 2:
 	    	return prodb.getDialog();
+	    case 3:
+	    	return attrb.getDialog();
 	    }
 	    return null;
 	}
