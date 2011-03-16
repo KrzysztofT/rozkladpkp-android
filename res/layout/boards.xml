@@ -17,16 +17,23 @@
 				android:layout_height="50dp" android:layout_alignParentRight="true" />
 		</RelativeLayout>
         
-        <org.tyszecki.rozkladpkp.TimeButton
-        	android:id="@+id/boardsTimeBut"
-        	android:layout_width="fill_parent"
-        	android:layout_height="wrap_content"
-        	/>
-        <org.tyszecki.rozkladpkp.DateButton
-        	android:id="@+id/boardsDateBut"
-        	android:layout_width="fill_parent"
-        	android:layout_height="wrap_content"
-			/>
+        <RelativeLayout 
+        	android:layout_width="match_parent"
+        	android:layout_height="wrap_content">
+	        <org.tyszecki.rozkladpkp.TimeButton
+	        	android:id="@+id/boardsTimeBut"
+	        	android:layout_width="110dip"
+	        	android:layout_height="wrap_content"
+	        	android:layout_alignParentLeft="true"
+	        	/>
+	        <org.tyszecki.rozkladpkp.DateButton
+	        	android:id="@+id/boardsDateBut"
+	        	android:layout_width="fill_parent"
+	        	android:layout_height="wrap_content"
+	        	android:layout_toRightOf="@+id/boardsTimeBut"
+				/>
+		</RelativeLayout>	
+        
 		<org.tyszecki.rozkladpkp.BoardTypeButton
         	android:id="@+id/boardsTypeBut"
         	android:layout_width="fill_parent"

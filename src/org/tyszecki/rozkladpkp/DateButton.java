@@ -1,9 +1,13 @@
 package org.tyszecki.rozkladpkp;
 
+import java.util.Date;
+import java.util.GregorianCalendar;
+
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.text.Html;
+import android.text.format.DateFormat;
 import android.text.format.Time;
 import android.util.AttributeSet;
 import android.widget.Button;
@@ -11,13 +15,13 @@ import android.widget.DatePicker;
 
 public class DateButton extends Button {
 
-	private String txt = "Dnia: ";
 	Integer day,month,year;
 	Time time;
+	private String txt = "";
 	
 	public DateButton(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		
+		setCompoundDrawablesWithIntrinsicBounds(getContext().getResources().getDrawable(R.drawable.ic_menu_today), null, null, null);
 		time	= new Time();
 	}
 
@@ -39,7 +43,9 @@ public class DateButton extends Button {
         
 	private void updateDate()
 	{
-		setText(Html.fromHtml(txt+"<b>"+day.toString()+"."+month.toString()+"."+year.toString()+"</b>"));
+		GregorianCalendar date = new GregorianCalendar(year,month-1,day);
+		java.text.DateFormat df = android.text.format.DateFormat.getLongDateFormat(getContext());
+		setText(Html.fromHtml(txt+"<b>"+df.format(date.getTime())+"</b>"));
 	}
 	
 	public void setToNow()

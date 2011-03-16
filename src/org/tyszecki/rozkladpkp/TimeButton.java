@@ -11,12 +11,13 @@ import android.widget.TimePicker;
 
 public class TimeButton extends Button {
 
-	private String txt = "Od godziny: ";
+	private String txt = "";
 	Integer minute,hour;
 	Time time;
 	
 	public TimeButton(Context context, AttributeSet attrs) {
 		super(context, attrs);
+		setCompoundDrawablesWithIntrinsicBounds(getContext().getResources().getDrawable(R.drawable.clock), null, null, null);
 		time	= new Time();
 	}
 	
