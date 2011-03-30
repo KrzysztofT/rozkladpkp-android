@@ -41,14 +41,15 @@ public final class R {
         public static final int km_pic=0x7f02001b;
         public static final int oso_pic=0x7f02001c;
         public static final int re_pic=0x7f02001d;
-        public static final int sta_gray=0x7f02001e;
-        public static final int sta_graygreen=0x7f02001f;
-        public static final int sta_green=0x7f020020;
-        public static final int sta_greengray=0x7f020021;
-        public static final int start_gray=0x7f020022;
-        public static final int start_green=0x7f020023;
-        public static final int time=0x7f020024;
-        public static final int tlk_pic=0x7f020025;
+        public static final int rower=0x7f02001e;
+        public static final int sta_gray=0x7f02001f;
+        public static final int sta_graygreen=0x7f020020;
+        public static final int sta_green=0x7f020021;
+        public static final int sta_greengray=0x7f020022;
+        public static final int start_gray=0x7f020023;
+        public static final int start_green=0x7f020024;
+        public static final int time=0x7f020025;
+        public static final int tlk_pic=0x7f020026;
     }
     public static final class id {
         public static final int android_board=0x7f060000;

@@ -154,5 +154,6 @@ public class AttributesButton extends Button {
 			t+=p[i]?"1":"0";
 		setText(t);
 		Log.i("RozkladPKP",getRequestString());
+		setCompoundDrawablesWithIntrinsicBounds(getContext().getResources().getDrawable(R.drawable.rower), null, null, null);
 	}
 }

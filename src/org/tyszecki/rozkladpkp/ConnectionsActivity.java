@@ -6,11 +6,13 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -44,6 +46,10 @@ public class ConnectionsActivity extends Activity {
 	private static byte[] sBuffer = new byte[512];
 	private byte[] plndata;
 	private int seqnr = 0;
+	
+	private boolean hasFullTable = false;
+	private String timetableUrl = null;
+	
 	PLN pln;
 	private ArrayList<ConnectionItem> items;
 	private ConnectionItemAdapter adapter;
@@ -141,7 +147,10 @@ public class ConnectionsActivity extends Activity {
         	TripIterator it = pln.tripIterator();
         	
         	if(!it.hasNext())
+        	{
+        		Log.i("RozkladPKP","Kurde..."+Integer.toString(pln.conCnt));
         		noConnectionsAlert();
+        	}
         	else
         	{
         		items.add(c.new ScrollItem(true));
@@ -191,6 +200,9 @@ public class ConnectionsActivity extends Activity {
 	
 	protected void getConnections() throws Exception {
 		
+		if(timetableUrl == null)
+			getFullTimetableUrl();
+		
 		String SID = getIntent().getExtras().getString("SID");
 		String ZID = getIntent().getExtras().getString("ZID");
 		
@@ -212,14 +224,141 @@ public class ConnectionsActivity extends Activity {
 		PLNRequest(url, data);
 	}
 	
+	protected void getFullTimetableUrl() throws Exception {
+		String SID = getIntent().getExtras().getString("SID");
+		String ZID = getIntent().getExtras().getString("ZID");
+		
+		/*String time = getIntent().getExtras().getString("Time");
+		String date = getIntent().getExtras().getString("Date");
+		String prod = getIntent().getExtras().getString("Products");
+		String attr = getIntent().getExtras().getString("Attributes");
+		*/
+		String data = "pp=20&spmo=1&output=pln&androidversion=1.1.4&htype=google_sdk&hcount=0&L=vs_javapln&ZID="+ZID+"&SID="+SID+"&start=1";
+		
+		
+		DefaultHttpClient client = new DefaultHttpClient();
+		
+		HttpPost request = new HttpPost("http://h2g.sitkol.pl/bin/tb/query-p2w.exe/pn");
+		client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestExpectContinue.class);
+        client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestUserAgent.class);
+        request.addHeader("Content-Type", "text/plain");
+        request.setEntity(new StringEntity(data));
+        
+        HttpResponse response = client.execute(request);
+         
+        // Pull content stream from response
+        HttpEntity entity = response.getEntity();
+        InputStream inputStream = entity.getContent();
+        ByteArrayOutputStream content = new ByteArrayOutputStream();
+        
+        int readBytes = 0;
+        while ((readBytes = inputStream.read(sBuffer)) != -1) {
+            content.write(sBuffer, 0, readBytes);
+        }
+        String[] parts = content.toString().split("\n");
+        
+        for (String s : parts){
+        	if(s.startsWith("url=")){
+        		timetableUrl = s.substring(4);
+        		break;
+        	}
+        }
+        
+        Log.i("RozkladPKP",timetableUrl != null ? timetableUrl : "NULL");
+	}
+	
+	protected void getFullTimetable() throws Exception {
+		DefaultHttpClient client = new DefaultHttpClient();
+		
+		HttpGet request = new HttpGet(timetableUrl);
+		client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestExpectContinue.class);
+        client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestUserAgent.class);
+        HttpResponse response = client.execute(request);
+         
+        // Pull content stream from response
+        HttpEntity entity = response.getEntity();
+        InputStream inputStream = entity.getContent();
+        ByteArrayOutputStream content = new ByteArrayOutputStream();
+        
+        int readBytes = 0;
+        while ((readBytes = inputStream.read(sBuffer)) != -1) {
+            content.write(sBuffer, 0, readBytes);
+        }
+        String[] parts = content.toString().split("\n");
+        String url = null;
+        
+        Log.i("RozkladPKP","GFT:"+content.toString());
+        
+        for (String s : parts){
+        	if(s.startsWith("url=")){
+        		url = s.substring(4);
+        		break;
+        	}
+        }
+        if(url != null)
+        {
+        	Log.i("RozkladPKP","PLN: "+url);
+	        //Pobranie PLN
+	        request = new HttpGet(url);
+	        response = client.execute(request);
+	        
+	        entity = response.getEntity();
+	        inputStream = entity.getContent();
+	        GZIPInputStream in = new GZIPInputStream(inputStream);
+	        content = new ByteArrayOutputStream();
+	        
+	        readBytes = 0;
+	        while ((readBytes = in.read(sBuffer)) != -1) {
+	            content.write(sBuffer, 0, readBytes);
+	        }
+	        
+	        plndata = content.toByteArray();
+	        Log.i("RozkladPKP", "jest pełny PLN" + Integer.toString(content.size()));
+	        pln = new PLN(plndata);
+	        
+	        File f = new File(Environment.getExternalStorageDirectory(),"PLN");
+			FileOutputStream w = null;
+			try {
+				w = new FileOutputStream(f);
+			} catch (FileNotFoundException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			try {
+				w.write(pln.data);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	        
+	        hasFullTable = true;
+	        
+        }
+        else
+        	Log.i("RozkladPKP","Jeszcze w8");
+         	runOnUiThread(loadData);
+	        
+        
+	}
+	
+	
 	public void getMore(boolean earlier) throws Exception
 	{
-		String dir = earlier ? "2" : "1";
-		seqnr++;
-		String data = "seqnr="+Integer.toString(seqnr)+"&h2g-direct=1&ident="+pln.id()+"&REQ0HafasScrollDir="+dir+"&hcount=1&ignoreMinuteRound=yes&androidversion=1.1.4";
-    	String url  = "http://rozklad.sitkol.pl/bin/query.exe/pn" ;
-    	
-		PLNRequest(url,data);
+		if(timetableUrl != null && !hasFullTable)
+			getFullTimetable();
+		else if(hasFullTable)
+		{
+			
+		}
+		else
+		{
+			String dir = earlier ? "2" : "1";
+			seqnr++;
+			String data = "seqnr="+Integer.toString(seqnr)+"&h2g-direct=1&ident="+pln.id()+"&REQ0HafasScrollDir="+dir+"&hcount=1&ignoreMinuteRound=yes&androidversion=1.1.4";
+	    	String url  = "http://rozklad.sitkol.pl/bin/query.exe/pn" ;
+	    	
+			PLNRequest(url,data);
+		}
 	}
 	
 	private void PLNRequest(String url, String data) throws Exception
