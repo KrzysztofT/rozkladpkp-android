@@ -34,7 +34,7 @@ public class PLN {
 	
 	Pattern p = Pattern.compile("(TLK|D|EN|EC|KD|IR|RE|EIC).*");
 	
-	private int conCnt;
+	public int conCnt;
 
 	byte[] data;
 	private Calendar sdate,edate,today;
@@ -97,6 +97,11 @@ public class PLN {
 			if(day >= 0 && day < days.size())
 				return days.get(day);
 			return false;
+		}
+		
+		public int length()
+		{
+			return dOffset*8+days.size();
 		}
 		String msg;
 		private BitSet days;
@@ -174,6 +179,14 @@ public class PLN {
 	
 	public class TripIterator implements Iterator<Trip>{
 		int pos = 0;
+		int max = -1;
+		
+		public TripIterator()
+		{
+			for(int i = 0; i < conCnt; ++i)
+				if(connections[i].availability.length() > max)
+					max = connections[i].availability.length();
+		}
 		
 		@Override
 		public boolean hasNext() {
@@ -184,11 +197,9 @@ public class PLN {
 			
 			int cix = pos%conCnt;
 			int dix = pos/conCnt;
-			int max = conCnt*16;
 			
-			while(pos < max)
+			while(dix <= max)
 			{
-				
 				if(connections[cix].availability != null && connections[cix].availability.available(dix))
 					return true;
 				else
