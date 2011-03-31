@@ -30,6 +30,8 @@ public class PLN {
 	public Connection[] connections;
 	private Station[] stations;
 	private Station dep,arr; 
+	private int totalConCnt = -1;
+	private int actualDaysCount = -1;
 	private HashMap<Integer,Availability> availabilities;
 	
 	Pattern p = Pattern.compile("(TLK|D|EN|EC|KD|IR|RE|EIC).*");
@@ -94,7 +96,7 @@ public class PLN {
 		public boolean available(int day)
 		{
 			day -= dOffset*8;
-			if(day >= 0 && day < days.size())
+			if(day >= 0 && day < days.length())
 				return days.get(day);
 			return false;
 		}
@@ -102,6 +104,21 @@ public class PLN {
 		public int length()
 		{
 			return dOffset*8+days.size();
+		}
+		
+		public int daysCount()
+		{
+			return days.cardinality();
+		}
+		
+		public BitSet bitset()
+		{
+			return days;
+		}
+		
+		public int offset()
+		{
+			return dOffset;
 		}
 		String msg;
 		private BitSet days;
@@ -275,6 +292,37 @@ public class PLN {
 	public String id()
 	{
 		return strings.get(10);
+	}
+	
+	public int connectionCount()
+	{
+		if(totalConCnt == -1)
+		{
+			++totalConCnt;
+			for(Connection c : connections)
+				totalConCnt += c.availability.daysCount();
+		}
+		return totalConCnt;
+	}
+	
+	public int daysCount()
+	{
+		if(actualDaysCount == -1)
+		{
+			BitSet res = new BitSet();
+			for(Connection c : connections)
+			{
+				Availability a = c.availability;
+				int j = a.dOffset*8;
+				BitSet t = a.bitset();
+				
+				for(int i = 0; i < t.length(); i++,j++)
+					res.set(j,t.get(i));
+				
+			}
+			actualDaysCount = res.cardinality();
+		}
+		return actualDaysCount;
 	}
 
 	private int readint(int pos)
