@@ -6,7 +6,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.zip.GZIPInputStream;
 
@@ -18,9 +17,6 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.tyszecki.rozkladpkp.ConnectionItem.ScrollItem;
 import org.tyszecki.rozkladpkp.ConnectionItem.TripItem;
-import org.tyszecki.rozkladpkp.PLN.Station;
-import org.tyszecki.rozkladpkp.PLN.Trip;
-import org.tyszecki.rozkladpkp.PLN.TripIterator;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -37,8 +33,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 
-import org.tyszecki.rozkladpkp.R;
-
 public class ConnectionsActivity extends Activity {
 	
 	private Runnable viewConn;
@@ -46,20 +40,21 @@ public class ConnectionsActivity extends Activity {
 	private static byte[] sBuffer = new byte[512];
 	private byte[] plndata;
 	private int seqnr = 0;
+	private final int TIMETABLE_DOWNLOAD_ATTEMPTS = 5;
+	private final int TIMETABLE_DOWNLOAD_INTERVAL = 200;
 	
 	private boolean hasFullTable = false;
 	private String timetableUrl = null;
 	
 	PLN pln;
-	private ArrayList<ConnectionItem> items;
+	
 	private ConnectionItemAdapter adapter;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
         setContentView(R.layout.connections);
         
-        items = new ArrayList<ConnectionItem>();
-        adapter = new ConnectionItemAdapter(this,  items);
+        adapter = new ConnectionItemAdapter(this);
             
         ListView lv = (ListView)findViewById(R.id.connview);
         lv.setAdapter(this.adapter);
@@ -69,7 +64,8 @@ public class ConnectionsActivity extends Activity {
         if(savedInstanceState != null && savedInstanceState.containsKey("PLNData")){
         	pln = new PLN(savedInstanceState.getByteArray("PLNData"));
         	seqnr = savedInstanceState.getInt("SeqNr");
-        	runOnUiThread(loadData);
+        	hasFullTable = savedInstanceState.getBoolean("hasFullTable");
+        	//runOnUiThread(loadData);
         }
         else
         {
@@ -95,7 +91,7 @@ public class ConnectionsActivity extends Activity {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View v, int pos, long id) {
 				
-				final ConnectionItem b =  items.get(pos);
+				final ConnectionItem b =  adapter.getItem(pos);
 				
 				if(b instanceof TripItem){
 					Intent ni = new Intent(arg0.getContext(),ConnectionInfoActivity.class);
@@ -108,8 +104,12 @@ public class ConnectionsActivity extends Activity {
 				}
 				else if(b instanceof ScrollItem)
 				{
-					//Pobierz wcześniejsze/póxniejsze
-					 viewConn = new Runnable(){
+					if(hasFullTable)
+						adapter.loadMore();
+					else
+					{
+					//Pobierz wcześniejsze/pózniejsze
+					viewConn = new Runnable(){
 				            @Override
 				            public void run() {
 				                try {
@@ -124,62 +124,27 @@ public class ConnectionsActivity extends Activity {
 				        thread.start();
 				        m_ProgressDialog = ProgressDialog.show(ConnectionsActivity.this,    
 				              "Czekaj...", "Pobieranie rozkładu...", true);
+					}
 				}
 				
 			}
 		});
 	}
 	
-	private Runnable loadData = new Runnable() {
-
-        @Override
-        public void run() {
-        	items.clear();
-        	Station dep = pln.departureStation();
-        	Station arr = pln.arrivalStation();
-        	
-        	if(arr != null && dep != null)
-        		setTitle(dep.name+" - "+arr.name);
-        	
-        	
-        	ConnectionItem c = new ConnectionItem();
-        	String lastDate = "";
-        	TripIterator it = pln.tripIterator();
-        	
-        	if(!it.hasNext())
-        	{
-        		Log.i("RozkladPKP","Kurde..."+Integer.toString(pln.conCnt));
-        		noConnectionsAlert();
-        	}
-        	else
-        	{
-        		items.add(c.new ScrollItem(true));
-	        	int i = 0;
-	        	while(it.hasNext())
-	        	{
-	        		Trip t = it.next();
-	        		if(!t.date.equals(lastDate))
-	        		{
-	        			ConnectionItem.DateItem d = c.new DateItem();
-	        			d.date = t.date;
-	        			items.add(d);
-	        			lastDate = t.date;
-	        		}
-	        		
-	        		TripItem ti = c.new TripItem();
-	        		ti.t = t;
-	        		items.add(ti);
-	        		i++;
-	        	}
-	        	items.add(c.new ScrollItem(false));	
-        	}
-        	
-        	adapter.notifyDataSetChanged();
-        	
-        	if(m_ProgressDialog != null)
-        		m_ProgressDialog.dismiss();	
-        }
-      };
+	public void updateDisplayedPLN()
+	{
+		Runnable uit = new Runnable() {
+			@Override
+			public void run() {
+				adapter.setPLN(pln, !hasFullTable);
+				if(m_ProgressDialog != null)
+	        		m_ProgressDialog.dismiss();	
+			}
+		};
+		runOnUiThread(uit);
+		
+		
+	}
       
 	protected void noConnectionsAlert() {
 		//Pokazuje okno dialogowe informujące o braku połączeń i umożliwia powrót do wcześniejszej aktywności.
@@ -273,27 +238,41 @@ public class ConnectionsActivity extends Activity {
 		HttpGet request = new HttpGet(timetableUrl);
 		client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestExpectContinue.class);
         client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestUserAgent.class);
-        HttpResponse response = client.execute(request);
-         
-        // Pull content stream from response
-        HttpEntity entity = response.getEntity();
-        InputStream inputStream = entity.getContent();
-        ByteArrayOutputStream content = new ByteArrayOutputStream();
-        
-        int readBytes = 0;
-        while ((readBytes = inputStream.read(sBuffer)) != -1) {
-            content.write(sBuffer, 0, readBytes);
-        }
-        String[] parts = content.toString().split("\n");
         String url = null;
+        int attempts = 0;
         
-        Log.i("RozkladPKP","GFT:"+content.toString());
+        HttpResponse response;
+        HttpEntity entity;
+        InputStream inputStream;
+        ByteArrayOutputStream content;
+        int readBytes;
         
-        for (String s : parts){
-        	if(s.startsWith("url=")){
-        		url = s.substring(4);
-        		break;
-        	}
+        while(url == null && attempts++ < TIMETABLE_DOWNLOAD_ATTEMPTS)
+        {
+	        response = client.execute(request);
+	         
+	        // Pull content stream from response
+	        entity = response.getEntity();
+	        inputStream = entity.getContent();
+	        content = new ByteArrayOutputStream();
+	        
+	        readBytes = 0;
+	        while ((readBytes = inputStream.read(sBuffer)) != -1) {
+	            content.write(sBuffer, 0, readBytes);
+	        }
+	        String[] parts = content.toString().split("\n");
+	        
+	        
+	        Log.i("RozkladPKP","GFT:"+content.toString());
+	        
+	        for (String s : parts){
+	        	if(s.startsWith("url=")){
+	        		url = s.substring(4);
+	        		break;
+	        	}
+	        }
+	        if(url == null)
+	        	Thread.sleep(TIMETABLE_DOWNLOAD_INTERVAL);
         }
         if(url != null)
         {
@@ -316,49 +295,28 @@ public class ConnectionsActivity extends Activity {
 	        Log.i("RozkladPKP", "jest pełny PLN" + Integer.toString(content.size()));
 	        pln = new PLN(plndata);
 	        
-	        File f = new File(Environment.getExternalStorageDirectory(),"PLN");
-			FileOutputStream w = null;
-			try {
-				w = new FileOutputStream(f);
-			} catch (FileNotFoundException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			try {
-				w.write(pln.data);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-	        
 	        hasFullTable = true;
-	        
+	        updateDisplayedPLN();
         }
         else
         	Log.i("RozkladPKP","Jeszcze w8");
-         	runOnUiThread(loadData);
-	        
+         	//runOnUiThread(loadData);
+        	
         
 	}
 	
 	
 	public void getMore(boolean earlier) throws Exception
 	{
-		if(timetableUrl != null && !hasFullTable)
-			getFullTimetable();
-		else if(hasFullTable)
-		{
-			
-		}
-		else
-		{
-			String dir = earlier ? "2" : "1";
-			seqnr++;
-			String data = "seqnr="+Integer.toString(seqnr)+"&h2g-direct=1&ident="+pln.id()+"&REQ0HafasScrollDir="+dir+"&hcount=1&ignoreMinuteRound=yes&androidversion=1.1.4";
-	    	String url  = "http://rozklad.sitkol.pl/bin/query.exe/pn" ;
+		String dir = earlier ? "2" : "1";
+		seqnr++;
+		String data = "seqnr="+Integer.toString(seqnr)+"&h2g-direct=1&ident="+pln.id()+"&REQ0HafasScrollDir="+dir+"&hcount=1&ignoreMinuteRound=yes&androidversion=1.1.4";
+	    String url  = "http://rozklad.sitkol.pl/bin/query.exe/pn" ;
 	    	
-			PLNRequest(url,data);
-		}
+		PLNRequest(url,data);
+		
+		if(pln.conCnt == 0 && timetableUrl != null)
+			getFullTimetable();
 	}
 	
 	private void PLNRequest(String url, String data) throws Exception
@@ -389,9 +347,10 @@ public class ConnectionsActivity extends Activity {
         plndata = content.toByteArray();
         Log.i("RozkladPKP", "jestPLN");
         pln = new PLN(plndata);
+       
         
         Log.i("RozkladPKP", "pln parsed");
-		runOnUiThread(loadData);
+		updateDisplayedPLN();
 	}
 	
 	public boolean onCreateOptionsMenu(Menu menu){
@@ -427,6 +386,7 @@ public class ConnectionsActivity extends Activity {
 		
 		state.putByteArray("PLNData", pln.data);
 		state.putInt("SeqNr", seqnr);
+		state.putBoolean("hasFullTable", hasFullTable);
 	}
 	
 	

@@ -5,6 +5,8 @@ import org.tyszecki.rozkladpkp.ConnectionItem.DateItem;
 import org.tyszecki.rozkladpkp.ConnectionItem.ScrollItem;
 import org.tyszecki.rozkladpkp.ConnectionItem.TripItem;
 import org.tyszecki.rozkladpkp.PLN.Connection;
+import org.tyszecki.rozkladpkp.PLN.Trip;
+import org.tyszecki.rozkladpkp.PLN.TripIterator;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -17,8 +19,6 @@ import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import org.tyszecki.rozkladpkp.R;
-
 
 public class ConnectionItemAdapter extends BaseAdapter {
 
@@ -26,19 +26,44 @@ public class ConnectionItemAdapter extends BaseAdapter {
 	final int NORMAL = 1;
 	final int SCROLL = 2;
 	
+	static final int PRELOAD_ITEMS = 30;
+	static final String LOG_TAG = "PAGEADAPTER";
+	Boolean loading;
+	boolean allItemsLoaded;
+	
 	private ArrayList<ConnectionItem> items;
+	private PLN pln;
+	private int first,last;
+	TripIterator it;
+	
 	Context c;
+	private String lastDate;	
+	
 
-	public ConnectionItemAdapter(Context context, ArrayList<ConnectionItem> objects) {
+	public ConnectionItemAdapter(Context context) {
 		c = context;
-		this.items = objects;
+		
+		items = new ArrayList<ConnectionItem>();
 	}
 	
+	public void setPLN(PLN file, boolean loadAll)
+	{
+		pln = file;
+		it = pln.tripIterator();
+	
+		lastDate = "";
+		loadData(loadAll);
+	}
+	
+	
+
 	public View getView(int position, View convertView, ViewGroup parent) {
         View v = convertView;
         ConnectionItem con = items.get(position);
         if (v == null) {
+        	
             LayoutInflater vi = (LayoutInflater)c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            
             if(con instanceof TripItem) 
             	v = vi.inflate(R.layout.connectionrow, null);
             else if(con instanceof DateItem)
@@ -113,22 +138,23 @@ public class ConnectionItemAdapter extends BaseAdapter {
         else
         {
         	TextView head = (TextView) v.findViewById(R.id.scrollitem_text);
-        	if(((ScrollItem)con).up)
-        		head.setText("Wcześniejsze połączenia");
-        	else
-        		head.setText("Późniejsze połączenia");
+	        if(((ScrollItem)con).up)
+	        	head.setText("Wcześniejsze połączenia");
+	        else
+	        	head.setText("Późniejsze połączenia");
         }
         return v;
+        
 	}
 
 	@Override
 	public int getCount() {
-		return items.size();
+        return items.size();
 	}
 
 	@Override
-	public Object getItem(int arg0) {
-		return null;
+	public ConnectionItem getItem(int arg0) {
+		return items.get(arg0);
 	}
 
 	@Override
@@ -169,4 +195,62 @@ public class ConnectionItemAdapter extends BaseAdapter {
     public boolean isEnabled(int position) {  
         return (getItemViewType(position) != HEADER);  
     }  
+	
+	private void loadData(boolean loadAll) {
+		items.clear();
+		ConnectionItem c = new ConnectionItem();
+		
+		//FIXME: Zrobic to poprawniej, teraz jest to "skrot myslowy"
+		if(loadAll)
+			items.add(c.new ScrollItem(true));
+		while(it.hasNext()){
+			
+        	Trip t = it.next();
+        	if(!t.date.equals(lastDate))
+        	{
+        		ConnectionItem.DateItem d = c.new DateItem();
+        		d.date = t.date;
+        		items.add(d);
+        		lastDate = t.date;
+        	}
+        		
+        	TripItem ti = c.new TripItem();
+        	ti.t = t;
+        	items.add(ti);
+        	
+        	if(!loadAll)
+        		if(items.size() > PRELOAD_ITEMS)
+        			break;
+    	}	
+		items.add(c.new ScrollItem(false));
+		notifyDataSetChanged();
+	}
+	
+	void loadMore()
+	{
+		ConnectionItem c = new ConnectionItem();
+		int i = 0;
+		int s = items.size()-2;
+		
+		while(it.hasNext() && i++ < PRELOAD_ITEMS){
+			
+        	Trip t = it.next();
+        	if(!t.date.equals(lastDate))
+        	{
+        		ConnectionItem.DateItem d = c.new DateItem();
+        		d.date = t.date;
+        		items.add(s+i,d);
+        		s++;
+        		lastDate = t.date;
+        	}
+        		
+        	TripItem ti = c.new TripItem();
+        	ti.t = t;
+        	items.add(s+i,ti);
+    	}	
+		if(!it.hasNext())
+			items.remove(items.size()-1);
+		notifyDataSetChanged();
+	}
+	
 }
