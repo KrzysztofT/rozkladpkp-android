@@ -35,13 +35,13 @@ import android.widget.AdapterView.OnItemClickListener;
 
 public class ConnectionsActivity extends Activity {
 	
-	private Runnable viewConn;
 	private ProgressDialog m_ProgressDialog;
+	private Runnable viewConn;
 	private static byte[] sBuffer = new byte[512];
 	private byte[] plndata;
 	private int seqnr = 0;
 	private final int TIMETABLE_DOWNLOAD_ATTEMPTS = 5;
-	private final int TIMETABLE_DOWNLOAD_INTERVAL = 200;
+	private final int TIMETABLE_DOWNLOAD_INTERVAL = 5000;
 	
 	private boolean hasFullTable = false;
 	private String timetableUrl = null;
@@ -49,6 +49,8 @@ public class ConnectionsActivity extends Activity {
 	PLN pln;
 	
 	private ConnectionItemAdapter adapter;
+	
+	
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -69,21 +71,19 @@ public class ConnectionsActivity extends Activity {
         }
         else
         {
-	        viewConn = new Runnable(){
-	            @Override
-	            public void run() {
-	                try {
-						getConnections();
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-	            }
-	        };
-	        
-	        Thread thread =  new Thread(null, viewConn, "MagentoBackground");
-	        thread.start();
-	        m_ProgressDialog = ProgressDialog.show(ConnectionsActivity.this,    
-	              "Czekaj...", "Pobieranie rozkładu...", true);
+        	viewConn = new Runnable(){
+					            @Override
+					            public void run() {
+					                try {
+										getConnections();
+									} catch (Exception e) {
+										e.printStackTrace();
+									}
+					            }
+	        				};
+	        new Thread(null, viewConn
+	        					, "MagentoBackground").start();
+	        showLoader();
         }
         
         lv.setOnItemClickListener(new OnItemClickListener() {
@@ -108,22 +108,19 @@ public class ConnectionsActivity extends Activity {
 						adapter.loadMore();
 					else
 					{
-					//Pobierz wcześniejsze/pózniejsze
-					viewConn = new Runnable(){
-				            @Override
-				            public void run() {
-				                try {
-									getMore(((ScrollItem)b).up);
-								} catch (Exception e) {
-									e.printStackTrace();
-								}
-				            }
-				        };
-				        
-				        Thread thread =  new Thread(null, viewConn, "MagentoBackground");
-				        thread.start();
-				        m_ProgressDialog = ProgressDialog.show(ConnectionsActivity.this,    
-				              "Czekaj...", "Pobieranie rozkładu...", true);
+						viewConn = new Runnable(){
+								            @Override
+								            public void run() {
+								                try {
+													getMore(((ScrollItem)b).up);
+												} catch (Exception e) {
+													e.printStackTrace();
+												}
+								            }
+				        				};
+						//Pobierz wcześniejsze/pózniejsze
+						new Thread(null, viewConn, "MagentoBackground").start();
+				        showLoader();
 					}
 				}
 				
@@ -131,19 +128,36 @@ public class ConnectionsActivity extends Activity {
 		});
 	}
 	
+	public void showLoader()
+	{
+		Runnable uit = new Runnable(){
+			@Override
+			public void run() {
+				m_ProgressDialog = ProgressDialog.show(ConnectionsActivity.this,    
+	              "Czekaj...", "Pobieranie rozkładu...", true);
+			}
+		};
+		runOnUiThread(uit);
+	}
+	
+	public void hideLoader()
+	{
+		if(m_ProgressDialog != null)
+		{				
+    		m_ProgressDialog.dismiss();
+    		m_ProgressDialog = null;
+		}
+	}
 	public void updateDisplayedPLN()
 	{
 		Runnable uit = new Runnable() {
 			@Override
 			public void run() {
 				adapter.setPLN(pln, !hasFullTable);
-				if(m_ProgressDialog != null)
-	        		m_ProgressDialog.dismiss();	
+				hideLoader();
 			}
 		};
 		runOnUiThread(uit);
-		
-		
 	}
       
 	protected void noConnectionsAlert() {
@@ -192,13 +206,10 @@ public class ConnectionsActivity extends Activity {
 	protected void getFullTimetableUrl() throws Exception {
 		String SID = getIntent().getExtras().getString("SID");
 		String ZID = getIntent().getExtras().getString("ZID");
-		
-		/*String time = getIntent().getExtras().getString("Time");
-		String date = getIntent().getExtras().getString("Date");
 		String prod = getIntent().getExtras().getString("Products");
 		String attr = getIntent().getExtras().getString("Attributes");
-		*/
-		String data = "pp=20&spmo=1&output=pln&androidversion=1.1.4&htype=google_sdk&hcount=0&L=vs_javapln&ZID="+ZID+"&SID="+SID+"&start=1";
+		
+		String data = "pp=20&spmo=1&output=pln&androidversion=1.1.4&htype=google_sdk&"+attr+"&hcount=0&L=vs_javapln&ZID="+ZID+"&SID="+SID+"&REQ0JourneyProduct_prod_list_1="+prod+"&start=1";
 		
 		
 		DefaultHttpClient client = new DefaultHttpClient();
@@ -229,7 +240,7 @@ public class ConnectionsActivity extends Activity {
         	}
         }
         
-        Log.i("RozkladPKP",timetableUrl != null ? timetableUrl : "NULL");
+        Log.i("RozkladPKP","TT URL" + (timetableUrl != null ? timetableUrl : "NULL"));
 	}
 	
 	protected void getFullTimetable() throws Exception {
@@ -247,6 +258,7 @@ public class ConnectionsActivity extends Activity {
         ByteArrayOutputStream content;
         int readBytes;
         
+        showLoader();
         while(url == null && attempts++ < TIMETABLE_DOWNLOAD_ATTEMPTS)
         {
 	        response = client.execute(request);
@@ -300,7 +312,8 @@ public class ConnectionsActivity extends Activity {
         }
         else
         	Log.i("RozkladPKP","Jeszcze w8");
-         	//runOnUiThread(loadData);
+         
+        hideLoader();
         	
         
 	}
@@ -316,7 +329,10 @@ public class ConnectionsActivity extends Activity {
 		PLNRequest(url,data);
 		
 		if(pln.conCnt == 0 && timetableUrl != null)
+		{
+			Log.i("RozkladPKP","Pobieram pelny");
 			getFullTimetable();
+		}
 	}
 	
 	private void PLNRequest(String url, String data) throws Exception
