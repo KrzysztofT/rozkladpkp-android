@@ -1,7 +1,6 @@
 package org.tyszecki.rozkladpkp;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import android.app.AlertDialog;
 import android.app.Dialog;

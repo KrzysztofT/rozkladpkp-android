@@ -6,7 +6,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.http.HttpEntity;
@@ -67,7 +66,8 @@ public class ConnectionsActivity extends Activity {
         	pln = new PLN(savedInstanceState.getByteArray("PLNData"));
         	seqnr = savedInstanceState.getInt("SeqNr");
         	hasFullTable = savedInstanceState.getBoolean("hasFullTable");
-        	//runOnUiThread(loadData);
+        	timetableUrl = savedInstanceState.getString("timetableURL");
+        	updateDisplayedPLN();
         }
         else
         {
@@ -127,7 +127,7 @@ public class ConnectionsActivity extends Activity {
 			}
 		});
 	}
-	
+
 	public void showLoader()
 	{
 		Runnable uit = new Runnable(){
@@ -403,6 +403,7 @@ public class ConnectionsActivity extends Activity {
 		state.putByteArray("PLNData", pln.data);
 		state.putInt("SeqNr", seqnr);
 		state.putBoolean("hasFullTable", hasFullTable);
+		state.putString("timetableURL", timetableUrl);
 	}
 	
 	
