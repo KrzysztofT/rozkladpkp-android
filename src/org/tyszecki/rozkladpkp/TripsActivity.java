@@ -1,6 +1,7 @@
 package org.tyszecki.rozkladpkp;
 
 import java.io.IOException;
+import java.io.Serializable;
 
 import org.tyszecki.rozkladpkp.R;
 
@@ -79,7 +80,7 @@ public class TripsActivity extends Activity {
 		});
         
         attrb = (AttributesButton) findViewById(R.id.tripsAttrBut);
-        attrb.setRequestString("");
+        attrb.deselectAll();
         attrb.setOnClickListener(new OnClickListener() {
 			
 			@Override
@@ -141,7 +142,7 @@ public class TripsActivity extends Activity {
 				ni.putExtra("Time", timeb.getTime());
 				ni.putExtra("Date", dateb.getDate());
 				ni.putExtra("Products", prodb.getProductString());
-				ni.putExtra("Attributes", attrb.getRequestString());
+				ni.putExtra("Attributes", attrb.getParameters());
 				startActivity(ni);
 			}
 		});

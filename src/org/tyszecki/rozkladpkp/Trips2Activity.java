@@ -1,5 +1,8 @@
 package org.tyszecki.rozkladpkp;
 
+import java.util.ArrayList;
+
+import org.apache.http.message.BasicNameValuePair;
 import org.tyszecki.rozkladpkp.StationSpinner.onDataLoaded;
 
 import android.app.Activity;
@@ -67,7 +70,7 @@ public class Trips2Activity extends Activity {
 		});
         
         attrb = (AttributesButton) findViewById(R.id.trips2AttrBut);
-        attrb.setRequestString(getIntent().getExtras().getString("Attributes"));
+        attrb.setParameters((ArrayList<SerializableNameValuePair>) getIntent().getExtras().getSerializable("Attributes"));
         attrb.setOnClickListener(new OnClickListener() {
 			
 			@Override
@@ -118,7 +121,7 @@ public class Trips2Activity extends Activity {
 				ni.putExtra("Products", prodb.getProductString());
 				ni.putExtra("ZID", arrEdit.getCurrentSID());
 				ni.putExtra("SID", depEdit.getCurrentSID());
-				ni.putExtra("Attributes", attrb.getRequestString());
+				ni.putExtra("Attributes", attrb.getParameters());
 				
 				startActivity(ni);
 			}

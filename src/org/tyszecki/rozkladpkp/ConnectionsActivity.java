@@ -6,14 +6,21 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.tyszecki.rozkladpkp.ConnectionItem.ScrollItem;
 import org.tyszecki.rozkladpkp.ConnectionItem.TripItem;
 
@@ -25,6 +32,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -44,6 +52,7 @@ public class ConnectionsActivity extends Activity {
 	
 	private boolean hasFullTable = false;
 	private String timetableUrl = null;
+	private ArrayList<SerializableNameValuePair> commonFieldsList;
 	
 	PLN pln;
 	
@@ -62,11 +71,21 @@ public class ConnectionsActivity extends Activity {
         
         setTitle("Połączenia");
         
+        
+        //Pola wykorzystywane przy wszystkich żądaniach
+        Bundle extras = getIntent().getExtras();
+        commonFieldsList = (ArrayList<SerializableNameValuePair>) extras.getSerializable("Attributes");
+        commonFieldsList.add(new SerializableNameValuePair("SID", extras.getString("SID")));
+        commonFieldsList.add(new SerializableNameValuePair("ZID", extras.getString("ZID")));
+        commonFieldsList.add(new SerializableNameValuePair("REQ0JourneyProduct_prod_list_1",extras.getString("Products")));
+        commonFieldsList.add(new SerializableNameValuePair("start", "1"));
+        
         if(savedInstanceState != null && savedInstanceState.containsKey("PLNData")){
         	pln = new PLN(savedInstanceState.getByteArray("PLNData"));
         	seqnr = savedInstanceState.getInt("SeqNr");
         	hasFullTable = savedInstanceState.getBoolean("hasFullTable");
         	timetableUrl = savedInstanceState.getString("timetableURL");
+        	
         	updateDisplayedPLN();
         }
         else
@@ -182,34 +201,31 @@ public class ConnectionsActivity extends Activity {
 		if(timetableUrl == null)
 			getFullTimetableUrl();
 		
-		String SID = getIntent().getExtras().getString("SID");
-		String ZID = getIntent().getExtras().getString("ZID");
 		
-		SID = SID.replaceAll("=", "%3D");
-		SID = SID.replaceAll(" ", "%20");
-		ZID = ZID.replaceAll("=", "%3D");
-		ZID = ZID.replaceAll(" ", "%20");
+		ArrayList<SerializableNameValuePair> data = new ArrayList<SerializableNameValuePair>();
+		data.addAll(commonFieldsList);
 		
-		String time = getIntent().getExtras().getString("Time");
-		String date = getIntent().getExtras().getString("Date");
-		String prod = getIntent().getExtras().getString("Products");
-		String attr = getIntent().getExtras().getString("Attributes");
+		data.add(new SerializableNameValuePair("ignoreMinuteRound", "yes"));
+		data.add(new SerializableNameValuePair("date", getIntent().getExtras().getString("Date")));
+		data.add(new SerializableNameValuePair("time", getIntent().getExtras().getString("Time")));
+		data.add(new SerializableNameValuePair("h2g-direct", "1"));
 		
-		
-		String data = "ignoreMinuteRound=yes&"+attr+"&REQ0JourneyProduct_prod_list_1="+prod+"&date="+date+"&ZID="+ZID+"&h2g-direct=1&time="+time+"&SID="+SID+"@&start=1";
     	String url  = "http://rozklad.sitkol.pl/bin/query.exe/pn" ;
-    	
-    	
 		PLNRequest(url, data);
 	}
 	
 	protected void getFullTimetableUrl() throws Exception {
-		String SID = getIntent().getExtras().getString("SID");
-		String ZID = getIntent().getExtras().getString("ZID");
-		String prod = getIntent().getExtras().getString("Products");
-		String attr = getIntent().getExtras().getString("Attributes");
 		
-		String data = "pp=20&spmo=1&output=pln&androidversion=1.1.4&htype=google_sdk&"+attr+"&hcount=0&L=vs_javapln&ZID="+ZID+"&SID="+SID+"&REQ0JourneyProduct_prod_list_1="+prod+"&start=1";
+		ArrayList<SerializableNameValuePair> data = new ArrayList<SerializableNameValuePair>();
+		data.addAll(commonFieldsList);
+		
+		data.add(new SerializableNameValuePair("pp", "20"));
+		data.add(new SerializableNameValuePair("spmo", "1"));
+		data.add(new SerializableNameValuePair("output", "pln"));
+		data.add(new SerializableNameValuePair("androidversion", "1.1.4"));
+		data.add(new SerializableNameValuePair("htype", "google_sdk"));
+		data.add(new SerializableNameValuePair("hcount", "0"));
+		data.add(new SerializableNameValuePair("L","vs_javapln"));
 		
 		
 		DefaultHttpClient client = new DefaultHttpClient();
@@ -218,7 +234,7 @@ public class ConnectionsActivity extends Activity {
 		client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestExpectContinue.class);
         client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestUserAgent.class);
         request.addHeader("Content-Type", "text/plain");
-        request.setEntity(new StringEntity(data));
+        request.setEntity(new UrlEncodedFormEntity(data));
         
         HttpResponse response = client.execute(request);
          
@@ -242,7 +258,7 @@ public class ConnectionsActivity extends Activity {
         
         Log.i("RozkladPKP","TT URL" + (timetableUrl != null ? timetableUrl : "NULL"));
 	}
-	
+
 	protected void getFullTimetable() throws Exception {
 		DefaultHttpClient client = new DefaultHttpClient();
 		
@@ -321,9 +337,21 @@ public class ConnectionsActivity extends Activity {
 	
 	public void getMore(boolean earlier) throws Exception
 	{
-		String dir = earlier ? "2" : "1";
+		//String dir = earlier ? "2" : "1";
 		seqnr++;
-		String data = "seqnr="+Integer.toString(seqnr)+"&h2g-direct=1&ident="+pln.id()+"&REQ0HafasScrollDir="+dir+"&hcount=1&ignoreMinuteRound=yes&androidversion=1.1.4";
+		
+		ArrayList<SerializableNameValuePair> data = new ArrayList<SerializableNameValuePair>();
+		data.addAll(commonFieldsList);
+		
+		data.add(new SerializableNameValuePair("seqnr", Integer.toString(seqnr)));
+		data.add(new SerializableNameValuePair("ident", pln.id()));
+		data.add(new SerializableNameValuePair("hcount", "1"));
+		data.add(new SerializableNameValuePair("REQ0HafasScrollDir", earlier ? "2" : "1"));
+		data.add(new SerializableNameValuePair("ignoreMinuteRound", "yes"));
+		data.add(new SerializableNameValuePair("androidversion", "1.1.4"));
+		data.add(new SerializableNameValuePair("h2g-direct", "1"));
+		
+		//String data = "seqnr="+Integer.toString(seqnr)+"&h2g-direct=1&ident="+pln.id()+"&REQ0HafasScrollDir="+dir+"&hcount=1&ignoreMinuteRound=yes&androidversion=1.1.4";
 	    String url  = "http://rozklad.sitkol.pl/bin/query.exe/pn" ;
 	    	
 		PLNRequest(url,data);
@@ -335,7 +363,7 @@ public class ConnectionsActivity extends Activity {
 		}
 	}
 	
-	private void PLNRequest(String url, String data) throws Exception
+	private void PLNRequest(String url, ArrayList<SerializableNameValuePair> data) throws Exception
 	{
 		DefaultHttpClient client = new DefaultHttpClient();
 		
@@ -343,7 +371,7 @@ public class ConnectionsActivity extends Activity {
 		client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestExpectContinue.class);
         client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestUserAgent.class);
         request.addHeader("Content-Type", "text/plain");
-        request.setEntity(new StringEntity(data));
+        request.setEntity(new UrlEncodedFormEntity(data));
         
         HttpResponse response = client.execute(request);
          
