@@ -1,25 +1,6 @@
 package org.tyszecki.rozkladpkp;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
-import org.tyszecki.rozkladpkp.R;
-
 import android.content.Context;
-import android.os.Handler;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.ArrayAdapter;
@@ -39,8 +20,6 @@ public class StationEdit extends  AutoCompleteTextView {
         
         stationsArr = getResources().getString(R.string.stations).split(",");
         setAdapter(new ArrayAdapter<String>(getContext(), R.layout.stationedititem, stationsArr));  
-        
-	
 	};
 	
 	public String getCurrentSID()

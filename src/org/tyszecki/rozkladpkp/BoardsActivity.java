@@ -91,6 +91,8 @@ public class BoardsActivity extends Activity {
 					Toast.makeText(getApplicationContext(), "Wprowadź nazwę stacji", Toast.LENGTH_SHORT).show();
 					return;
 				}
+				if(!CommonUtils.onlineCheck(getBaseContext()))
+					return;
 				String sid = autoComplete.getCurrentSID();
 				
 				Intent ni;

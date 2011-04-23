@@ -6,21 +6,15 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 import org.tyszecki.rozkladpkp.ConnectionItem.ScrollItem;
 import org.tyszecki.rozkladpkp.ConnectionItem.TripItem;
 
@@ -32,7 +26,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
-import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -58,22 +51,20 @@ public class ConnectionsActivity extends Activity {
 	
 	private ConnectionItemAdapter adapter;
 	
-	
-
+	@SuppressWarnings("unchecked")
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
         setContentView(R.layout.connections);
         
         adapter = new ConnectionItemAdapter(this);
-            
         ListView lv = (ListView)findViewById(R.id.connview);
         lv.setAdapter(this.adapter);
         
-        setTitle("Połączenia");
-        
+        Bundle extras = getIntent().getExtras();
+        setTitle("Połączenia "+extras.getString("depName")+" - "+extras.getString("arrName"));
         
         //Pola wykorzystywane przy wszystkich żądaniach
-        Bundle extras = getIntent().getExtras();
+        
         commonFieldsList = (ArrayList<SerializableNameValuePair>) extras.getSerializable("Attributes");
         commonFieldsList.add(new SerializableNameValuePair("SID", extras.getString("SID")));
         commonFieldsList.add(new SerializableNameValuePair("ZID", extras.getString("ZID")));
@@ -100,8 +91,7 @@ public class ConnectionsActivity extends Activity {
 									}
 					            }
 	        				};
-	        new Thread(null, viewConn
-	        					, "MagentoBackground").start();
+	        new Thread(null, viewConn, "MagentoBackground").start();
 	        showLoader();
         }
         
@@ -172,8 +162,16 @@ public class ConnectionsActivity extends Activity {
 		Runnable uit = new Runnable() {
 			@Override
 			public void run() {
-				adapter.setPLN(pln, !hasFullTable);
-				hideLoader();
+				if(seqnr == 0 && pln.conCnt == 0)
+				{
+					hideLoader();
+					noConnectionsAlert();
+				}
+				else
+				{
+					adapter.setPLN(pln, !hasFullTable);
+					hideLoader();
+				}
 			}
 		};
 		runOnUiThread(uit);
@@ -198,9 +196,11 @@ public class ConnectionsActivity extends Activity {
 	
 	protected void getConnections() throws Exception {
 		
+		if(!CommonUtils.onlineCheck(getBaseContext()))
+			return;
+		
 		if(timetableUrl == null)
 			getFullTimetableUrl();
-		
 		
 		ArrayList<SerializableNameValuePair> data = new ArrayList<SerializableNameValuePair>();
 		data.addAll(commonFieldsList);
@@ -211,6 +211,7 @@ public class ConnectionsActivity extends Activity {
 		data.add(new SerializableNameValuePair("h2g-direct", "1"));
 		
     	String url  = "http://rozklad.sitkol.pl/bin/query.exe/pn" ;
+    	
 		PLNRequest(url, data);
 	}
 	
@@ -337,7 +338,6 @@ public class ConnectionsActivity extends Activity {
 	
 	public void getMore(boolean earlier) throws Exception
 	{
-		//String dir = earlier ? "2" : "1";
 		seqnr++;
 		
 		ArrayList<SerializableNameValuePair> data = new ArrayList<SerializableNameValuePair>();
@@ -350,11 +350,8 @@ public class ConnectionsActivity extends Activity {
 		data.add(new SerializableNameValuePair("ignoreMinuteRound", "yes"));
 		data.add(new SerializableNameValuePair("androidversion", "1.1.4"));
 		data.add(new SerializableNameValuePair("h2g-direct", "1"));
-		
-		//String data = "seqnr="+Integer.toString(seqnr)+"&h2g-direct=1&ident="+pln.id()+"&REQ0HafasScrollDir="+dir+"&hcount=1&ignoreMinuteRound=yes&androidversion=1.1.4";
-	    String url  = "http://rozklad.sitkol.pl/bin/query.exe/pn" ;
 	    	
-		PLNRequest(url,data);
+		PLNRequest("http://rozklad.sitkol.pl/bin/query.exe/pn",data);
 		
 		if(pln.conCnt == 0 && timetableUrl != null)
 		{

@@ -1,10 +1,6 @@
 package org.tyszecki.rozkladpkp;
 
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.tyszecki.rozkladpkp.R;
 
 import android.content.Context;
 import android.text.Html;

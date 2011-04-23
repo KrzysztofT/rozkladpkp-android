@@ -1,8 +1,6 @@
 package org.tyszecki.rozkladpkp;
 
 import java.io.IOException;
-import java.io.Serializable;
-
 import org.tyszecki.rozkladpkp.R;
 
 import android.app.Activity;
@@ -114,6 +112,8 @@ public class TripsActivity extends Activity {
 					Toast.makeText(getApplicationContext(), "Wprowadź nazwę stacji docelowej", Toast.LENGTH_SHORT).show();
 					return;
 				}
+				if(!CommonUtils.onlineCheck(getBaseContext()))
+					return;
 				
 				String sidd = depEdit.getCurrentSID();
 				String sida = arrEdit.getCurrentSID();
@@ -138,6 +138,8 @@ public class TripsActivity extends Activity {
 					ni = new Intent(arg0.getContext(),ConnectionsActivity.class);
 					ni.putExtra("ZID", arrEdit.getCurrentSID());
 					ni.putExtra("SID", depEdit.getCurrentSID());
+					ni.putExtra("depName", depEdit.getText().toString());
+					ni.putExtra("arrName", arrEdit.getText().toString());
 				}
 				ni.putExtra("Time", timeb.getTime());
 				ni.putExtra("Date", dateb.getDate());

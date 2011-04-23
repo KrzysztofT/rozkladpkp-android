@@ -2,7 +2,6 @@ package org.tyszecki.rozkladpkp;
 
 import java.util.ArrayList;
 
-import org.apache.http.message.BasicNameValuePair;
 import org.tyszecki.rozkladpkp.StationSpinner.onDataLoaded;
 
 import android.app.Activity;
@@ -13,8 +12,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-
-import org.tyszecki.rozkladpkp.R;
 
 public class Trips2Activity extends Activity {
 	private TimeButton timeb;
@@ -36,6 +33,7 @@ public class Trips2Activity extends Activity {
 
 	
 
+	@SuppressWarnings("unchecked")
 	private void initializeGui() {
 		
 		loading = 2;
@@ -122,6 +120,9 @@ public class Trips2Activity extends Activity {
 				ni.putExtra("ZID", arrEdit.getCurrentSID());
 				ni.putExtra("SID", depEdit.getCurrentSID());
 				ni.putExtra("Attributes", attrb.getParameters());
+				
+				ni.putExtra("depName", depEdit.getText());
+				ni.putExtra("arrName", arrEdit.getText());
 				
 				startActivity(ni);
 			}
