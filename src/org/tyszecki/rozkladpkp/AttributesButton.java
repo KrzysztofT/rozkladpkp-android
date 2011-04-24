@@ -1,6 +1,8 @@
 package org.tyszecki.rozkladpkp;
 
+import java.util.AbstractCollection;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -12,18 +14,19 @@ import android.widget.Button;
 
 public class AttributesButton extends Button {
 
+	public static String join(AbstractCollection<String> s, String delimiter) {
+	    if (s.isEmpty()) return "";
+	    Iterator<String> iter = s.iterator();
+	    StringBuffer buffer = new StringBuffer(iter.next());
+	    while (iter.hasNext()) buffer.append(delimiter).append(iter.next());
+	    return buffer.toString();
+	}
+	
 	private class Attribute{
 		public Attribute(String name, String code)
 		{
 			this.name = name;
 			this.code = code;
-		}
-		public String getString(boolean enabled)
-		{
-			if(enabled)
-				return "REQ0HafasAttrInc="+code;
-			else
-				return "REQ0HafasAttrExc="+code;
 		}
 		String name;
 		String code = null;
@@ -127,11 +130,14 @@ public class AttributesButton extends Button {
 	}
 
 	private void updateText() {
-		String t = "";
-		for(int i = 0; i < ATTR_CNT; ++i)
-			t+=p[i]?"1":"0";
-		setText(t);
+		ArrayList<String> l = new ArrayList<String>();
 		
-		setCompoundDrawablesWithIntrinsicBounds(getContext().getResources().getDrawable(R.drawable.rower), null, null, null);
+		for(int i = 0; i < ATTR_CNT; ++i)
+			if(p[i])
+				l.add(items.get(i).name);
+		
+		setText(l.size() == 0?"Wszystkie połączenia":join(l,","));
+		
+		//setCompoundDrawablesWithIntrinsicBounds(getContext().getResources().getDrawable(R.drawable.bezp), null, null, null);
 	}
 }
