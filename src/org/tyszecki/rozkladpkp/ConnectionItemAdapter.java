@@ -33,7 +33,6 @@ public class ConnectionItemAdapter extends BaseAdapter {
 	
 	private ArrayList<ConnectionItem> items;
 	private PLN pln;
-	private int first,last;
 	TripIterator it;
 	
 	Context c;
@@ -94,38 +93,16 @@ public class ConnectionItemAdapter extends BaseAdapter {
                 lay.removeAllViews();
                 for(int i = 0; i < tl; i++)
                 {
-                	String s = o.trains[i].getType();
+                	String s = CommonUtils.trainType(o.trains[i].number);
                 	
                 	TextView t = new TextView(c);
-                	t.setText(s);
+                	t.setText(s.length() > 0 ? s : "OS");
                 	t.setTextColor(Color.BLACK);
                 	t.setPadding(0, 0, 6, 0);
                 	t.setGravity(Gravity.CENTER_VERTICAL);
                 	t.setSingleLine();
-                	
-                	
-                    int iid = R.drawable.back_reg;
                     
-                    if(s.equals("TLK"))iid = R.drawable.back_tlk;
-                    else if(s.equals("D"))iid = R.drawable.back_tlk;
-                    
-                    else if(s.equals("EC"))iid = R.drawable.back_ec;
-                    else if(s.equals("EIC"))iid = R.drawable.back_eic;
-                    else if(s.equals("EN"))iid = R.drawable.back_eic;
-                    
-                    else if(s.equals("KD"))iid = R.drawable.back_reg;
-                    
-                    else if(s.equals("IR"))iid = R.drawable.back_ir;
-                    else if(s.equals("RE"))iid = R.drawable.back_re;
-                    
-                    else if(s.equals("SKM"))iid = R.drawable.back_skm;
-                    else if(s.equals("SKW"))iid = R.drawable.back_skm;
-                    else if(s.equals("WKD"))iid = R.drawable.back_skm;
-
-                    else iid = R.drawable.back_reg;
-                    
-                    t.setBackgroundResource(iid);
-                    	
+                    t.setBackgroundResource(CommonUtils.drawableForTrainType(s));
                 	lay.addView(t);
                 }
                 

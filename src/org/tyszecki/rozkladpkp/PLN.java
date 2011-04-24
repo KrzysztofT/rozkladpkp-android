@@ -7,8 +7,6 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import android.util.Log;
 
@@ -33,8 +31,6 @@ public class PLN {
 	private int totalConCnt = -1;
 	private int actualDaysCount = -1;
 	private HashMap<Integer,Availability> availabilities;
-	
-	Pattern p = Pattern.compile("(TLK|D|EN|EC|KD|IR|RE|EIC).*");
 	
 	public int conCnt;
 
@@ -155,15 +151,6 @@ public class PLN {
 		public String toString()
 		{
 			return depstation+" ("+deptime+") "+arrstation+" ("+arrtime+"); "+combine(attributes,",");
-		}
-		
-		public String getType()
-		{
-            Matcher m = p.matcher(number);
-            
-            if(m.matches())
-            	return m.group(1);
-            return "OS";
 		}
 	}
 	
