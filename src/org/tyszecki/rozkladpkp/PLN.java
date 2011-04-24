@@ -78,6 +78,17 @@ public class PLN {
 		public String toLongString() {
 			return ((days>0)?(Integer.toString(days)+" dni "):"")+toString();
 		}
+		
+		public Time difference(Time b)
+		{
+			int va = val+days*2400;
+			int diff = va-(b.val+b.days*2400);
+			
+			if(diff%100 >= 60)
+				diff -= 40;
+			
+			return new Time(diff);		
+		}
 	}
 	
 	class Availability{
