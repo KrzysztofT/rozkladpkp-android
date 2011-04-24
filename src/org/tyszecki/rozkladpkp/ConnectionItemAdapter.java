@@ -93,6 +93,11 @@ public class ConnectionItemAdapter extends BaseAdapter {
                 lay.removeAllViews();
                 for(int i = 0; i < tl; i++)
                 {
+                	//Nie mam pojęcia, dlaczego zawsze zamiast "pieszo", jest niemieckie Fußweg.
+                	//Oryginalny klient też dokonuje takiego sprawdzania
+                	if(o.trains[i].number.equals("Fußweg"))
+                		continue;
+                	
                 	String s = CommonUtils.trainType(o.trains[i].number);
                 	
                 	TextView t = new TextView(c);

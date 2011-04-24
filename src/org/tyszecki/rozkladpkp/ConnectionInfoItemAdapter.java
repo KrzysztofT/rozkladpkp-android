@@ -48,7 +48,7 @@ public class ConnectionInfoItemAdapter extends BaseAdapter {
         	((TextView) v.findViewById(R.id.conninfo_dep_station)).setText(t.depstation.name);
         	((TextView) v.findViewById(R.id.conninfo_arr_station)).setText(t.arrstation.name);
         	
-        	((TextView) v.findViewById(R.id.conninfo_train)).setText(t.number);
+        	((TextView) v.findViewById(R.id.conninfo_train)).setText(t.number.equals("Fußweg") ? "Pieszo" : t.number);
         	((TextView) v.findViewById(R.id.conninfo_train)).setBackgroundResource(CommonUtils.drawableForTrainType(CommonUtils.trainType(t.number)));
         	((TextView) v.findViewById(R.id.conninfo_time)).setText(t.arrtime.difference(t.deptime).toString());
         }

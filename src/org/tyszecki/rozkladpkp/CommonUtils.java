@@ -1,5 +1,6 @@
 package org.tyszecki.rozkladpkp;
 
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,31 +29,43 @@ public class CommonUtils {
 	/*
 	 * Zwraca ID drawable'a który odpowiada typowi pociągu, którego numer podano w parametrze
 	 */
+	
+	private static final HashMap<String, Integer> typeDrawables = new HashMap<String, Integer>(){
+		
+		private static final long serialVersionUID = 1L;
+		{
+			put("Fußweg", R.drawable.back_foot);
+			put("Pieszo", R.drawable.back_foot);
+			put("IR", R.drawable.back_ir);
+			put("RE", R.drawable.back_re);
+			
+			for(String a : new String[]{"TGV","ES","KDP"}) //;)
+				put(a,R.drawable.back_kdp);
+			
+			for(String a : new String[]{"TLK","D"})
+				put(a,R.drawable.back_tlk);
+			
+			for(String a : new String[]{"EC","EIC", "EN"})
+				put(a,R.drawable.back_ec);
+			
+			for(String a : new String[]{"SKM","SKW", "WKD"})
+				put(a,R.drawable.back_skm);	
+		}
+	};
+	
 	public static int drawableForTrainType(String t)
 	{
-         if(t != null && t.length() > 0)
-         {              	
-         	if(t.equals("TLK") || t.equals("D"))
-         		return R.drawable.back_tlk;
-         	
-         	else if(t.equals("EC") || t.equals("EIC") || t.equals("EN"))
-         		return R.drawable.back_ec;
-         	
-         	else if(t.equals("IR"))
-         		return R.drawable.back_ir;
-         	
-         	else if(t.equals("RE"))
-         		return R.drawable.back_re;
-         	
-         	else if(t.equals("SKM") || t.equals("SKW") || t.equals("WKD"))
-         		return R.drawable.back_skm;		
-         }
-         
-         return R.drawable.back_reg;	
+         if(t != null && t.length() > 0 && typeDrawables.containsKey(t))
+        	 return typeDrawables.get(t);
+         else
+        	 return R.drawable.back_reg;	
 	}
 	
 	public static String trainType(String number)
 	{
+		if(number.equals("Fußweg"))
+			return number;
+		
         Matcher m = Pattern.compile("([a-zA-Z]*)").matcher(number);   
         return m.find() ? m.group(1) : null;
 	}
