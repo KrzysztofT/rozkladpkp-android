@@ -73,6 +73,7 @@ public class ConnectionsActivity extends Activity {
         
         if(savedInstanceState != null && savedInstanceState.containsKey("PLNData")){
         	pln = new PLN(savedInstanceState.getByteArray("PLNData"));
+        	plndata = pln.data;
         	seqnr = savedInstanceState.getInt("SeqNr");
         	hasFullTable = savedInstanceState.getBoolean("hasFullTable");
         	timetableUrl = savedInstanceState.getString("timetableURL");

@@ -40,9 +40,7 @@ public class ConnectionInfoActivity extends Activity {
 	{
 		items.clear();
     	
-    	
     	ConnectionInfoItem c = new ConnectionInfoItem();
-    	String lastDate = "";
     	Connection con = pln.connections[conidx];
     	
     	
