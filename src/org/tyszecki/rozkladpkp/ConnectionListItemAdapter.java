@@ -1,9 +1,9 @@
 package org.tyszecki.rozkladpkp;
 import java.util.ArrayList;
 
-import org.tyszecki.rozkladpkp.ConnectionItem.DateItem;
-import org.tyszecki.rozkladpkp.ConnectionItem.ScrollItem;
-import org.tyszecki.rozkladpkp.ConnectionItem.TripItem;
+import org.tyszecki.rozkladpkp.ConnectionListItem.DateItem;
+import org.tyszecki.rozkladpkp.ConnectionListItem.ScrollItem;
+import org.tyszecki.rozkladpkp.ConnectionListItem.TripItem;
 import org.tyszecki.rozkladpkp.PLN.Connection;
 import org.tyszecki.rozkladpkp.PLN.Trip;
 import org.tyszecki.rozkladpkp.PLN.TripIterator;
@@ -20,7 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 
-public class ConnectionItemAdapter extends BaseAdapter {
+public class ConnectionListItemAdapter extends BaseAdapter {
 
 	final int HEADER = 0;
 	final int NORMAL = 1;
@@ -31,7 +31,7 @@ public class ConnectionItemAdapter extends BaseAdapter {
 	Boolean loading;
 	boolean allItemsLoaded;
 	
-	private ArrayList<ConnectionItem> items;
+	private ArrayList<ConnectionListItem> items;
 	private PLN pln;
 	TripIterator it;
 	
@@ -39,10 +39,10 @@ public class ConnectionItemAdapter extends BaseAdapter {
 	private String lastDate;	
 	
 
-	public ConnectionItemAdapter(Context context) {
+	public ConnectionListItemAdapter(Context context) {
 		c = context;
 		
-		items = new ArrayList<ConnectionItem>();
+		items = new ArrayList<ConnectionListItem>();
 	}
 	
 	public void setPLN(PLN file, boolean loadAll)
@@ -58,15 +58,15 @@ public class ConnectionItemAdapter extends BaseAdapter {
 
 	public View getView(int position, View convertView, ViewGroup parent) {
         View v = convertView;
-        ConnectionItem con = items.get(position);
+        ConnectionListItem con = items.get(position);
         if (v == null) {
         	
             LayoutInflater vi = (LayoutInflater)c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             
             if(con instanceof TripItem) 
-            	v = vi.inflate(R.layout.connectionrow, null);
+            	v = vi.inflate(R.layout.connection_list_row, null);
             else if(con instanceof DateItem)
-            	v = vi.inflate(R.layout.connectionheaderrow, null);
+            	v = vi.inflate(R.layout.common_date_header_row, null);
             else 
             	v = vi.inflate(R.layout.scrollitem, null);
         }
@@ -74,8 +74,8 @@ public class ConnectionItemAdapter extends BaseAdapter {
         if (con instanceof TripItem) {
         		Connection o = ((TripItem)con).t.con;
         		
-                TextView tt = (TextView) v.findViewById(R.id.conn_dep);
-                TextView bt = (TextView) v.findViewById(R.id.conn_arr);
+                TextView tt = (TextView) v.findViewById(R.id.departure_time);
+                TextView bt = (TextView) v.findViewById(R.id.arrival_time);
                 
                 int tl = o.trains.length;
                 
@@ -85,17 +85,15 @@ public class ConnectionItemAdapter extends BaseAdapter {
                 if(bt != null)
                 	bt.setText(Html.fromHtml("<b>"+o.trains[tl-1].arrtime+"</b>"));
                 
-                ((TextView) v.findViewById(R.id.conn_changes)).setText(Integer.toString(o.changes));
-                ((TextView) v.findViewById(R.id.conn_time)).setText(o.journeyTime.toLongString());
+                ((TextView) v.findViewById(R.id.changes)).setText(Integer.toString(o.changes));
+                ((TextView) v.findViewById(R.id.duration)).setText(o.journeyTime.toLongString());
                 
-                LinearLayout lay = (LinearLayout)v.findViewById(R.id.conn_layout);
+                LinearLayout lay = (LinearLayout)v.findViewById(R.id.type_icons);
                 
                 lay.removeAllViews();
                 for(int i = 0; i < tl; i++)
-                {
-                	//Nie mam pojęcia, dlaczego zawsze zamiast "pieszo", jest niemieckie Fußweg.
-                	//Oryginalny klient też dokonuje takiego sprawdzania
-                	if(o.trains[i].number.equals("Fußweg"))
+                { 
+                	if(o.trains[i].number.equals("Fußweg") || o.trains[i].number.equals("Übergang"))
                 		continue;
                 	
                 	String s = CommonUtils.trainType(o.trains[i].number);
@@ -115,7 +113,7 @@ public class ConnectionItemAdapter extends BaseAdapter {
         else if (con instanceof DateItem)
         {
         	TextView head = (TextView) v.findViewById(R.id.conn_header);
-            head.setText(((ConnectionItem.DateItem)con).date);
+            head.setText(((ConnectionListItem.DateItem)con).date);
         }
         else
         {
@@ -135,7 +133,7 @@ public class ConnectionItemAdapter extends BaseAdapter {
 	}
 
 	@Override
-	public ConnectionItem getItem(int arg0) {
+	public ConnectionListItem getItem(int arg0) {
 		return items.get(arg0);
 	}
 
@@ -147,9 +145,9 @@ public class ConnectionItemAdapter extends BaseAdapter {
 	@Override
 	public int getItemViewType(int arg0) {
 		
-		if(items.get(arg0) instanceof ConnectionItem.DateItem)
+		if(items.get(arg0) instanceof ConnectionListItem.DateItem)
 			return HEADER;
-		else if(items.get(arg0) instanceof ConnectionItem.TripItem)
+		else if(items.get(arg0) instanceof ConnectionListItem.TripItem)
 			return NORMAL;
 		else
 			return SCROLL;
@@ -180,7 +178,7 @@ public class ConnectionItemAdapter extends BaseAdapter {
 	
 	private void loadData(boolean loadAll) {
 		items.clear();
-		ConnectionItem c = new ConnectionItem();
+		ConnectionListItem c = new ConnectionListItem();
 		
 		//FIXME: Zrobic to poprawniej, teraz jest to "skrot myslowy"
 		if(loadAll)
@@ -190,7 +188,7 @@ public class ConnectionItemAdapter extends BaseAdapter {
         	Trip t = it.next();
         	if(!t.date.equals(lastDate))
         	{
-        		ConnectionItem.DateItem d = c.new DateItem();
+        		ConnectionListItem.DateItem d = c.new DateItem();
         		d.date = t.date;
         		items.add(d);
         		lastDate = t.date;
@@ -210,7 +208,7 @@ public class ConnectionItemAdapter extends BaseAdapter {
 	
 	void loadMore()
 	{
-		ConnectionItem c = new ConnectionItem();
+		ConnectionListItem c = new ConnectionListItem();
 		int i = 0;
 		int s = items.size()-2;
 		
@@ -219,7 +217,7 @@ public class ConnectionItemAdapter extends BaseAdapter {
         	Trip t = it.next();
         	if(!t.date.equals(lastDate))
         	{
-        		ConnectionItem.DateItem d = c.new DateItem();
+        		ConnectionListItem.DateItem d = c.new DateItem();
         		d.date = t.date;
         		items.add(s+i,d);
         		s++;

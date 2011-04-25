@@ -1,5 +1,14 @@
 package org.tyszecki.rozkladpkp;
 
 public class TimetableItem {
-	String arr,dep,station,stid;
+	
+	public class DateItem extends TimetableItem {
+		String date;
+	}
+	
+	public class TrainItem extends TimetableItem {
+		public String time,number,station,delay,type;
+		public String date,message="";
+	}
+
 }

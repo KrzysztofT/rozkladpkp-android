@@ -19,7 +19,7 @@ public class StationEdit extends  AutoCompleteTextView {
         setDropDownHeight(-2);
         
         stationsArr = getResources().getString(R.string.stations).split(",");
-        setAdapter(new ArrayAdapter<String>(getContext(), R.layout.stationedititem, stationsArr));  
+        setAdapter(new ArrayAdapter<String>(getContext(), R.layout.station_edit_item, stationsArr));  
 	};
 	
 	public String getCurrentSID()

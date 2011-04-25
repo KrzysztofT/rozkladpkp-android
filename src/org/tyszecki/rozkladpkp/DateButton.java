@@ -1,13 +1,11 @@
 package org.tyszecki.rozkladpkp;
 
-import java.util.Date;
 import java.util.GregorianCalendar;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.text.Html;
-import android.text.format.DateFormat;
 import android.text.format.Time;
 import android.util.AttributeSet;
 import android.widget.Button;

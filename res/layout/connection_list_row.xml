@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:stretchColumns="8"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content">
+    <TableRow
+    	android:gravity="center_vertical"
+    	android:paddingTop="6dip"
+    	android:paddingBottom="6dip">
+        <ImageView 
+	        android:id="@+id/departure_icon" 
+	        android:src="@drawable/departure"/>
+        <TextView
+            android:id="@+id/departure_time"
+            android:layout_marginLeft="3dip"
+            android:layout_marginRight="13dip"/>
+        <ImageView 
+	        android:id="@+id/arrival_icon" 
+	        android:src="@drawable/arrival"/>
+        <TextView
+            android:id="@+id/arrival_time"
+            android:layout_marginLeft="3dip"
+            android:layout_marginRight="13dip"/>
+        <ImageView 
+	        android:id="@+id/duration_icon" 
+	        android:src="@drawable/time"/>
+        <TextView
+            android:id="@+id/duration"
+            android:layout_marginLeft="3dip"
+            android:layout_marginRight="13dip"/>
+        <ImageView 
+	        android:id="@+id/changes_icon"   
+	        android:src="@drawable/changes"/>
+        <TextView
+            android:id="@+id/changes"
+            android:layout_marginLeft="3dip"
+            android:layout_marginRight="13dip"/>
+        <LinearLayout
+			android:id="@+id/type_icons"
+			android:gravity="right"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal">
+		</LinearLayout>
+	</TableRow>
+</TableLayout>

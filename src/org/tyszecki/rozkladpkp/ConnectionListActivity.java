@@ -15,8 +15,8 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.tyszecki.rozkladpkp.ConnectionItem.ScrollItem;
-import org.tyszecki.rozkladpkp.ConnectionItem.TripItem;
+import org.tyszecki.rozkladpkp.ConnectionListItem.ScrollItem;
+import org.tyszecki.rozkladpkp.ConnectionListItem.TripItem;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -33,7 +33,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 
-public class ConnectionsActivity extends Activity {
+public class ConnectionListActivity extends Activity {
 	
 	private ProgressDialog m_ProgressDialog;
 	private Runnable viewConn;
@@ -49,15 +49,15 @@ public class ConnectionsActivity extends Activity {
 	
 	PLN pln;
 	
-	private ConnectionItemAdapter adapter;
+	private ConnectionListItemAdapter adapter;
 	
 	@SuppressWarnings("unchecked")
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-        setContentView(R.layout.connections);
+        setContentView(R.layout.connection_list);
         
-        adapter = new ConnectionItemAdapter(this);
-        ListView lv = (ListView)findViewById(R.id.connview);
+        adapter = new ConnectionListItemAdapter(this);
+        ListView lv = (ListView)findViewById(R.id.connection_list);
         lv.setAdapter(this.adapter);
         
         Bundle extras = getIntent().getExtras();
@@ -101,10 +101,10 @@ public class ConnectionsActivity extends Activity {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View v, int pos, long id) {
 				
-				final ConnectionItem b =  adapter.getItem(pos);
+				final ConnectionListItem b =  adapter.getItem(pos);
 				
 				if(b instanceof TripItem){
-					Intent ni = new Intent(arg0.getContext(),ConnectionInfoActivity.class);
+					Intent ni = new Intent(arg0.getContext(),ConnectionDetailsActivity.class);
 					
 					ni.putExtra("PLNData",plndata);
 					ni.putExtra("ConnectionIndex",((TripItem)b).t.conidx);
@@ -143,7 +143,7 @@ public class ConnectionsActivity extends Activity {
 		Runnable uit = new Runnable(){
 			@Override
 			public void run() {
-				m_ProgressDialog = ProgressDialog.show(ConnectionsActivity.this,    
+				m_ProgressDialog = ProgressDialog.show(ConnectionListActivity.this,    
 	              "Czekaj...", "Pobieranie rozkładu...", true);
 			}
 		};
@@ -188,7 +188,7 @@ public class ConnectionsActivity extends Activity {
     	
     	alertDialog.setButton("Powrót", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface arg0, int arg1) {
-				ConnectionsActivity.this.finish();
+				ConnectionListActivity.this.finish();
 			}
 		});
     	alertDialog.show();
@@ -396,7 +396,7 @@ public class ConnectionsActivity extends Activity {
 	}
 	
 	public boolean onCreateOptionsMenu(Menu menu){
-		getMenuInflater().inflate(R.menu.connections, menu);
+		getMenuInflater().inflate(R.menu.connection_list, menu);
 		return true;
 	}
 	

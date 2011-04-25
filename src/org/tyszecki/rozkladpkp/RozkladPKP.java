@@ -8,7 +8,7 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.widget.TabHost;
 
-public class HelloAndroid extends TabActivity {
+public class RozkladPKP extends TabActivity {
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -30,13 +30,13 @@ public class HelloAndroid extends TabActivity {
         tabHost.addTab(spec);
 
         // Do the same for the other tabs
-        intent = new Intent().setClass(this, TripsActivity.class);
+        intent = new Intent().setClass(this, ConnectionsFormActivity.class);
         spec = tabHost.newTabSpec("trips").setIndicator("Połączenia",
                           res.getDrawable(R.drawable.ic_menu_change_order))
                       .setContent(intent);
         tabHost.addTab(spec);
 
-        intent = new Intent().setClass(this, BoardsActivity.class);
+        intent = new Intent().setClass(this, TimetableFormActivity.class);
         spec = tabHost.newTabSpec("boards").setIndicator("Rozkłady",
                           res.getDrawable(R.drawable.ic_menu_show_list))
                       .setContent(intent);

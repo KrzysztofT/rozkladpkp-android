@@ -8,14 +8,14 @@
 	<TableRow
 		android:layout_marginTop="3dip">
 		<ImageView 	
-			android:id="@+id/conninfo_dep_icon" 
+			android:id="@+id/departure_icon" 
 			android:layout_height="fill_parent"
 			android:src="@drawable/departure" />
 		<TextView 
-			android:id="@+id/conninfo_dep_time"
+			android:id="@+id/departure_time"
 			android:layout_marginLeft="3dip" />
 		<TextView 
-			android:id="@+id/conninfo_dep_station"
+			android:id="@+id/departure_station"
 			android:text="test"
 			android:layout_marginLeft="8dip" />
 		<LinearLayout
@@ -23,13 +23,13 @@
 			android:layout_width="wrap_content"
 			android:layout_height="fill_parent">
 			<ImageView 
-				android:id="@+id/conninfo_time_icon"   
+				android:id="@+id/duration_icon"   
 				android:src="@drawable/time"
 				android:layout_width="wrap_content"
 				android:layout_height="fill_parent"
 				/>
 			<TextView
-				android:id="@+id/conninfo_time"
+				android:id="@+id/duration"
 				android:layout_height="wrap_content"
 				android:layout_width="wrap_content"
 				android:layout_marginLeft="3dip"
@@ -40,17 +40,17 @@
     	android:layout_marginTop="3dip"
     	android:layout_marginBottom="3dip">				
         <ImageView 
-	        android:id="@+id/conninfo_arr_icon" 
+	        android:id="@+id/arrival_icon" 
 	        android:layout_height="fill_parent"
 	        android:src="@drawable/arrival"/>
         <TextView
-            android:id="@+id/conninfo_arr_time"	
+            android:id="@+id/arrival_time"	
             android:layout_marginLeft="3dip"/>
         <TextView
-            android:id="@+id/conninfo_arr_station"	
+            android:id="@+id/arrival_station"	
             android:layout_marginLeft="8dip"/>
 	    <TextView
-	        android:id="@+id/conninfo_train"
+	        android:id="@+id/train_number"
 	        android:gravity="right"
 	        android:textColor="#000"
 	        android:layout_width="wrap_content" 

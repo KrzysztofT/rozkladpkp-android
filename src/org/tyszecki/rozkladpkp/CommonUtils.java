@@ -34,10 +34,11 @@ public class CommonUtils {
 		
 		private static final long serialVersionUID = 1L;
 		{
-			put("Fußweg", R.drawable.back_foot);
-			put("Pieszo", R.drawable.back_foot);
 			put("IR", R.drawable.back_ir);
 			put("RE", R.drawable.back_re);
+			
+			for(String a : new String[]{"Fußweg","Übergang"})
+				put(a,R.drawable.back_foot);
 			
 			for(String a : new String[]{"TGV","ES","KDP"}) //;)
 				put(a,R.drawable.back_kdp);
@@ -63,10 +64,24 @@ public class CommonUtils {
 	
 	public static String trainType(String number)
 	{
-		if(number.equals("Fußweg"))
+		if(number.equals("Fußweg") || number.equals("Übergang"))
 			return number;
 		
         Matcher m = Pattern.compile("([a-zA-Z]*)").matcher(number);   
         return m.find() ? m.group(1) : null;
+	}
+	
+	/*
+	 * Metoda zwraca tekst jaki zostanie wyświetlony jako typ pociągu.
+	 * Przydaje się do zamiany niemieckiego "Fussweg" i "Ubergang" i usuwania podwojonych spacji.
+	 */
+	public static String trainDisplayName(String number)
+	{
+		if(number.equals("Fußweg"))
+			return "Pieszo";
+		if(number.equals("Übergang"))
+			return "Przejście";
+		
+		else return number.replaceAll("\\s+", " ");
 	}
 }

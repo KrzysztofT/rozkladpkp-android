@@ -2,90 +2,110 @@ package org.tyszecki.rozkladpkp;
 
 import java.util.ArrayList;
 
+import org.tyszecki.rozkladpkp.TimetableItem.DateItem;
+import org.tyszecki.rozkladpkp.TimetableItem.TrainItem;
+
 import android.content.Context;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
+import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 
-class TimetableItemAdapter extends ArrayAdapter<TimetableItem> {
+public class TimetableItemAdapter extends BaseAdapter {
 
+	final int HEADER = 0;
+	final int NORMAL = 1;
 	
     private ArrayList<TimetableItem> items;
     private boolean dep;
-    private String station = "";
-    private int stationPos = -1;
+    Context c;
 
-    public TimetableItemAdapter(Context context, int textViewResourceId, ArrayList<TimetableItem> items) {
-            super(context, textViewResourceId, items);
+    public TimetableItemAdapter(Context context, ArrayList<TimetableItem> items) {
+    		c = context;
             this.items = items;
     }
     
-    public void setCurrentStation(String id, int pos)
+    public void setType(boolean d)
     {
-    	station = id;
-    	stationPos	= pos;
+    	dep = d;
     }
-    
     
     public View getView(int position, View convertView, ViewGroup parent) {
             View v = convertView;
+            TimetableItem b = items.get(position);
+            
             if (v == null) {
-                LayoutInflater vi = (LayoutInflater)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                v = vi.inflate(R.layout.timetablerow, null);
+                LayoutInflater vi = (LayoutInflater)c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                if (b instanceof TrainItem)
+                	v = vi.inflate(R.layout.timetable_row, null);
+                else
+                	v = vi.inflate(R.layout.common_date_header_row, null);
             }
-            TimetableItem o = items.get(position);
-            if (o != null) {
-            		boolean last = (position == items.size()-1);
-                    TextView tt = (TextView) v.findViewById(R.id.timetable_arr);
-                    TextView bt = (TextView) v.findViewById(R.id.timetable_dep);
-                    TextView ts = (TextView) v.findViewById(R.id.timetable_station);
-                    if (tt != null) {
-                    		if(position == 0 || o.arr == null)
-                    			tt.setText("");
-                    		else
-                    			tt.setText(Html.fromHtml("P: <b>"+o.arr+"</b>"));
-                          }
-                    if(bt != null){
-                    		if(last || o.dep == null)
-                    			bt.setText("");
-                    		else
-                    			bt.setText(Html.fromHtml("O: <b>"+o.dep+"</b>"));
-                    }
-                    if(ts != null){
-                        ts.setText(o.station);
-                    }
-                    int imgId = R.drawable.sta_gray;
+            
+            if (b instanceof TrainItem) {
+            		
+            		TrainItem o = (TrainItem)b;
+            		
+                    ((TextView) v.findViewById(R.id.time)).setText(Html.fromHtml("<b>"+o.time+"</b> "));
+                    ((TextView) v.findViewById(R.id.station)).setText(Html.fromHtml(((dep)?"do ":"z ")+"<b>"+o.station+"</b> "));
                     
-                    //Start
-                    if(position == 0)
-                    {
-                    	if(stationPos == 0)
-                    		imgId = R.drawable.start_green;
-                    	else
-                    		imgId = R.drawable.start_gray;
-                    }
-                    else if(last)
-                    {
-                    	imgId = R.drawable.end_green;
-                    }
-                    else
-                    {
-                    	if(position == stationPos)
-                    		imgId	= R.drawable.sta_graygreen;
-                    	else if(position > stationPos)
-                    		imgId	= R.drawable.sta_green;
-                    }
                     
-                    ImageView icon = (ImageView) v.findViewById(R.id.timetable_icon);
-                    
-
-                    icon.setImageDrawable(getContext().getResources().getDrawable(imgId));
+                    TextView type = (TextView) v.findViewById(R.id.train_type);
+                    type.requestLayout(); //Przeliczenie wymiarów, dzięki tej linijce po kilkukrotnym przewinięciu listy, elementy nie będą tej samej długości
+                   
+                    String t = CommonUtils.trainType(o.number);
+                    type.setText(t.length() > 0 ? t : "Osob");
+                    type.setBackgroundResource(CommonUtils.drawableForTrainType(t));                    
+            }
+            else {
+            	TextView head = (TextView) v.findViewById(R.id.conn_header);
+                head.setText(((DateItem)b).date);
             }
             return v;
     }
+    @Override
+	public int getCount() {
+		return items.size();
+	}
+
+	@Override
+	public Object getItem(int arg0) {
+		return null;
+	}
+
+	@Override
+	public long getItemId(int arg0) {
+		return arg0;
+	}
+
+	@Override
+	public int getItemViewType(int arg0) {
+		return items.get(arg0) instanceof DateItem ? HEADER : NORMAL;
+	}
+
+	@Override
+	public int getViewTypeCount() {
+		return 2;
+	}
+
+	@Override
+	public boolean hasStableIds() {
+		return false;
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return items.size() == 0;
+	}
+	
+	public boolean areAllItemsSelectable() {  
+        return false;  
+    }  
+	@Override
+    public boolean isEnabled(int position) {  
+        return (getItemViewType(position) != HEADER);  
+    }  
 }

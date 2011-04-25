@@ -1,8 +1,8 @@
 package org.tyszecki.rozkladpkp;
 import java.util.ArrayList;
 
-import org.tyszecki.rozkladpkp.ConnectionInfoItem.DateItem;
-import org.tyszecki.rozkladpkp.ConnectionInfoItem.TrainItem;
+import org.tyszecki.rozkladpkp.ConnectionDetailsItem.DateItem;
+import org.tyszecki.rozkladpkp.ConnectionDetailsItem.TrainItem;
 import org.tyszecki.rozkladpkp.PLN.Train;
 
 import android.content.Context;
@@ -13,28 +13,28 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 
-public class ConnectionInfoItemAdapter extends BaseAdapter {
+public class ConnectionDetailsItemAdapter extends BaseAdapter {
 
 	final int HEADER = 0;
 	final int NORMAL = 1;
 	
-	private ArrayList<ConnectionInfoItem> items;
+	private ArrayList<ConnectionDetailsItem> items;
 	Context c;
 
-	public ConnectionInfoItemAdapter(Context context, ArrayList<ConnectionInfoItem> objects) {
+	public ConnectionDetailsItemAdapter(Context context, ArrayList<ConnectionDetailsItem> objects) {
 		c = context;
 		this.items = objects;
 	}
 	
 	public View getView(int position, View convertView, ViewGroup parent) {
         View v = convertView;
-        ConnectionInfoItem con = items.get(position);
+        ConnectionDetailsItem con = items.get(position);
         if (v == null) {
             LayoutInflater vi = (LayoutInflater)c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             if(con instanceof TrainItem) 
-            	v = vi.inflate(R.layout.connectioninforow, null);
+            	v = vi.inflate(R.layout.connection_details_row, null);
             else if(con instanceof DateItem)
-            	v = vi.inflate(R.layout.connectionheaderrow, null);
+            	v = vi.inflate(R.layout.common_date_header_row, null);
             else 
             	v = vi.inflate(R.layout.scrollitem, null);
         }
@@ -42,15 +42,17 @@ public class ConnectionInfoItemAdapter extends BaseAdapter {
         if (con instanceof TrainItem) {
         	Train t = ((TrainItem)con).t;
         	
-        	((TextView) v.findViewById(R.id.conninfo_dep_time)).setText(t.deptime.toString());
-        	((TextView) v.findViewById(R.id.conninfo_arr_time)).setText(t.arrtime.toString());
+        	((TextView) v.findViewById(R.id.departure_time)).setText(t.deptime.toString());
+        	((TextView) v.findViewById(R.id.arrival_time)).setText(t.arrtime.toString());
         	
-        	((TextView) v.findViewById(R.id.conninfo_dep_station)).setText(t.depstation.name);
-        	((TextView) v.findViewById(R.id.conninfo_arr_station)).setText(t.arrstation.name);
+        	((TextView) v.findViewById(R.id.departure_station)).setText(t.depstation.name);
+        	((TextView) v.findViewById(R.id.arrival_station)).setText(t.arrstation.name);
         	
-        	((TextView) v.findViewById(R.id.conninfo_train)).setText(t.number.equals("Fußweg") ? "Pieszo" : t.number);
-        	((TextView) v.findViewById(R.id.conninfo_train)).setBackgroundResource(CommonUtils.drawableForTrainType(CommonUtils.trainType(t.number)));
-        	((TextView) v.findViewById(R.id.conninfo_time)).setText(t.arrtime.difference(t.deptime).toString());
+        	((TextView) v.findViewById(R.id.train_number)).setText(CommonUtils.trainDisplayName(t.number));
+        	((TextView) v.findViewById(R.id.train_number)).setBackgroundResource(CommonUtils.drawableForTrainType(CommonUtils.trainType(t.number)));
+        	((TextView) v.findViewById(R.id.train_number)).requestLayout();
+        	
+        	((TextView) v.findViewById(R.id.duration)).setText(t.arrtime.difference(t.deptime).toString());
         }
         else if (con instanceof DateItem)
         {
@@ -79,9 +81,9 @@ public class ConnectionInfoItemAdapter extends BaseAdapter {
 	@Override
 	public int getItemViewType(int arg0) {
 		
-		if(items.get(arg0) instanceof ConnectionInfoItem.DateItem)
+		if(items.get(arg0) instanceof ConnectionDetailsItem.DateItem)
 			return HEADER;
-		else if(items.get(arg0) instanceof ConnectionInfoItem.TrainItem)
+		else if(items.get(arg0) instanceof ConnectionDetailsItem.TrainItem)
 			return NORMAL;
 		return NORMAL;
 	}

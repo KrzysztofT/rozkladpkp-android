@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView 
+	xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+	<LinearLayout 
         android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
@@ -9,19 +13,22 @@
         	android:layout_width="match_parent"
         	android:layout_height="wrap_content">
 			<org.tyszecki.rozkladpkp.StationEdit
-	        	android:id="@+id/tripsDepEdit"
+	        	android:id="@+id/departure_edit"
 	        	android:layout_width="fill_parent"
 	        	android:layout_height="wrap_content"
-				android:layout_toLeftOf="@+id/tripsLocation"
+				android:layout_toLeftOf="@+id/location_button"
 				/>
-			<ImageButton android:src="@drawable/ic_mylocation"
-				android:id="@+id/tripsLocation" android:layout_width="50dp"
-				android:layout_height="50dp" android:layout_alignParentRight="true" />
+			<ImageButton 
+				android:src="@drawable/ic_mylocation"
+				android:id="@+id/location_button" 
+				android:layout_width="50dp"
+				android:layout_height="50dp" 
+				android:layout_alignParentRight="true" />
 		</RelativeLayout>
 
         
         <org.tyszecki.rozkladpkp.StationEdit
-        	android:id="@+id/tripsArrEdit"
+        	android:id="@+id/arrival_edit"
         	android:layout_width="fill_parent"
         	android:layout_height="wrap_content"/>
         	
@@ -29,31 +36,32 @@
         	android:layout_width="match_parent"
         	android:layout_height="wrap_content">
 	        <org.tyszecki.rozkladpkp.TimeButton
-	        	android:id="@+id/tripsTimeBut"
+	        	android:id="@+id/time_button"
 	        	android:layout_width="110dip"
 	        	android:layout_height="wrap_content"
 	        	android:layout_alignParentLeft="true"
 	        	/>
 	        <org.tyszecki.rozkladpkp.DateButton
-	        	android:id="@+id/tripsDateBut"
+	        	android:id="@+id/date_button"
 	        	android:layout_width="fill_parent"
 	        	android:layout_height="wrap_content"
-	        	android:layout_toRightOf="@+id/tripsTimeBut"
+	        	android:layout_toRightOf="@+id/time_button"
 				/>
 		</RelativeLayout>	
 		<org.tyszecki.rozkladpkp.ProductsButton
-        	android:id="@+id/tripsProdBut"
+        	android:id="@+id/products_button"
         	android:layout_width="fill_parent"
         	android:layout_height="wrap_content"
 			/>
 		<org.tyszecki.rozkladpkp.AttributesButton
-        	android:id="@+id/tripsAttrBut"
+        	android:id="@+id/attributes_button"
         	android:layout_width="fill_parent"
         	android:layout_height="wrap_content"
 			/>
         <Button
-        	android:id="@+id/tripsOK"
+        	android:id="@+id/ok_button"
         	android:layout_width="fill_parent"
         	android:layout_height="wrap_content"
         	android:text="OK" />
-</LinearLayout>
+	</LinearLayout>
+</ScrollView>

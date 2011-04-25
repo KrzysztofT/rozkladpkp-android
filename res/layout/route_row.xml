@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:stretchColumns="2">
+	<TableRow>
+		<ImageView
+	        android:id="@+id/icon"
+	        android:layout_height="fill_parent"
+	        android:layout_marginRight="6dip"/>
+	   			<TableLayout
+	    			android:layout_width="wrap_content"
+	    			android:layout_height="fill_parent">
+	    				<TableRow>
+	    					<TextView 
+	    						android:text="@string/arrivalShortLabel"
+	    						android:id="@+id/arrival_label"/>
+	        				<TextView 
+	        					android:id="@+id/arrival_time" 
+	        					android:textStyle="bold"
+	        					android:paddingLeft="6dip"/>
+	        			</TableRow>
+	        			<TableRow>
+	        				<TextView 
+	        					android:text="@string/departureShortLabel"
+	        					android:id="@+id/departure_label"/>
+	        				<TextView 
+	        					android:id="@+id/departure_time" 
+	        					android:textStyle="bold"
+	        					android:paddingLeft="6dip"/>
+	        			</TableRow>
+	    		</TableLayout>
+		<TextView
+	        android:id="@+id/station"
+	        android:layout_height="fill_parent"
+	        android:paddingLeft="15dip"
+	        android:gravity="center_vertical" />
+     </TableRow>
+</TableLayout>

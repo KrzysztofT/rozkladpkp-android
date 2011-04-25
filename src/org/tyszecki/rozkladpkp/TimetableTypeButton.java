@@ -5,10 +5,10 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.Button;
 
-public class BoardTypeButton extends Button {
+public class TimetableTypeButton extends Button {
 
 	boolean dep	= true;
-	public BoardTypeButton(Context context, AttributeSet attrs) {
+	public TimetableTypeButton(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		setText("Odjazdy");
 		

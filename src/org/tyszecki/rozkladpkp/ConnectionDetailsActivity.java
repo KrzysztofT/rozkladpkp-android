@@ -2,7 +2,7 @@ package org.tyszecki.rozkladpkp;
 
 import java.util.ArrayList;
 
-import org.tyszecki.rozkladpkp.ConnectionInfoItem.TrainItem;
+import org.tyszecki.rozkladpkp.ConnectionDetailsItem.TrainItem;
 import org.tyszecki.rozkladpkp.PLN.Connection;
 import org.tyszecki.rozkladpkp.PLN.Train;
 
@@ -11,26 +11,26 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.ListView;
 
-public class ConnectionInfoActivity extends Activity {
-	private ConnectionInfoItemAdapter adapter;
-	private ArrayList<ConnectionInfoItem> items;
+public class ConnectionDetailsActivity extends Activity {
+	private ConnectionDetailsItemAdapter adapter;
+	private ArrayList<ConnectionDetailsItem> items;
 	private PLN pln;
-	private String startDate;
+	//private String startDate;
 	private int conidx;
 	
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.connectioninfo);
+        setContentView(R.layout.connection_details);
         setTitle("Plan podróży");
         
-        startDate = getIntent().getExtras().getString("StartDate");
+        //startDate = getIntent().getExtras().getString("StartDate");
         pln = new PLN(getIntent().getExtras().getByteArray("PLNData"));
         conidx = getIntent().getExtras().getInt("ConnectionIndex");
         
-        items = new ArrayList<ConnectionInfoItem>();
-        adapter = new ConnectionInfoItemAdapter(this,  items);
+        items = new ArrayList<ConnectionDetailsItem>();
+        adapter = new ConnectionDetailsItemAdapter(this,  items);
             
-        ListView lv = (ListView)findViewById(R.id.conninfoview);
+        ListView lv = (ListView)findViewById(R.id.connection_details);
         lv.setAdapter(this.adapter);
         
         loadData();
@@ -40,7 +40,7 @@ public class ConnectionInfoActivity extends Activity {
 	{
 		items.clear();
     	
-    	ConnectionInfoItem c = new ConnectionInfoItem();
+    	ConnectionDetailsItem c = new ConnectionDetailsItem();
     	Connection con = pln.connections[conidx];
     	
     	

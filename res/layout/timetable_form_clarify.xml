@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView 
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+	<LinearLayout 
         android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:padding="5dp">
         <org.tyszecki.rozkladpkp.StationSpinner
-        	android:id="@+id/selectStation"
+        	android:id="@+id/station_select"
         	android:layout_width="fill_parent"
         	android:layout_height="wrap_content"/>
         
@@ -13,32 +17,33 @@
         	android:layout_width="match_parent"
         	android:layout_height="wrap_content">
 	        <org.tyszecki.rozkladpkp.TimeButton
-	        	android:id="@+id/boards2TimeBut"
+	        	android:id="@+id/time_button"
 	        	android:layout_width="110dip"
 	        	android:layout_height="wrap_content"
 	        	android:layout_alignParentLeft="true"
 	        	/>
 	        <org.tyszecki.rozkladpkp.DateButton
-	        	android:id="@+id/boards2DateBut"
+	        	android:id="@+id/date_button"
 	        	android:layout_width="fill_parent"
 	        	android:layout_height="wrap_content"
-	        	android:layout_toRightOf="@+id/boards2TimeBut"
+	        	android:layout_toRightOf="@+id/time_button"
 				/>
 		</RelativeLayout>
 		
-		<org.tyszecki.rozkladpkp.BoardTypeButton
-        	android:id="@+id/boards2TypeBut"
+		<org.tyszecki.rozkladpkp.TimetableTypeButton
+        	android:id="@+id/type_button"
         	android:layout_width="fill_parent"
         	android:layout_height="wrap_content"
 			/>
 		<org.tyszecki.rozkladpkp.ProductsButton
-        	android:id="@+id/boards2ProdBut"
+        	android:id="@+id/products_button"
         	android:layout_width="fill_parent"
         	android:layout_height="wrap_content"
 			/>
         <Button
-        	android:id="@+id/ok"
+        	android:id="@+id/ok_button"
         	android:layout_width="fill_parent"
         	android:layout_height="wrap_content"
         	android:text="OK" />  		
-</LinearLayout>
+	</LinearLayout>
+</ScrollView>

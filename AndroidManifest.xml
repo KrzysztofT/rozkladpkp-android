@@ -3,7 +3,7 @@
       android:versionCode="1"
       android:versionName="1.0" package="org.tyszecki.rozkladpkp">
     <application android:icon="@drawable/icon" android:label="@string/app_name" android:name="PKPApplication">
-        <activity android:name=".HelloAndroid" android:theme="@android:style/Theme.NoTitleBar"
+        <activity android:name=".RozkladPKP" android:theme="@android:style/Theme.NoTitleBar"
                   android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -12,21 +12,17 @@
         </activity>
         <activity android:name="RememberedActivity">
         </activity>
-        <activity android:name="BoardsActivity">
+        <activity android:name="TimetableActivity">
         </activity>
-        <activity android:name="BoardActivity">
+        <activity android:name="TimetableFormActivity">
         </activity>
-        <activity android:name="Boards2Activity">
+        <activity android:name="ConnectionsFormActivity">
         </activity>
-        <activity android:name="TripsActivity">
+        <activity android:name="RouteActivity">
         </activity>
-        <activity android:name="Trips2Activity">
+        <activity android:name="ConnectionListActivity">
         </activity>
-        <activity android:name="TrainInfoActivity">
-        </activity>
-        <activity android:name="ConnectionsActivity">
-        </activity>
-        <activity android:name="ConnectionInfoActivity">
+        <activity android:name="ConnectionDetailsActivity">
         </activity>
     </application>
 <uses-permission android:name="android.permission.INTERNET"/>

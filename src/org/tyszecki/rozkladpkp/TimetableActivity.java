@@ -15,8 +15,8 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.tyszecki.rozkladpkp.BoardItem.DateItem;
-import org.tyszecki.rozkladpkp.BoardItem.TrainItem;
+import org.tyszecki.rozkladpkp.TimetableItem.DateItem;
+import org.tyszecki.rozkladpkp.TimetableItem.TrainItem;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -36,17 +36,17 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 
-public class BoardActivity extends Activity {
+public class TimetableActivity extends Activity {
 	
 	private ProgressDialog m_ProgressDialog = null; 
-	private ArrayList<BoardItem> m_items = null;
-	private BoardItemAdapter m_adapter;
+	private ArrayList<TimetableItem> m_items = null;
+	private TimetableItemAdapter m_adapter;
 	private Runnable viewBoard;
 	private static byte[] sBuffer = new byte[512];
 	private String SID;
 	private boolean dep;
 	NodeList destList = null;
-	BoardItem item;
+	TimetableItem item;
 	String startID = null,destID = null;
 	Pattern p;
 	Matcher m;
@@ -56,7 +56,7 @@ public class BoardActivity extends Activity {
 	
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.board);
+        setContentView(R.layout.timetable);
         
         SID = getIntent().getExtras().getString("SID");
         
@@ -65,13 +65,13 @@ public class BoardActivity extends Activity {
 
         setTitle((dep?"Odjazdy z ":"Przyjazdy do ")+getIntent().getExtras().getString("Station"));
         
-        m_items = new ArrayList<BoardItem>();
+        m_items = new ArrayList<TimetableItem>();
         
-        m_adapter = new BoardItemAdapter(this, m_items);
+        m_adapter = new TimetableItemAdapter(this, m_items);
         m_adapter.setType(dep);
         
-        ListView lv = (ListView)findViewById(R.id.android_board);
-                lv.setAdapter(this.m_adapter);
+        ListView lv = (ListView)findViewById(R.id.timetable);
+        lv.setAdapter(this.m_adapter);
         
         viewBoard = new Runnable(){
             @Override
@@ -82,7 +82,7 @@ public class BoardActivity extends Activity {
         
         Thread thread =  new Thread(null, viewBoard, "MagentoBackground");
         thread.start();
-        m_ProgressDialog = ProgressDialog.show(BoardActivity.this,    
+        m_ProgressDialog = ProgressDialog.show(TimetableActivity.this,    
               "Czekaj...", "Pobieranie rozkładu...", true);
         
         //Włączanie informacji o pociągu - potrzebnego do tego są identyfikatory stacji.
@@ -101,12 +101,12 @@ public class BoardActivity extends Activity {
 					startID	= m.group(1);
 			
 				item = m_items.get(pos);
-				if(item instanceof BoardItem.DateItem)
+				if(item instanceof TimetableItem.DateItem)
 					return;
 				
 				titem = (TrainItem)item;
 				
-				m_ProgressDialog = ProgressDialog.show(BoardActivity.this,    
+				m_ProgressDialog = ProgressDialog.show(TimetableActivity.this,    
 			              "Czekaj...", "Wyszukiwanie stacji...", true);
 				
 				showTimetable = new Runnable() {
@@ -131,7 +131,7 @@ public class BoardActivity extends Activity {
 						//Mamy oba ID, mozna pobrac rozklad
 						if(startID != null && destID != null)
 						{
-							Intent ni = new Intent(av.getContext(),TrainInfoActivity.class);
+							Intent ni = new Intent(av.getContext(),RouteActivity.class);
 							ni.putExtra("startID",startID);
 							ni.putExtra("destID",destID);
 							ni.putExtra("number",titem.number);
@@ -221,7 +221,7 @@ public class BoardActivity extends Activity {
             
             m_items.clear();
             
-            BoardItem bi = new BoardItem();
+            TimetableItem bi = new TimetableItem();
             String pdate = "";
             int j = list.getLength();
             for(int i = 0; i < j; i++)
@@ -269,7 +269,7 @@ public class BoardActivity extends Activity {
     	
     	alertDialog.setButton("Powrót", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface arg0, int arg1) {
-				BoardActivity.this.finish();
+				TimetableActivity.this.finish();
 			}
 		});
     	alertDialog.show();

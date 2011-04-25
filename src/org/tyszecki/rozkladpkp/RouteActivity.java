@@ -29,17 +29,17 @@ import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.widget.ListView;
 
-public class TrainInfoActivity extends Activity {
+public class RouteActivity extends Activity {
 	
-	private ArrayList<TimetableItem> m_items = null;
+	private ArrayList<RouteItem> m_items = null;
 	private ProgressDialog m_ProgressDialog = null; 
-	private TimetableItemAdapter m_adapter;
+	private RouteItemAdapter m_adapter;
 	private Runnable viewTable;
 	private static byte[] sBuffer = new byte[512];
 	
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.timetable);
+        setContentView(R.layout.route);
         
         
 
@@ -54,17 +54,17 @@ public class TrainInfoActivity extends Activity {
             }
         };
         
-        m_items = new ArrayList<TimetableItem>();
+        m_items = new ArrayList<RouteItem>();
         
-        m_adapter = new TimetableItemAdapter(this, R.layout.row, m_items);
+        m_adapter = new RouteItemAdapter(this, R.layout.timetable_row, m_items);
         
         
-        ListView lv = (ListView)findViewById(R.id.info_timetable);
+        ListView lv = (ListView)findViewById(R.id.route);
                 lv.setAdapter(this.m_adapter);
         
         Thread thread =  new Thread(null, viewTable, "MagentoBackground");
         thread.start();
-        m_ProgressDialog = ProgressDialog.show(TrainInfoActivity.this,    
+        m_ProgressDialog = ProgressDialog.show(RouteActivity.this,    
               "Czekaj...", "Pobieranie rozkładu...", true);
 	}
 
@@ -120,14 +120,14 @@ public class TrainInfoActivity extends Activity {
     	
     	NodeList list = doc.getElementsByTagName("St");
         
-        m_items = new ArrayList<TimetableItem>();
+        m_items = new ArrayList<RouteItem>();
         
         int j = list.getLength();
         
         int isID	= Integer.parseInt(sID);
 		for(int i = 0; i < j; i++)
         { 
-        	TimetableItem o = new TimetableItem();
+        	RouteItem o = new RouteItem();
         	Node n = list.item(i);
         	o.station 	= n.getAttributes().getNamedItem("name").getNodeValue();
         	if(n.getAttributes().getNamedItem("arrTime") != null)
