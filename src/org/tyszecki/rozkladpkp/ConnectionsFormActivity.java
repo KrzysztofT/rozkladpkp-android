@@ -2,7 +2,13 @@ package org.tyszecki.rozkladpkp;
 
 import java.util.ArrayList;
 
-import org.tyszecki.rozkladpkp.StationSpinner.onDataLoaded;
+import org.tyszecki.rozkladpkp.widgets.AttributesButton;
+import org.tyszecki.rozkladpkp.widgets.DateButton;
+import org.tyszecki.rozkladpkp.widgets.ProductsButton;
+import org.tyszecki.rozkladpkp.widgets.StationEdit;
+import org.tyszecki.rozkladpkp.widgets.StationSpinner;
+import org.tyszecki.rozkladpkp.widgets.TimeButton;
+import org.tyszecki.rozkladpkp.widgets.StationSpinner.onDataLoaded;
 
 import android.app.Activity;
 import android.app.Dialog;

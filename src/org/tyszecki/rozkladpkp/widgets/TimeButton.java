@@ -1,4 +1,6 @@
-package org.tyszecki.rozkladpkp;
+package org.tyszecki.rozkladpkp.widgets;
+
+import org.tyszecki.rozkladpkp.R;
 
 import android.app.Dialog;
 import android.app.TimePickerDialog;

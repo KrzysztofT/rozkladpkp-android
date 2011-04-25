@@ -1,8 +1,10 @@
-package org.tyszecki.rozkladpkp;
+package org.tyszecki.rozkladpkp.widgets;
 
 import java.util.AbstractCollection;
 import java.util.ArrayList;
 import java.util.Iterator;
+
+import org.tyszecki.rozkladpkp.SerializableNameValuePair;
 
 import android.app.AlertDialog;
 import android.app.Dialog;

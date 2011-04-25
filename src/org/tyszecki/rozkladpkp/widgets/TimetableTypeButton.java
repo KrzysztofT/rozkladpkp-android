@@ -1,4 +1,4 @@
-package org.tyszecki.rozkladpkp;
+package org.tyszecki.rozkladpkp.widgets;
 
 import android.content.Context;
 import android.util.AttributeSet;

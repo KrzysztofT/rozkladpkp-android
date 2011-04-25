@@ -1,4 +1,4 @@
-package org.tyszecki.rozkladpkp;
+package org.tyszecki.rozkladpkp.widgets;
 
 import java.util.ArrayList;
 

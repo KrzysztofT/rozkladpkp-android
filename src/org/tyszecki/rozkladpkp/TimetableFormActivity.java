@@ -1,5 +1,12 @@
 package org.tyszecki.rozkladpkp;
 
+import org.tyszecki.rozkladpkp.widgets.DateButton;
+import org.tyszecki.rozkladpkp.widgets.ProductsButton;
+import org.tyszecki.rozkladpkp.widgets.StationEdit;
+import org.tyszecki.rozkladpkp.widgets.StationSpinner;
+import org.tyszecki.rozkladpkp.widgets.TimeButton;
+import org.tyszecki.rozkladpkp.widgets.TimetableTypeButton;
+
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;

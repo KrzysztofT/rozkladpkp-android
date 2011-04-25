@@ -70,7 +70,7 @@ public class ConnectionDetailsItemAdapter extends BaseAdapter {
 
 	@Override
 	public Object getItem(int arg0) {
-		return null;
+		return items.get(arg0);
 	}
 
 	@Override

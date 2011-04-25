@@ -1,6 +1,8 @@
-package org.tyszecki.rozkladpkp;
+package org.tyszecki.rozkladpkp.widgets;
 
 import java.util.GregorianCalendar;
+
+import org.tyszecki.rozkladpkp.R;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;

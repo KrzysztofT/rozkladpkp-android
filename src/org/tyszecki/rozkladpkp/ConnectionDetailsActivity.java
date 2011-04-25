@@ -7,9 +7,14 @@ import org.tyszecki.rozkladpkp.PLN.Connection;
 import org.tyszecki.rozkladpkp.PLN.Train;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.AdapterView.OnItemClickListener;
 
 public class ConnectionDetailsActivity extends Activity {
 	private ConnectionDetailsItemAdapter adapter;
@@ -32,6 +37,21 @@ public class ConnectionDetailsActivity extends Activity {
             
         ListView lv = (ListView)findViewById(R.id.connection_details);
         lv.setAdapter(this.adapter);
+        
+        lv.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View arg1, int pos, long id) {
+				
+				Intent ni = new Intent(arg0.getContext(),TrainDetailsActivity.class);
+				
+				ni.putExtra("PLNData",pln.data);
+				ni.putExtra("ConnectionIndex",conidx);
+				ni.putExtra("TrainIndex", pos);
+				
+				startActivity(ni);
+			}
+		});
         
         loadData();
 	}

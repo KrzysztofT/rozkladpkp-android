@@ -11,7 +11,7 @@
 	        <RelativeLayout 
 	        	android:layout_width="match_parent"
 	        	android:layout_height="wrap_content">
-	        	<org.tyszecki.rozkladpkp.StationEdit
+	        	<org.tyszecki.rozkladpkp.widgets.StationEdit
 		        	android:id="@+id/station_edit"
 		        	android:layout_width="fill_parent"
 		        	android:layout_height="wrap_content"
@@ -27,13 +27,13 @@
 	        <RelativeLayout 
 	        	android:layout_width="match_parent"
 	        	android:layout_height="wrap_content">
-		        <org.tyszecki.rozkladpkp.TimeButton
+		        <org.tyszecki.rozkladpkp.widgets.TimeButton
 		        	android:id="@+id/time_button"
 		        	android:layout_width="110dip"
 		        	android:layout_height="wrap_content"
 		        	android:layout_alignParentLeft="true"
 		        	/>
-		        <org.tyszecki.rozkladpkp.DateButton
+		        <org.tyszecki.rozkladpkp.widgets.DateButton
 		        	android:id="@+id/date_button"
 		        	android:layout_width="fill_parent"
 		        	android:layout_height="wrap_content"
@@ -41,12 +41,12 @@
 					/>
 			</RelativeLayout>	
 	        
-			<org.tyszecki.rozkladpkp.TimetableTypeButton
+			<org.tyszecki.rozkladpkp.widgets.TimetableTypeButton
 	        	android:id="@+id/type_button"
 	        	android:layout_width="fill_parent"
 	        	android:layout_height="wrap_content"
 				/>
-			<org.tyszecki.rozkladpkp.ProductsButton
+			<org.tyszecki.rozkladpkp.widgets.ProductsButton
 	        	android:id="@+id/products_button"
 	        	android:layout_width="fill_parent"
 	        	android:layout_height="wrap_content"

@@ -60,6 +60,9 @@ public class CommonUtils {
 			
 			for(String a : new String[]{"SKM","SKW", "WKD"})
 				put(a,R.drawable.back_skm);	
+			
+			for(String a : new String[]{"Bus","Tra", "Metro"})
+				put(a,R.drawable.back_bus);
 		}
 	};
 	
