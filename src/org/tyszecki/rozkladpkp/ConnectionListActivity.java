@@ -23,6 +23,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.DialogInterface.OnCancelListener;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -40,12 +41,12 @@ public class ConnectionListActivity extends Activity {
 	private static byte[] sBuffer = new byte[512];
 	private byte[] plndata;
 	private int seqnr = 0;
-	private final int TIMETABLE_DOWNLOAD_ATTEMPTS = 5;
 	private final int TIMETABLE_DOWNLOAD_INTERVAL = 5000;
 	
 	private boolean hasFullTable = false;
 	private String timetableUrl = null;
 	private ArrayList<SerializableNameValuePair> commonFieldsList;
+	private Thread loadingThread;
 	
 	PLN pln;
 	
@@ -129,7 +130,8 @@ public class ConnectionListActivity extends Activity {
 								            }
 				        				};
 						//Pobierz wcześniejsze/pózniejsze
-						new Thread(null, viewConn, "MagentoBackground").start();
+						loadingThread = new Thread(null, viewConn, "MagentoBackground");
+						loadingThread.start();
 				        showLoader();
 					}
 				}
@@ -145,6 +147,24 @@ public class ConnectionListActivity extends Activity {
 			public void run() {
 				m_ProgressDialog = ProgressDialog.show(ConnectionListActivity.this,    
 	              "Czekaj...", "Pobieranie rozkładu...", true);
+			}
+		};
+		runOnUiThread(uit);
+	}
+	
+	public void showFullLoader()
+	{
+		Runnable uit = new Runnable(){
+			@Override
+			public void run() {
+				m_ProgressDialog = ProgressDialog.show(ConnectionListActivity.this,    
+	              "Czekaj...", "Pobieranie pełnego rozkładu. Może to zająć więcej czasu...", true, true, new OnCancelListener() {
+					@Override
+					public void onCancel(DialogInterface arg0) {
+						loadingThread.interrupt();
+						ConnectionListActivity.this.finish();
+					}
+				});
 			}
 		};
 		runOnUiThread(uit);
@@ -268,7 +288,6 @@ public class ConnectionListActivity extends Activity {
 		client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestExpectContinue.class);
         client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestUserAgent.class);
         String url = null;
-        int attempts = 0;
         
         HttpResponse response;
         HttpEntity entity;
@@ -276,8 +295,9 @@ public class ConnectionListActivity extends Activity {
         ByteArrayOutputStream content;
         int readBytes;
         
-        showLoader();
-        while(url == null && attempts++ < TIMETABLE_DOWNLOAD_ATTEMPTS)
+        showFullLoader();
+        try{
+        while(url == null)
         {
 	        response = client.execute(request);
 	         
@@ -330,6 +350,12 @@ public class ConnectionListActivity extends Activity {
         }
         else
         	Log.i("RozkladPKP","Jeszcze w8");
+        }
+        catch(InterruptedException e)
+        {
+        	Log.d("RozkladPKP","Pobieranie pełnego rozkładu anulowane");
+        	return;
+        }
          
         hideLoader();
         	

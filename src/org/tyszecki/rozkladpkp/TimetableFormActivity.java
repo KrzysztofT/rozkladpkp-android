@@ -1,14 +1,11 @@
 package org.tyszecki.rozkladpkp;
 
-import java.io.IOException;
-
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.Selection;
@@ -27,7 +24,7 @@ public class TimetableFormActivity extends Activity {
 	TimeButton timeb;
 	DateButton dateb;
 	ProductsButton prodb;
-	
+
 	private Resources res;
 	
 	/*
@@ -66,13 +63,15 @@ public class TimetableFormActivity extends Activity {
         
         if(!clarify)
         {
-	        StationEdit autoComplete = (StationEdit)  findViewById(R.id.station_edit);
-	        autoComplete.setHint("Stacja kolejowa");
+        	StationEdit autoComplete = (StationEdit)  findViewById(R.id.station_edit);
+	        autoComplete.setHint(res.getString(R.string.hintStation));
 	        autoComplete.setAutoComplete(pref.getBoolean("EnableStationAC", true));
         }
         else
         {
-        	ProgressDialog progressDialog = ProgressDialog.show(TimetableFormActivity.this, "Czekaj...", "Wyszukiwanie stacji...", true);
+        	ProgressDialog progressDialog = ProgressDialog.show(TimetableFormActivity.this, 
+        			res.getString(R.string.progressTitle), res.getString(R.string.progressSearchingStation), true);
+        	
             StationSpinner sp = (StationSpinner)  findViewById(R.id.station_select);
             sp.setProgressDialog(progressDialog);
             sp.setUserInput(getIntent().getExtras().getString("userText"));
@@ -137,7 +136,7 @@ public class TimetableFormActivity extends Activity {
 					StationEdit autoComplete = (StationEdit)  findViewById(R.id.station_edit);
 					if(autoComplete.getText().toString().trim().length() == 0)
 					{
-						Toast.makeText(getApplicationContext(), "Wprowadź nazwę stacji", Toast.LENGTH_SHORT).show();
+						Toast.makeText(getApplicationContext(), res.getString(R.string.toastStationEmpty), Toast.LENGTH_SHORT).show();
 						return;
 					}
 					
@@ -186,7 +185,22 @@ public class TimetableFormActivity extends Activity {
 	        ((ImageButton)findViewById(R.id.location_button)).setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					new GetLocationTask().execute();
+					CommonUtils.currentLocality(TimetableFormActivity.this, new CommonUtils.LocationResult() {
+						@Override
+						public void gotLocality(final String s) {
+								runOnUiThread(new Runnable() {
+									@Override
+									public void run() {
+										StationEdit ed = (StationEdit) findViewById(R.id.station_edit);
+										ed.setText(s);
+										final Editable etext = ed.getText();
+										final int position = etext.length();
+										Selection.setSelection(etext, position);
+									}
+								});
+							}
+						}
+					);					
 				}
 			});
         }
@@ -200,7 +214,7 @@ public class TimetableFormActivity extends Activity {
 		
 		StationEdit autoComplete = (StationEdit)  findViewById(R.id.station_edit);
 		getMenuInflater().inflate(R.menu.timetable, menu);
-		menu.getItem(0).setTitle((autoComplete.autoComplete() ? "Wyłącz" : "Włącz") + " autouzupełnianie");
+		menu.getItem(0).setTitle(res.getString((autoComplete.autoComplete() ? R.string.menuDisableAC : R.string.menuEnableAC)));
 		return true;
 	}
 	
@@ -230,48 +244,4 @@ public class TimetableFormActivity extends Activity {
 	    }
 	    return null;
 	}
-	
-	
-	private class GetLocationTask extends AsyncTask<Void, Void, String> {
-		
-		private ProgressDialog mProgress;
-		
-		@Override
-		protected void onPostExecute(String result) {
-			StationEdit ed = (StationEdit)  findViewById(R.id.station_edit);
-			mProgress.dismiss();
-			if(result == null || result == "") {
-				Toast.makeText(TimetableFormActivity.this, 
-						res.getText(R.string.toastLocationError), 
-						Toast.LENGTH_LONG)
-						.show();
-			} else {
-				ed.setText(result);
-				//set cursor at end of text
-				final Editable etext = ed.getText();
-				final int position = etext.length();  // end of buffer, for instance
-				Selection.setSelection(etext, position);
-			}
-		}
-
-
-		@Override
-		protected void onPreExecute() {
-			mProgress = ProgressDialog.show(TimetableFormActivity.this, 
-					res.getText(R.string.progressTitle), 
-					res.getText(R.string.progressBodyLocation));
-		}
-
-
-		@Override
-		protected String doInBackground(Void... params) {
-			try {
-				return ((PKPApplication)getApplication()).getLocation();
-			} catch (IOException e) {
-				return null;
-			}
-		}
-		
-	}
-	
 }

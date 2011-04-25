@@ -1,10 +1,19 @@
 package org.tyszecki.rozkladpkp;
 
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.res.Resources;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.widget.Toast;
@@ -84,4 +93,43 @@ public class CommonUtils {
 		
 		else return number.replaceAll("\\s+", " ");
 	}
+	
+	/*
+	 * Zwraca miejscowość, na podstawie pamiętanej przez urządzenie lokalizacji,
+	 * podczas operacji, pokazuje wiadomość o postępie.
+	 * Przekazywanie aktywności może nie jest najelegantsze, ale w obecnym wypadku,
+	 * jest to sensowne rozwiązanie.
+	 */
+	public static void currentLocality(final Activity cx, final LocationResult callback)
+	{
+		Resources res = cx.getResources();
+		final ProgressDialog p = ProgressDialog.show(cx, res.getString(R.string.progressTitle), res.getString(R.string.progressBodyLocation));
+		new Thread( new Runnable() {
+			
+			@Override
+			public void run() {
+				LocationManager lm = (LocationManager) cx.getSystemService(Context.LOCATION_SERVICE);
+				Location l = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+				Geocoder c = new Geocoder(cx);
+				try {
+					List<Address> addresses = c.getFromLocation(l.getLatitude(), l.getLongitude(), 1);
+					callback.gotLocality(addresses.get(0).getLocality());
+				} catch (IOException e) {
+					callback.gotLocality(null);
+				}
+				//TODO: Czy to wywołanie może w ogóle zawieźć? 
+				cx.runOnUiThread(new Runnable() {
+					
+					@Override
+					public void run() {
+							p.dismiss();
+					}
+				});
+			}
+		}).start();
+	}
+	
+	public static abstract class LocationResult{
+        public abstract void gotLocality(String s);
+    }
 }

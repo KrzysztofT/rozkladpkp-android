@@ -1,9 +1,7 @@
 package org.tyszecki.rozkladpkp;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
-import org.tyszecki.rozkladpkp.R;
 import org.tyszecki.rozkladpkp.StationSpinner.onDataLoaded;
 
 import android.app.Activity;
@@ -12,7 +10,6 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.Selection;
@@ -128,8 +125,8 @@ public class ConnectionsFormActivity extends Activity {
 	        depEdit = (StationEdit) findViewById(R.id.departure_edit);
 	        arrEdit = (StationEdit) findViewById(R.id.arrival_edit);
 	        
-	        depEdit.setHint("Stacja początkowa");
-	        arrEdit.setHint("Stacja docelowa");
+	        depEdit.setHint(res.getText(R.string.hintDepartureStation));
+	        arrEdit.setHint(res.getText(R.string.hintArrivalStaton));
 	        
 	        depEdit.setAutoComplete(pref.getBoolean("EnableStationAC", true));
 	        arrEdit.setAutoComplete(pref.getBoolean("EnableStationAC", true));
@@ -151,7 +148,7 @@ public class ConnectionsFormActivity extends Activity {
             depSelect.setOnDataLoaded(dl);
             arrSelect.setOnDataLoaded(dl);
             
-            progressDialog = ProgressDialog.show(ConnectionsFormActivity.this, "Czekaj...", "Wyszukiwanie stacji...", true);
+            progressDialog = ProgressDialog.show(ConnectionsFormActivity.this, res.getText(R.string.progressTitle), res.getText(R.string.progressSearchingStation), true);
             
             Bundle extra = getIntent().getExtras();
             if(extra.containsKey("depSID"))
@@ -175,12 +172,12 @@ public class ConnectionsFormActivity extends Activity {
 					//Nie wprowadzono którejś ze stacji
 					if(depEdit.getText().toString().trim().length() == 0)
 					{
-						Toast.makeText(getApplicationContext(), "Wprowadź nazwę stacji początkowej", Toast.LENGTH_SHORT).show();
+						Toast.makeText(getApplicationContext(), res.getText(R.string.toastDepartureEmpty), Toast.LENGTH_SHORT).show();
 						return;
 					}
 					else if(arrEdit.getText().toString().trim().length() == 0)
 					{
-						Toast.makeText(getApplicationContext(), "Wprowadź nazwę stacji docelowej", Toast.LENGTH_SHORT).show();
+						Toast.makeText(getApplicationContext(), res.getText(R.string.toastArrivalEmpty), Toast.LENGTH_SHORT).show();
 						return;
 					}
 					
@@ -208,6 +205,12 @@ public class ConnectionsFormActivity extends Activity {
 					
 						ni.putExtra("arrText", arrEdit.getText().toString());
 					}
+					//Wpisano dwie takie same stacje
+					else if(arrEdit.getCurrentSID().equals(depEdit.getCurrentSID()))
+					{
+						Toast.makeText(getApplicationContext(), res.getText(R.string.toastSameStationsError), Toast.LENGTH_SHORT).show();
+							return;
+					}
 					//Nic nie trzeba doprecyzowywać
 					else
 					{
@@ -220,7 +223,13 @@ public class ConnectionsFormActivity extends Activity {
 				}
 				else
 				{
-					//Wybrano stacje z listy
+					//Wybrano diwe takie same stacje z listy
+					if(arrSelect.getCurrentSID().equals(depSelect.getCurrentSID()))
+					{
+						Toast.makeText(getApplicationContext(), res.getText(R.string.toastSameStationsError), Toast.LENGTH_SHORT).show();
+							return;
+					}
+					
 					ni = new Intent(arg0.getContext(),ConnectionListActivity.class);
 					
 					ni.putExtra("ZID", arrSelect.getCurrentSID());
@@ -244,7 +253,22 @@ public class ConnectionsFormActivity extends Activity {
 	        ((ImageButton) findViewById(R.id.location_button)).setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					new GetLocationTask().execute();
+					CommonUtils.currentLocality(ConnectionsFormActivity.this, new CommonUtils.LocationResult() {
+						@Override
+						public void gotLocality(final String s) {
+								runOnUiThread(new Runnable() {
+									@Override
+									public void run() {
+										StationEdit ed = (StationEdit) findViewById(R.id.departure_edit);
+										ed.setText(s);
+										final Editable etext = ed.getText();
+										final int position = etext.length();
+										Selection.setSelection(etext, position);
+									}
+								});
+							}
+						}
+					);		
 				}
 			});
         }
@@ -263,46 +287,5 @@ public class ConnectionsFormActivity extends Activity {
 	    	return attrb.getDialog();
 	    }
 	    return null;
-	}
-	
-	private class GetLocationTask extends AsyncTask<Void, Void, String> {
-		
-		private ProgressDialog mProgress;
-		
-		@Override
-		protected void onPostExecute(String result) {
-			mProgress.dismiss();
-			if(result == null || result == "") {
-				Toast.makeText(ConnectionsFormActivity.this, 
-						res.getText(R.string.toastLocationError), 
-						Toast.LENGTH_LONG)
-						.show();
-			} else {
-				depEdit.setText(result);
-				//set cursor at end of text
-				final Editable etext = depEdit.getText();
-				final int position = etext.length();  // end of buffer, for instance
-				Selection.setSelection(etext, position);
-			}
-		}
-
-
-		@Override
-		protected void onPreExecute() {
-			mProgress = ProgressDialog.show(ConnectionsFormActivity.this, 
-					res.getText(R.string.progressTitle), 
-					res.getText(R.string.progressBodyLocation));
-		}
-
-
-		@Override
-		protected String doInBackground(Void... params) {
-			try {
-				return ((PKPApplication)getApplication()).getLocation();
-			} catch (IOException e) {
-				return null;
-			}
-		}
-		
 	}
 }
