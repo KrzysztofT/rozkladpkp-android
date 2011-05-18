@@ -171,6 +171,7 @@ public class TimetableFormActivity extends Activity {
 					//Wybrano stację z dostępnej listy
 					ni = new Intent(arg0.getContext(),TimetableActivity.class);
 					StationSpinner sp = (StationSpinner)  findViewById(R.id.station_select);
+					sp.saveInDatabase();
 					
 					ni.putExtra("SID", sp.getCurrentSID());
 					ni.putExtra("Station", sp.getText());

@@ -7,18 +7,20 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.tyszecki.rozkladpkp.DatabaseHelper;
 import org.tyszecki.rozkladpkp.R;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Filter;
 
 public class StationEdit extends  AutoCompleteTextView {
 
-	private String[] stationsArr;
+	private ArrayList<String> stationsArr;
 	private boolean enableAC = true;
 	
 	private static final Map<String,String> chmap = new HashMap<String,String>(){
@@ -169,18 +171,25 @@ public class StationEdit extends  AutoCompleteTextView {
 	}
 	
 	
+	@SuppressWarnings("unchecked")
 	public StationEdit(Context context, AttributeSet attrs) {
         super(context, attrs); 
         setSingleLine();
         setDropDownHeight(-2);
         
-        stationsArr = getResources().getString(R.string.stations).split(",");
+        SQLiteDatabase db =  DatabaseHelper.getDb(getContext());
+        Cursor cur = db.query("stations", new String[]{"name"}, null, null, null, null, null);
+        
+        stationsArr = new ArrayList<String>();
+        
+        while(cur.moveToNext())
+        	stationsArr.add(cur.getString(0));
+        
+        db.close();
         
         //Konieczna jest konwersja Tablica -> ArrayList, ponieważ jeśli podamy tablicę, ArrayAdapter zachowa ją wewnętrznie jako AbstractList.
         //AbstractList nie można modyfikować i program dostanie FC przy próbie filtrowania.
-        StationAdapter a = new StationAdapter(getContext(), R.layout.station_edit_item, new ArrayList<String>(Arrays.asList(stationsArr)));
-        
-        
+        StationAdapter a = new StationAdapter(getContext(), R.layout.station_edit_item, (ArrayList<String>) stationsArr.clone());
         
         setAdapter(a);  
 	};
@@ -188,20 +197,18 @@ public class StationEdit extends  AutoCompleteTextView {
 	public String getCurrentSID()
 	{
 		String cstation = getText().toString();
-		int j = stationsArr.length;
-		int i;
-		for(i = 0; i < j; i++)
-			if(cstation.equals(stationsArr[i]))
-			{
-				String a = getResources().getString(R.string.stationids).split(",")[i];
-				String [] parts = a.split(";");
-				
-				a = "A=1@O="+cstation+"@X="+parts[0]+"@Y="+parts[1]+"@L="+parts[2]+"@";
-				Log.i("RozkladPKP",a);
-				return a;
-			}
-			
-		return "";
+		
+		SQLiteDatabase db =  DatabaseHelper.getDb(getContext());
+        Cursor cur = db.query("stations", new String[]{"_id"}, "name = \""+cstation+"\"", null, null, null, null,"1");
+		
+        if(cur.moveToNext())
+        {
+        	db.close();
+        	return "A=1@O="+cstation+"@L="+Integer.toString(cur.getInt(0))+"@";
+        }
+        db.close();
+        return "";
+        
 	}
 	
 	public void setAutoComplete(boolean en)

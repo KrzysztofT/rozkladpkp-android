@@ -112,22 +112,20 @@ public final class R {
     }
     public static final class string {
         public static final int app_name=0x7f040000;
-        public static final int arrivalShortLabel=0x7f04000c;
-        public static final int departureShortLabel=0x7f04000b;
-        public static final int hintArrivalStaton=0x7f04000d;
-        public static final int hintDepartureStation=0x7f04000e;
-        public static final int hintStation=0x7f04000f;
-        public static final int menuDisableAC=0x7f040011;
-        public static final int menuEnableAC=0x7f040010;
-        public static final int progressBodyLocation=0x7f040004;
-        public static final int progressSearchingStation=0x7f040005;
-        public static final int progressTitle=0x7f040003;
-        public static final int stationids=0x7f040002;
-        public static final int stations=0x7f040001;
-        public static final int toastArrivalEmpty=0x7f040008;
-        public static final int toastDepartureEmpty=0x7f040009;
-        public static final int toastLocationError=0x7f040006;
-        public static final int toastSameStationsError=0x7f040007;
-        public static final int toastStationEmpty=0x7f04000a;
+        public static final int arrivalShortLabel=0x7f04000a;
+        public static final int departureShortLabel=0x7f040009;
+        public static final int hintArrivalStaton=0x7f04000b;
+        public static final int hintDepartureStation=0x7f04000c;
+        public static final int hintStation=0x7f04000d;
+        public static final int menuDisableAC=0x7f04000f;
+        public static final int menuEnableAC=0x7f04000e;
+        public static final int progressBodyLocation=0x7f040002;
+        public static final int progressSearchingStation=0x7f040003;
+        public static final int progressTitle=0x7f040001;
+        public static final int toastArrivalEmpty=0x7f040006;
+        public static final int toastDepartureEmpty=0x7f040007;
+        public static final int toastLocationError=0x7f040004;
+        public static final int toastSameStationsError=0x7f040005;
+        public static final int toastStationEmpty=0x7f040008;
     }
 }

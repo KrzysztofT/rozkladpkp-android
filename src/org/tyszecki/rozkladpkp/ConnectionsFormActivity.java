@@ -150,6 +150,9 @@ public class ConnectionsFormActivity extends Activity {
      
         	depSelect = (StationSpinner) findViewById(R.id.departure_select);
         	arrSelect = (StationSpinner) findViewById(R.id.arrival_select);
+        	
+        	
+        	
             
             depSelect.setOnDataLoaded(dl);
             arrSelect.setOnDataLoaded(dl);
@@ -229,6 +232,9 @@ public class ConnectionsFormActivity extends Activity {
 				}
 				else
 				{
+					depSelect.saveInDatabase();
+		        	arrSelect.saveInDatabase();
+		        	
 					//Wybrano diwe takie same stacje z listy
 					if(arrSelect.getCurrentSID().equals(depSelect.getCurrentSID()))
 					{
