@@ -7,6 +7,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.tyszecki.rozkladpkp.DatabaseHelper;
 import org.tyszecki.rozkladpkp.StationSearch;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -14,7 +15,9 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -77,6 +80,25 @@ public class StationSpinner extends Spinner {
 	public String getText()
 	{
 		return stations[getSelectedItemPosition()][0];
+	}
+	
+	public void saveInDatabase()
+	{
+		SQLiteDatabase db = DatabaseHelper.getDbRW(getContext());
+		
+		ContentValues val = new ContentValues();
+		
+		for(String t: getCurrentSID().split("@"))
+			if(t.startsWith("L="))
+			{
+				val.put("_id",t.split("=")[1]);
+				break;
+			}
+			
+		val.put("name", getText());
+		
+		db.insert("stations", null, val);
+		db.close();
 	}
 	
 	private Runnable showUpdate = new Runnable(){
