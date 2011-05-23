@@ -271,11 +271,16 @@ public class ConnectionsFormActivity extends Activity {
 								runOnUiThread(new Runnable() {
 									@Override
 									public void run() {
-										StationEdit ed = (StationEdit) findViewById(R.id.departure_edit);
-										ed.setText(s);
-										final Editable etext = ed.getText();
-										final int position = etext.length();
-										Selection.setSelection(etext, position);
+										if(s == null)
+											Toast.makeText(getApplicationContext(), res.getText(R.string.toastLocationError), Toast.LENGTH_SHORT).show();
+										else
+										{
+											StationEdit ed = (StationEdit) findViewById(R.id.departure_edit);
+											ed.setText(s);
+											final Editable etext = ed.getText();
+											final int position = etext.length();
+											Selection.setSelection(etext, position);
+										}
 									}
 								});
 							}

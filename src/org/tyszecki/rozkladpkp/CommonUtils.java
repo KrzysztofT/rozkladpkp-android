@@ -1,6 +1,5 @@
 package org.tyszecki.rozkladpkp;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -9,6 +8,8 @@ import java.util.regex.Pattern;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.location.Address;
 import android.location.Geocoder;
@@ -117,9 +118,9 @@ public class CommonUtils {
 				try {
 					List<Address> addresses = c.getFromLocation(l.getLatitude(), l.getLongitude(), 1);
 					callback.gotLocality(addresses.get(0).getLocality());
-				} catch (IOException e) {
+				} catch (Exception e) {
 					callback.gotLocality(null);
-				}
+				} 
 				//TODO: Czy to wywołanie może w ogóle zawieźć? 
 				cx.runOnUiThread(new Runnable() {
 					
@@ -135,4 +136,22 @@ public class CommonUtils {
 	public static abstract class LocationResult{
         public abstract void gotLocality(String s);
     }
+	
+	// http://stackoverflow.com/questions/2833474/how-to-toggle-orientation-lock-in-android
+	public static void setActivityOrientation(Activity activity, int preferenceOrientation) {
+	    if (preferenceOrientation == Configuration.ORIENTATION_LANDSCAPE) { 
+	        if( activity.getRequestedOrientation() != ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE){ 
+	        // You need to check if your desired orientation isn't already set because setting orientation restarts your Activity which takes long
+	            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+	        }
+	    } else if (preferenceOrientation == Configuration.ORIENTATION_PORTRAIT) {
+	        if( activity.getRequestedOrientation() != ActivityInfo.SCREEN_ORIENTATION_PORTRAIT){
+	            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+	        }    
+	    } else {
+	        if( activity.getRequestedOrientation() != ActivityInfo.SCREEN_ORIENTATION_SENSOR){
+	            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+	        }
+	    }
+	}
 }
