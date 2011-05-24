@@ -24,7 +24,6 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.DialogInterface.OnCancelListener;
-import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -56,12 +55,8 @@ public class ConnectionListActivity extends Activity {
 	@SuppressWarnings("unchecked")
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		//Zablokowanie zmiany orientacji, zapobiega wywalaniu się aplikacji, kiedy orientacja zostanie zmieniona przed pobraniem rozkładu
-		CommonUtils.setActivityOrientation(this, getResources().getConfiguration().orientation);
-		
 		
 		setContentView(R.layout.connection_list);
-        
         
         adapter = new ConnectionListItemAdapter(this);
         ListView lv = (ListView)findViewById(R.id.connection_list);
@@ -190,7 +185,6 @@ public class ConnectionListActivity extends Activity {
 			@Override
 			public void run() {
 				//Pozwolenie na zmianę orientacji
-				CommonUtils.setActivityOrientation(ConnectionListActivity.this, ActivityInfo.SCREEN_ORIENTATION_SENSOR);
 				if(seqnr == 0 && pln.conCnt == 0)
 				{
 					hideLoader();

@@ -4,7 +4,6 @@ import org.tyszecki.rozkladpkp.PLN.Train;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.TextView;
 
 public class TrainDetailsActivity extends Activity {

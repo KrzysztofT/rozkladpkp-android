@@ -9,21 +9,21 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="RememberedActivity">
+        <activity android:name="RememberedActivity" android:configChanges="orientation">
         </activity>
-        <activity android:name="TimetableActivity">
+        <activity android:name="TimetableActivity" android:configChanges="orientation">
         </activity>
-        <activity android:name="TimetableFormActivity">
+        <activity android:name="TimetableFormActivity" android:configChanges="orientation">
         </activity>
-        <activity android:name="ConnectionsFormActivity">
+        <activity android:name="ConnectionsFormActivity" android:configChanges="orientation">
         </activity>
-        <activity android:name="RouteActivity">
+        <activity android:name="RouteActivity" android:configChanges="orientation">
         </activity>
-        <activity android:name="ConnectionListActivity">
+        <activity android:name="ConnectionListActivity" android:configChanges="orientation">
         </activity>
-        <activity android:name="ConnectionDetailsActivity">
+        <activity android:name="ConnectionDetailsActivity" android:configChanges="orientation">
         </activity>
-        <activity android:name="TrainDetailsActivity">
+        <activity android:name="TrainDetailsActivity" android:configChanges="orientation">
         </activity>
     </application>
 <uses-permission android:name="android.permission.INTERNET"/>
