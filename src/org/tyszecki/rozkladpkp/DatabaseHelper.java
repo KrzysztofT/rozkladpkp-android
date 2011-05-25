@@ -1,14 +1,18 @@
 package org.tyszecki.rozkladpkp;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.channels.FileChannel;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Environment;
 import android.util.Log;
 
 public class DatabaseHelper extends SQLiteOpenHelper{
@@ -32,6 +36,37 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 	public DatabaseHelper(Context context) {
 		super(context, DB_NAME, null, DB_VERSION);
 		this.myContext = context;
+		
+		/*try {
+
+			File sd = Environment.getExternalStorageDirectory();
+
+			File data = Environment.getDataDirectory();
+
+			if (sd.canWrite()) {
+
+			
+
+			File currentDB = new File(DB_PATH+DB_NAME);
+
+			File backupDB = new File(sd, "rozklad.db");
+
+			if (currentDB.exists()) {
+
+			FileChannel src = new FileInputStream(currentDB).getChannel();
+
+			FileChannel dst = new FileOutputStream(backupDB).getChannel();
+
+			dst.transferFrom(src, 0, src.size());
+
+			src.close();
+
+			dst.close();
+
+			}
+			}
+
+			} catch (Exception e) {}*/
 	}	
 
 	//TODO: Ograniczenie liczby wywołań openDatabase.

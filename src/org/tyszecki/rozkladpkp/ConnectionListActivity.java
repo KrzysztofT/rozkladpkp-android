@@ -73,6 +73,8 @@ public class ConnectionListActivity extends Activity {
         commonFieldsList.add(new SerializableNameValuePair("REQ0JourneyProduct_prod_list_1",extras.getString("Products")));
         commonFieldsList.add(new SerializableNameValuePair("start", "1"));
         
+        RememberedManager.addtoHistory(this, CommonUtils.StationIDfromSID(extras.getString("SID")), CommonUtils.StationIDfromSID(extras.getString("ZID")));
+        
         if(savedInstanceState != null && savedInstanceState.containsKey("PLNData")){
         	pln = new PLN(savedInstanceState.getByteArray("PLNData"));
         	plndata = pln.data;

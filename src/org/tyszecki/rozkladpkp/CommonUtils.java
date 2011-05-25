@@ -154,4 +154,12 @@ public class CommonUtils {
 	        }
 	    }
 	}
+	
+	public static String StationIDfromSID(String ID)
+	{
+		for(String t: ID.split("@"))
+			if(t.startsWith("L="))
+				return t.split("=")[1];
+		return null;
+	}
 }

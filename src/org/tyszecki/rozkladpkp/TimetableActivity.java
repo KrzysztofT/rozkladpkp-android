@@ -58,9 +58,13 @@ public class TimetableActivity extends Activity {
         
         SID = getIntent().getExtras().getString("SID");
         
-        Log.i("Sitkol",SID);
+        
+        
+        Log.i("RozkladPKP",SID);
         dep = getIntent().getExtras().getString("Type").equals("dep");
-
+        
+        RememberedManager.addtoHistory(this, CommonUtils.StationIDfromSID(SID), dep);
+        
         setTitle((dep?"Odjazdy z ":"Przyjazdy do ")+getIntent().getExtras().getString("Station"));
         
         m_items = new ArrayList<TimetableItem>();

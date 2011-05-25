@@ -235,7 +235,7 @@ public class ConnectionsFormActivity extends Activity {
 					depSelect.saveInDatabase();
 		        	arrSelect.saveInDatabase();
 		        	
-					//Wybrano diwe takie same stacje z listy
+					//Wybrano dwie takie same stacje z listy
 					if(arrSelect.getCurrentSID().equals(depSelect.getCurrentSID()))
 					{
 						Toast.makeText(getApplicationContext(), res.getText(R.string.toastSameStationsError), Toast.LENGTH_SHORT).show();
