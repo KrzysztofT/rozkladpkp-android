@@ -22,8 +22,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-import org.tyszecki.rozkladpkp.R;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -209,7 +207,6 @@ public class TimetableActivity extends Activity {
 
             // Return result from buffered stream
             String xmlstring = new String(content.toByteArray());
-            
         	
         	DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         	DocumentBuilder db = factory.newDocumentBuilder();

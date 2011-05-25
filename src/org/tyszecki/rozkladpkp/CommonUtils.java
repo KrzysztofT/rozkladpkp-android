@@ -121,7 +121,7 @@ public class CommonUtils {
 				} catch (Exception e) {
 					callback.gotLocality(null);
 				} 
-				//TODO: Czy to wywołanie może w ogóle zawieźć? 
+				//TODO: Czy to wywołanie może w ogóle zawieść? 
 				cx.runOnUiThread(new Runnable() {
 					
 					@Override

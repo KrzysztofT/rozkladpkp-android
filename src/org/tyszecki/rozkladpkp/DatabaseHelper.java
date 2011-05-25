@@ -9,6 +9,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 public class DatabaseHelper extends SQLiteOpenHelper{
 
@@ -17,6 +18,8 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 
 	private static String DB_NAME = "rozkladpkp";
 
+	private final static int DB_VERSION = 2;
+	
 	private SQLiteDatabase myDataBase; 
 
 	private final Context myContext;
@@ -27,25 +30,25 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 	 * @param context
 	 */
 	public DatabaseHelper(Context context) {
-
-		super(context, DB_NAME, null, 1);
+		super(context, DB_NAME, null, DB_VERSION);
 		this.myContext = context;
 	}	
 
+	//TODO: Ograniczenie liczby wywołań openDatabase.
+	
 	/**
 	 * Creates a empty database on the system and rewrites it with your own database.
 	 * */
 	public void createDataBase() throws IOException{
 
 		boolean dbExist = checkDataBase();
-
+		
 		if(dbExist){
 			//do nothing - database already exist
 		}else{
-
 			//By calling this method and empty database will be created into the default system path
 			//of your application so we are gonna be able to overwrite that database with our database.
-			this.getReadableDatabase();
+			this.getReadableDatabase().close();
 			try {
 				copyDataBase();
 			} catch (IOException e) {
@@ -65,13 +68,19 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 
 		try{
 			String myPath = DB_PATH + DB_NAME;
-			checkDB = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READONLY);
+			checkDB = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READWRITE);
 
 		}catch(SQLiteException e){
 			//database does't exist yet.
 		}
 
 		if(checkDB != null){
+			//getWriteableDatabase nie wywoła onUpgrade kiedy wersja starej bazy będzie równa 0
+			if(DB_VERSION > checkDB.getVersion())
+			{
+				myUpgrade(checkDB, checkDB.getVersion(), DB_VERSION);
+				checkDB.setVersion(DB_VERSION);
+			}
 			checkDB.close(); 
 		}
 
@@ -83,8 +92,9 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 	 * system folder, from where it can be accessed and handled.
 	 * This is done by transfering bytestream.
 	 * */
+	
 	private void copyDataBase() throws IOException{
-
+		Log.i("RozkladPKP","kopiowanie!");
 		//Open your local db as the input stream
 		InputStream myInput = myContext.getAssets().open(DB_NAME);
 
@@ -105,6 +115,8 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 		myOutput.flush();
 		myOutput.close();
 		myInput.close();
+		
+		myCreate();
 
 	}
 
@@ -143,12 +155,37 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-
 	}
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
+	}
+	
+	/*
+	 * Te metody utworzono, aby ominąć wewnętrzny mechanizm SQLiteOpenHelpera. 
+	 * Metoda onCreate zostałaby wywołana przed skopiowaniem bazy z katalogu assets,
+	 * co sprawiłoby że zmiany przez nią wprowadzone zostałyby cofnięte. 
+	 */
+	public void myCreate() {
+		Log.i("RozkladPKP","myCreate called!");
+		SQLiteDatabase db = SQLiteDatabase.openDatabase(DB_PATH+DB_NAME, null, SQLiteDatabase.OPEN_READWRITE);
+		createFavTables(db);
+		
+		db.setVersion(DB_VERSION);
+		db.close();
+	}
+	
+	public void myUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+		Log.i("RozkladPKP","myUpgrade called!");
+		if(oldVersion < 2)
+			createFavTables(db);
+	}
+	
+	private void createFavTables(SQLiteDatabase db)
+	{
+		db.execSQL("CREATE TABLE \"favRoutes\" (\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,\"sidFrom\" INTEGER NOT NULL,\"sidTo\" INTEGER NOT NULL);");
+		db.execSQL("CREATE TABLE \"favTimetables\" (\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,\"sid\" INTEGER NOT NULL,\"departure\" INTEGER);");
+		db.execSQL("CREATE TABLE \"lastQueries\" (\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,\"sid\" INTEGER NOT NULL,\"toSid\" INTEGER,\"type\" INTEGER);");	
 	}
 
 }
