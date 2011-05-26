@@ -17,6 +17,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.tyszecki.rozkladpkp.TimetableItem.DateItem;
 import org.tyszecki.rozkladpkp.TimetableItem.TrainItem;
+import org.tyszecki.rozkladpkp.widgets.StationEdit;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -29,6 +30,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -287,6 +290,20 @@ public class TimetableActivity extends Activity {
             
             m_ProgressDialog.dismiss();
         }
-      };
+	};
+	
+	public boolean onCreateOptionsMenu(Menu menu){
+		getMenuInflater().inflate(R.menu.timetable, menu);
+		return true;
+	}
+	
+	public boolean onOptionsItemSelected (MenuItem item){
+		switch(item.getItemId()){
+		case R.id.item_favourite:
+			RememberedManager.saveStation(this, CommonUtils.StationIDfromSID(SID), dep);
+			return true;
+		}
+		return false;
+	}
 }
 

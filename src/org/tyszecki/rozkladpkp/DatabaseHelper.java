@@ -219,7 +219,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 	private void createFavTables(SQLiteDatabase db)
 	{
 		db.execSQL("CREATE TABLE \"favRoutes\" (\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,\"sidFrom\" INTEGER NOT NULL,\"sidTo\" INTEGER NOT NULL);");
-		db.execSQL("CREATE TABLE \"favTimetables\" (\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,\"sid\" INTEGER NOT NULL,\"departure\" INTEGER);");
+		db.execSQL("CREATE TABLE \"favTimetables\" (\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,\"sid\" INTEGER NOT NULL,\"type\" INTEGER);");
 		db.execSQL("CREATE TABLE \"lastQueries\" (\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,\"sid\" INTEGER NOT NULL,\"toSid\" INTEGER,\"type\" INTEGER);");	
 	}
 

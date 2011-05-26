@@ -226,7 +226,7 @@ public class TimetableFormActivity extends Activity {
 			return false;
 		
 		StationEdit autoComplete = (StationEdit)  findViewById(R.id.station_edit);
-		getMenuInflater().inflate(R.menu.timetable, menu);
+		getMenuInflater().inflate(R.menu.timetable_form, menu);
 		menu.getItem(0).setTitle(res.getString((autoComplete.autoComplete() ? R.string.menuDisableAC : R.string.menuEnableAC)));
 		return true;
 	}

@@ -27,25 +27,50 @@ public class RememberedItemAdapter extends BaseAdapter {
 	
 	public RememberedItemAdapter(Context context) {
 		c = context;
-		
 		items = new ArrayList<RememberedItem>();
+	}
+	
+	public void reloadData() {
+		items.clear();
 		
 		HeaderItem h = new HeaderItem();
 		h.text = "Trasy";
-		
 		items.add(h);
+		
+		SQLiteDatabase db = DatabaseHelper.getDb(c);
+		Cursor cur = db.rawQuery("SELECT sidFrom,sidTo,s.name,stations.name AS name1 FROM favroutes LEFT JOIN stations AS s on s._id=sidFrom LEFT join stations on stations._id=sidTo", null);
+		while(cur.moveToNext())
+		{
+			RouteItem t = new RouteItem();
+			t.SIDFrom = cur.getInt(0);
+			t.SIDTo = cur.getInt(1);
+			t.fromName = cur.getString(2);
+			t.toName = cur.getString(3);
+			items.add(t);
+		}
 		
 		h = new HeaderItem();
 		h.text = "Rozkłady";
 		items.add(h);
 		
+		cur = db.rawQuery("SELECT type,sid,stations.name FROM favtimetables LEFT join stations on stations._id=sid", null);
+		while(cur.moveToNext())
+		{
+			TimetableItem t = new TimetableItem();
+			t.type = (cur.getInt(0) == 0) ? TimetableType.Departure : TimetableType.Arrival;
+			t.SID = cur.getInt(1);
+			t.name = cur.getString(2);
+			
+			items.add(t);
+		}
+		
+		
 		h = new HeaderItem();
 		h.text = "Ostatnio wyszukiwane";
 		items.add(h);
 		
-		SQLiteDatabase db = DatabaseHelper.getDb(c);
 		//Zwraca nazwy i SIDy ostatnio wyszukiwanych
-		Cursor cur = db.rawQuery("SELECT type,sid,tosid,s.name,stations.name AS name1 FROM lastqueries LEFT JOIN stations AS s on s._id=sid LEFT join stations on stations._id=toSID", null);
+		cur = db.rawQuery("SELECT type,sid,tosid,s.name,stations.name AS name1 FROM lastqueries LEFT JOIN stations AS s on s._id=sid LEFT join stations on stations._id=toSID", null);
 		while(cur.moveToNext())
 		{
 			//2 = trasa, 1 = przyjazdy, 0 = odjazdy
@@ -68,9 +93,9 @@ public class RememberedItemAdapter extends BaseAdapter {
 				items.add(t);
 			}
 		}
-		
-	}
-	
+		db.close();
+		notifyDataSetChanged();
+	} 
 	@Override
 	public int getCount() {
 		return items.size();
@@ -147,5 +172,6 @@ public class RememberedItemAdapter extends BaseAdapter {
 	@Override
     public boolean isEnabled(int position) {  
         return (getItemViewType(position) != HEADER);  
-    } 
+    }
+
 }

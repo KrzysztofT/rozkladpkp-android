@@ -1,3 +1,5 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-<item android:title="Autouzupełnianie" android:id="@+id/item01"></item>
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+  xmlns:android="http://schemas.android.com/apk/res/android">
+<item android:title="Dodaj do zapamiętanych" android:id="@+id/item_favourite"></item>
 </menu>

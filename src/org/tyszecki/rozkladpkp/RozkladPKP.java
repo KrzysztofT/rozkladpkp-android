@@ -1,7 +1,5 @@
 package org.tyszecki.rozkladpkp;
 
-import org.tyszecki.rozkladpkp.R;
-
 import android.app.TabActivity;
 import android.content.Intent;
 import android.content.res.Resources;

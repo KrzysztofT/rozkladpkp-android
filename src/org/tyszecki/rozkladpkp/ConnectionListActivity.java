@@ -448,6 +448,10 @@ public class ConnectionListActivity extends Activity {
 				e.printStackTrace();
 			}
 			return true;
+		case R.id.item_favourite:
+			Bundle extras = getIntent().getExtras();
+			RememberedManager.saveRoute(this, CommonUtils.StationIDfromSID(extras.getString("SID")), CommonUtils.StationIDfromSID(extras.getString("ZID")));
+			return true;
 		}
 		return false;
 	}
