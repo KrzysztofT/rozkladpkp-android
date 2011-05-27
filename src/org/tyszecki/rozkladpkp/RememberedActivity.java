@@ -2,7 +2,6 @@ package org.tyszecki.rozkladpkp;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.ListView;
 
 public class RememberedActivity extends Activity {

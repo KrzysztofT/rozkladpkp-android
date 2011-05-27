@@ -17,7 +17,6 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.tyszecki.rozkladpkp.TimetableItem.DateItem;
 import org.tyszecki.rozkladpkp.TimetableItem.TrainItem;
-import org.tyszecki.rozkladpkp.widgets.StationEdit;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -28,6 +27,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.DialogInterface.OnCancelListener;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -45,7 +45,7 @@ public class TimetableActivity extends Activity {
 	private Runnable viewBoard;
 	private static byte[] sBuffer = new byte[512];
 	private String SID;
-	private boolean dep;
+	private boolean dep, inFront = true, showNDDialog = false;
 	NodeList destList = null;
 	TimetableItem item;
 	String startID = null,destID = null;
@@ -54,14 +54,13 @@ public class TimetableActivity extends Activity {
 	AdapterView<?> av;
 	Runnable showTimetable;
 	TrainItem titem;
+	Thread loadingThread;
 	
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.timetable);
         
         SID = getIntent().getExtras().getString("SID");
-        
-        
         
         Log.i("RozkladPKP",SID);
         dep = getIntent().getExtras().getString("Type").equals("dep");
@@ -85,10 +84,16 @@ public class TimetableActivity extends Activity {
             }
         };
         
-        Thread thread =  new Thread(null, viewBoard, "MagentoBackground");
-        thread.start();
+        loadingThread =  new Thread(null, viewBoard, "MagentoBackground");
+        loadingThread.start();
         m_ProgressDialog = ProgressDialog.show(TimetableActivity.this,    
-              "Czekaj...", "Pobieranie rozkładu...", true);
+              "Czekaj...", "Pobieranie rozkładu...", true, true, new OnCancelListener() {
+				@Override
+				public void onCancel(DialogInterface dialog) {
+					loadingThread.interrupt();
+					TimetableActivity.this.finish();
+				}
+			});
         
         //Włączanie informacji o pociągu - potrzebnego do tego są identyfikatory stacji.
         //Ponieważ nie rozpracowałem jeszcze formatu PLN, używana jest wyszukiwarka.
@@ -166,8 +171,8 @@ public class TimetableActivity extends Activity {
 						}
 		            }
 		        };
-		        Thread thread =  new Thread(null,destSearch, "DestSearch");
-		        thread.start();
+		        loadingThread =  new Thread(null,destSearch, "DestSearch");
+		        loadingThread.start();
 		        
 		        
 				
@@ -285,8 +290,10 @@ public class TimetableActivity extends Activity {
         public void run() {
             if(m_items != null && m_items.size() > 0)
                 m_adapter.notifyDataSetChanged();
-            else
+            else if(inFront)
             	noDataAlert();
+            else
+            	showNDDialog = true;
             
             m_ProgressDialog.dismiss();
         }
@@ -304,6 +311,24 @@ public class TimetableActivity extends Activity {
 			return true;
 		}
 		return false;
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		inFront = true;
+		if(showNDDialog)
+		{
+			noDataAlert();
+			showNDDialog = false;
+		}
+		
+	}
+	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		inFront = false;
 	}
 }
 

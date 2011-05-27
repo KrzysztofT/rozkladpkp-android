@@ -38,34 +38,21 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 		this.myContext = context;
 		
 		/*try {
-
 			File sd = Environment.getExternalStorageDirectory();
-
 			File data = Environment.getDataDirectory();
 
 			if (sd.canWrite()) {
+				File currentDB = new File(DB_PATH+DB_NAME);
+				File backupDB = new File(sd, "rozklad.db");
 
-			
-
-			File currentDB = new File(DB_PATH+DB_NAME);
-
-			File backupDB = new File(sd, "rozklad.db");
-
-			if (currentDB.exists()) {
-
-			FileChannel src = new FileInputStream(currentDB).getChannel();
-
-			FileChannel dst = new FileOutputStream(backupDB).getChannel();
-
-			dst.transferFrom(src, 0, src.size());
-
-			src.close();
-
-			dst.close();
-
+				if (currentDB.exists()) {
+					FileChannel src = new FileInputStream(currentDB).getChannel();
+					FileChannel dst = new FileOutputStream(backupDB).getChannel();
+					dst.transferFrom(src, 0, src.size());
+					src.close();		
+					dst.close();
+				}
 			}
-			}
-
 			} catch (Exception e) {}*/
 	}	
 

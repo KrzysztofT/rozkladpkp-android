@@ -10,7 +10,6 @@ import org.tyszecki.rozkladpkp.RememberedItem.TimetableType;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,7 +47,7 @@ public class RememberedItemAdapter extends BaseAdapter {
 			t.toName = cur.getString(3);
 			items.add(t);
 		}
-		
+		cur.close();
 		h = new HeaderItem();
 		h.text = "Rozkłady";
 		items.add(h);
@@ -63,14 +62,14 @@ public class RememberedItemAdapter extends BaseAdapter {
 			
 			items.add(t);
 		}
-		
+		cur.close();
 		
 		h = new HeaderItem();
 		h.text = "Ostatnio wyszukiwane";
 		items.add(h);
 		
 		//Zwraca nazwy i SIDy ostatnio wyszukiwanych
-		cur = db.rawQuery("SELECT type,sid,tosid,s.name,stations.name AS name1 FROM lastqueries LEFT JOIN stations AS s on s._id=sid LEFT join stations on stations._id=toSID", null);
+		cur = db.rawQuery("SELECT type,sid,tosid,s.name,stations.name AS name1 FROM lastqueries LEFT JOIN stations AS s on s._id=sid LEFT join stations on stations._id=toSID ORDER by lastqueries._id DESC", null);
 		while(cur.moveToNext())
 		{
 			//2 = trasa, 1 = przyjazdy, 0 = odjazdy
@@ -93,6 +92,7 @@ public class RememberedItemAdapter extends BaseAdapter {
 				items.add(t);
 			}
 		}
+		cur.close();
 		db.close();
 		notifyDataSetChanged();
 	} 

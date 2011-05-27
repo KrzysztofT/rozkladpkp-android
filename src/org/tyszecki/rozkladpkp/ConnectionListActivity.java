@@ -44,6 +44,7 @@ public class ConnectionListActivity extends Activity {
 	private final int TIMETABLE_DOWNLOAD_INTERVAL = 5000;
 	
 	private boolean hasFullTable = false;
+	private boolean inFront = true, showNCDialog = false;
 	private String timetableUrl = null;
 	private ArrayList<SerializableNameValuePair> commonFieldsList;
 	private Thread loadingThread;
@@ -57,7 +58,9 @@ public class ConnectionListActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		
 		setContentView(R.layout.connection_list);
-        
+		
+		Log.i("RozkladPKP", "Start listy");
+		
         adapter = new ConnectionListItemAdapter(this);
         ListView lv = (ListView)findViewById(R.id.connection_list);
         lv.setAdapter(this.adapter);
@@ -96,7 +99,8 @@ public class ConnectionListActivity extends Activity {
 									}
 					            }
 	        				};
-	        new Thread(null, viewConn, "MagentoBackground").start();
+	        loadingThread = new Thread(null, viewConn, "MagentoBackground");
+	        loadingThread.start();
 	        showLoader();
         }
         
@@ -149,7 +153,13 @@ public class ConnectionListActivity extends Activity {
 			@Override
 			public void run() {
 				m_ProgressDialog = ProgressDialog.show(ConnectionListActivity.this,    
-	              "Czekaj...", "Pobieranie rozkładu...", true);
+	              "Czekaj...", "Pobieranie rozkładu...", true, true, new OnCancelListener() {
+					@Override
+					public void onCancel(DialogInterface dialog) {
+						loadingThread.interrupt();
+						ConnectionListActivity.this.finish();
+					}
+				});
 			}
 		};
 		runOnUiThread(uit);
@@ -190,7 +200,10 @@ public class ConnectionListActivity extends Activity {
 				if(seqnr == 0 && pln.conCnt == 0)
 				{
 					hideLoader();
-					noConnectionsAlert();
+					if(inFront)
+						noConnectionsAlert();
+					else
+						showNCDialog = true;
 				}
 				else
 				{
@@ -450,7 +463,8 @@ public class ConnectionListActivity extends Activity {
 			return true;
 		case R.id.item_favourite:
 			Bundle extras = getIntent().getExtras();
-			RememberedManager.saveRoute(this, CommonUtils.StationIDfromSID(extras.getString("SID")), CommonUtils.StationIDfromSID(extras.getString("ZID")));
+			
+			RememberedManager.saveRoute(ConnectionListActivity.this, CommonUtils.StationIDfromSID(extras.getString("SID")), CommonUtils.StationIDfromSID(extras.getString("ZID")));
 			return true;
 		}
 		return false;
@@ -460,10 +474,29 @@ public class ConnectionListActivity extends Activity {
 	protected void onSaveInstanceState(Bundle state){
 		super.onSaveInstanceState(state);
 		
-		state.putByteArray("PLNData", pln.data);
+		if(pln != null)
+			state.putByteArray("PLNData", pln.data);
 		state.putInt("SeqNr", seqnr);
 		state.putBoolean("hasFullTable", hasFullTable);
 		state.putString("timetableURL", timetableUrl);
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		inFront = true;
+		if(showNCDialog)
+		{
+			noConnectionsAlert();
+			showNCDialog = false;
+		}
+		
+	}
+	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		inFront = false;
 	}
 	
 	
