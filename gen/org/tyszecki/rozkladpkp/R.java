@@ -69,7 +69,8 @@ public final class R {
         public static final int duration_icon=0x7f060005;
         public static final int header=0x7f060027;
         public static final int icon=0x7f06001c;
-        public static final int item01=0x7f06002b;
+        public static final int item01=0x7f06002c;
+        public static final int item_delete=0x7f06002b;
         public static final int item_favourite=0x7f06002a;
         public static final int location_button=0x7f06000c;
         public static final int ok_button=0x7f060012;
@@ -113,8 +114,9 @@ public final class R {
     }
     public static final class menu {
         public static final int connection_list=0x7f050000;
-        public static final int timetable=0x7f050001;
-        public static final int timetable_form=0x7f050002;
+        public static final int remembered_list_context=0x7f050001;
+        public static final int timetable=0x7f050002;
+        public static final int timetable_form=0x7f050003;
     }
     public static final class string {
         public static final int app_name=0x7f040000;

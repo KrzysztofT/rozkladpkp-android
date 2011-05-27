@@ -162,4 +162,9 @@ public class CommonUtils {
 				return t.split("=")[1];
 		return null;
 	}
+	
+	public static String SIDfromStationID(int ID, String name)
+	{
+		return "A=1@O="+name+"@L="+Integer.toString(ID)+"@";
+	}
 }

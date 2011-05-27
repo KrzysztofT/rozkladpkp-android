@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.tyszecki.rozkladpkp.RememberedItem.HeaderItem;
 import org.tyszecki.rozkladpkp.RememberedItem.RouteItem;
+import org.tyszecki.rozkladpkp.RememberedItem.StoredType;
 import org.tyszecki.rozkladpkp.RememberedItem.TimetableItem;
 import org.tyszecki.rozkladpkp.RememberedItem.TimetableType;
 
@@ -37,7 +38,7 @@ public class RememberedItemAdapter extends BaseAdapter {
 		items.add(h);
 		
 		SQLiteDatabase db = DatabaseHelper.getDb(c);
-		Cursor cur = db.rawQuery("SELECT sidFrom,sidTo,s.name,stations.name AS name1 FROM favroutes LEFT JOIN stations AS s on s._id=sidFrom LEFT join stations on stations._id=sidTo", null);
+		Cursor cur = db.rawQuery("SELECT sidFrom,sidTo,s.name,stations.name,favroutes._id AS name1 FROM favroutes LEFT JOIN stations AS s on s._id=sidFrom LEFT join stations on stations._id=sidTo", null);
 		while(cur.moveToNext())
 		{
 			RouteItem t = new RouteItem();
@@ -45,6 +46,8 @@ public class RememberedItemAdapter extends BaseAdapter {
 			t.SIDTo = cur.getInt(1);
 			t.fromName = cur.getString(2);
 			t.toName = cur.getString(3);
+			t.id = cur.getInt(4);
+			t.storedType = StoredType.Route;
 			items.add(t);
 		}
 		cur.close();
@@ -52,14 +55,15 @@ public class RememberedItemAdapter extends BaseAdapter {
 		h.text = "Rozkłady";
 		items.add(h);
 		
-		cur = db.rawQuery("SELECT type,sid,stations.name FROM favtimetables LEFT join stations on stations._id=sid", null);
+		cur = db.rawQuery("SELECT type,sid,stations.name,favtimetables._id FROM favtimetables LEFT join stations on stations._id=sid", null);
 		while(cur.moveToNext())
 		{
 			TimetableItem t = new TimetableItem();
 			t.type = (cur.getInt(0) == 0) ? TimetableType.Departure : TimetableType.Arrival;
 			t.SID = cur.getInt(1);
 			t.name = cur.getString(2);
-			
+			t.id = cur.getInt(3);
+			t.storedType = StoredType.Timetable;
 			items.add(t);
 		}
 		cur.close();
@@ -69,7 +73,7 @@ public class RememberedItemAdapter extends BaseAdapter {
 		items.add(h);
 		
 		//Zwraca nazwy i SIDy ostatnio wyszukiwanych
-		cur = db.rawQuery("SELECT type,sid,tosid,s.name,stations.name AS name1 FROM lastqueries LEFT JOIN stations AS s on s._id=sid LEFT join stations on stations._id=toSID ORDER by lastqueries._id DESC", null);
+		cur = db.rawQuery("SELECT type,sid,tosid,s.name,stations.name,lastqueries._id AS name1 FROM lastqueries LEFT JOIN stations AS s on s._id=sid LEFT join stations on stations._id=toSID ORDER by lastqueries._id DESC", null);
 		while(cur.moveToNext())
 		{
 			//2 = trasa, 1 = przyjazdy, 0 = odjazdy
@@ -80,6 +84,10 @@ public class RememberedItemAdapter extends BaseAdapter {
 				t.SIDTo = cur.getInt(2);
 				t.fromName = cur.getString(3);
 				t.toName = cur.getString(4);
+				
+				t.id = cur.getInt(5);
+				t.storedType = StoredType.Searched;
+				
 				items.add(t);
 			}
 			else
@@ -88,6 +96,9 @@ public class RememberedItemAdapter extends BaseAdapter {
 				t.type = (cur.getInt(0) == 0) ? TimetableType.Departure : TimetableType.Arrival;
 				t.SID = cur.getInt(1);
 				t.name = cur.getString(3);
+				
+				t.id = cur.getInt(5);
+				t.storedType = StoredType.Searched;
 				
 				items.add(t);
 			}
@@ -102,7 +113,7 @@ public class RememberedItemAdapter extends BaseAdapter {
 	}
 
 	@Override
-	public Object getItem(int arg0) {
+	public RememberedItem getItem(int arg0) {
 		return items.get(arg0);
 	}
 
@@ -173,5 +184,17 @@ public class RememberedItemAdapter extends BaseAdapter {
     public boolean isEnabled(int position) {  
         return (getItemViewType(position) != HEADER);  
     }
+	
+	public void deleteItem(int position)
+	{
+		RememberedItem item = getItem(position);
+		
+		SQLiteDatabase db = DatabaseHelper.getDbRW(c);		
+		db.delete(item.storedType == StoredType.Route?"favroutes" : item.storedType==StoredType.Timetable?"favtimetables":"lastQueries", "_id=?", 
+				new String[]{Integer.toString(item.id)});
+		db.close();
+		
+		reloadData();
+	}
 
 }
