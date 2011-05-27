@@ -205,9 +205,8 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 	
 	private void createFavTables(SQLiteDatabase db)
 	{
-		db.execSQL("CREATE TABLE \"favRoutes\" (\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,\"sidFrom\" INTEGER NOT NULL,\"sidTo\" INTEGER NOT NULL);");
-		db.execSQL("CREATE TABLE \"favTimetables\" (\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,\"sid\" INTEGER NOT NULL,\"type\" INTEGER);");
-		db.execSQL("CREATE TABLE \"lastQueries\" (\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,\"sid\" INTEGER NOT NULL,\"toSid\" INTEGER,\"type\" INTEGER);");	
+		db.execSQL("CREATE TABLE 'stored' ('_id' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,'sidFrom' INTEGER NOT NULL,'sidTo' INTEGER,'type' INTEGER,'fav' INTEGER);");
+		db.execSQL("CREATE VIEW storedview AS SELECT stored._id,sidFrom,sidTo,s.name AS fromName,stations.name AS toName,type,fav FROM stored LEFT JOIN stations AS s on s._id=sidFrom LEFT join stations on stations._id=sidTo ORDER BY stored._id DESC");
 	}
 
 }

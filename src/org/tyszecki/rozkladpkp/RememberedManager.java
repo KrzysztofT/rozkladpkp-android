@@ -13,11 +13,11 @@ public class RememberedManager {
 	 */
 	private static void cleanupHistory(SQLiteDatabase db)
 	{
-		Cursor cur = db.rawQuery("SELECT _id FROM lastqueries ORDER BY _id DESC LIMIT -1 OFFSET 10", null);
+		Cursor cur = db.rawQuery("SELECT _id FROM stored WHERE fav IS null ORDER BY _id DESC LIMIT -1 OFFSET 10", null);
 		
 		if(cur.getCount() > 0)
 		{
-			String SQL = "DELETE FROM lastqueries WHERE _id IN (";
+			String SQL = "DELETE FROM stored WHERE _id IN (";
 			
 			while(cur.moveToNext())
 			{
@@ -38,7 +38,7 @@ public class RememberedManager {
 	{
 		SQLiteDatabase db = DatabaseHelper.getDbRW(c);
 		
-		Cursor cur = db.query("lastqueries", new String[]{"_id"}, "sid=? AND type=?", new String[]{stationSID,departure?"0":"1"}, null, null, null);
+		Cursor cur = db.query("stored", new String[]{"_id"}, "sidFrom=? AND type=?", new String[]{stationSID,departure?"0":"1"}, null, null, null);
 		
 		String id = null;
 		
@@ -47,18 +47,15 @@ public class RememberedManager {
 		cur.close();
 		
 		if(id != null)
-		{
-			Log.i("RozkladPKP","Zmiana ID"+id);
-			db.execSQL("UPDATE lastqueries SET _id=(SELECT _id+1 FROM lastqueries ORDER BY _id DESC LIMIT 1) WHERE _id="+id);
-		}
+			db.execSQL("UPDATE stored SET _id=(SELECT _id+1 FROM stored ORDER BY _id DESC LIMIT 1) WHERE _id="+id);
+		
 		else
 		{
-			Log.i("RozkladPKP","Nowa pozycja");
 			ContentValues val = new ContentValues();
-			val.put("sid", stationSID);
+			val.put("sidFrom", stationSID);
 			val.put("type", departure?0:1);
 			
-			db.insert("lastQueries", null, val);
+			db.insert("stored", null, val);
 			cleanupHistory(db);	
 		}
 		db.close();
@@ -68,7 +65,7 @@ public class RememberedManager {
 	{
 		SQLiteDatabase db = DatabaseHelper.getDbRW(c);
 		
-		Cursor cur = db.query("lastqueries", new String[]{"_id"}, "sid=? AND toSid=?", new String[]{fromSID,toSID}, null, null, null);
+		Cursor cur = db.query("stored", new String[]{"_id"}, "sidFrom=? AND sidTo=?", new String[]{fromSID,toSID}, null, null, null);
 		String id = null;
 		
 		if(cur.moveToNext())
@@ -76,17 +73,14 @@ public class RememberedManager {
 		cur.close();
 		
 		if(id != null)
-		{
-			Log.i("RozkladPKP","Zmiana ID"+id);
-			db.execSQL("UPDATE lastqueries SET _id=(SELECT _id+1 FROM lastqueries ORDER BY _id DESC LIMIT 1) WHERE _id="+id);
-		}
+			db.execSQL("UPDATE stored SET _id=(SELECT _id+1 FROM stored ORDER BY _id DESC LIMIT 1) WHERE _id="+id);
 		else
 		{
 			ContentValues val = new ContentValues();
-			val.put("sid", fromSID);
-			val.put("toSid", toSID);
+			val.put("sidFrom", fromSID);
+			val.put("sidTo", toSID);
 			val.put("type", 2);
-			db.insert("lastQueries", null, val);
+			db.insert("stored", null, val);
 			cleanupHistory(db);
 		}
 		db.close();
@@ -96,18 +90,18 @@ public class RememberedManager {
 	{
 		SQLiteDatabase db = DatabaseHelper.getDbRW(c);
 		
-		Cursor cur = db.query("favtimetables", new String[]{"_id"}, "sid=? AND type=?", new String[]{stationSID,departure?"0":"1"}, null, null, null);
+		Cursor cur = db.rawQuery("SELECT _id,fav FROM stored WHERE sidFrom=? AND type=?",new String[]{stationSID,departure?"0":"1"});
 		
-		boolean add = cur.getCount() == 0;
+		cur.moveToNext();
+		boolean add = cur.getInt(1) != 1;
+		int id = cur.getInt(0);
 		cur.close();
 		
 		if(add)
 		{
 			ContentValues val = new ContentValues();
-			val.put("sid", stationSID);
-			val.put("type", departure?0:1);
-			
-			db.insert("favtimetables", null, val);
+			val.put("fav", 1);
+			db.update("stored", val, "_id="+Integer.toString(id),null);
 		}
 		Toast.makeText(c, add?"Stację dodano do zapamiętanych":"Stacja już jest na liście zapamiętanych", Toast.LENGTH_SHORT).show();
 		db.close();
@@ -117,17 +111,18 @@ public class RememberedManager {
 	{
 		SQLiteDatabase db = DatabaseHelper.getDbRW(c);
 		
-		Cursor cur = db.query("favroutes", new String[]{"_id"}, "sidFrom=? AND sidTo=?", new String[]{fromSID,toSID}, null, null, null);
+		Cursor cur = db.query("stored", new String[]{"_id,fav"}, "sidFrom=? AND sidTo=?", new String[]{fromSID,toSID}, null, null, null);
 		
-		boolean add = cur.getCount() == 0;
+		cur.moveToNext();
+		boolean add = cur.getInt(1) != 1;
+		int id = cur.getInt(0);
 		cur.close();
 		
 		if(add)
 		{
 			ContentValues val = new ContentValues();
-			val.put("sidFrom", fromSID);
-			val.put("sidTo", toSID);
-			db.insert("favroutes", null, val);
+			val.put("fav", 1);
+			db.update("stored", val, "_id="+Integer.toString(id),null);
 		}
 		Toast.makeText(c, add?"Trasę dodano do zapamiętanych":"Trasa już jest na liście zapamiętanych", Toast.LENGTH_SHORT).show();
 		db.close();
