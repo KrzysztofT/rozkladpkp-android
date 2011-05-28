@@ -273,7 +273,12 @@ public class ConnectionListActivity extends Activity {
 		client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestExpectContinue.class);
         client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestUserAgent.class);
         request.addHeader("Content-Type", "text/plain");
-        request.setEntity(new UrlEncodedFormEntity(data));
+        request.setEntity(new UrlEncodedFormEntity(data,"UTF-8"));
+        
+        String t= "";
+        for(SerializableNameValuePair p : data)
+        	t+=p.name+"="+p.value+"&";
+        Log.i("RozkladPKP","TTData: "+ t);
         
         HttpResponse response = client.execute(request);
          
@@ -412,7 +417,12 @@ public class ConnectionListActivity extends Activity {
 		client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestExpectContinue.class);
         client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestUserAgent.class);
         request.addHeader("Content-Type", "text/plain");
-        request.setEntity(new UrlEncodedFormEntity(data));
+        request.setEntity(new UrlEncodedFormEntity(data,"UTF-8"));
+        
+        String t= "";
+        for(SerializableNameValuePair p : data)
+        	t+=p.name+"="+p.value+"&";
+        Log.i("RozkladPKP","PLNReq: "+ t);
         
         HttpResponse response = client.execute(request);
          

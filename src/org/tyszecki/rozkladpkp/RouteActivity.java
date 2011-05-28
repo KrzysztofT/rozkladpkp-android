@@ -1,6 +1,9 @@
 package org.tyszecki.rozkladpkp;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -27,6 +30,7 @@ import org.tyszecki.rozkladpkp.R;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.os.Environment;
 import android.widget.ListView;
 
 public class RouteActivity extends Activity {
@@ -110,7 +114,6 @@ public class RouteActivity extends Activity {
         // Return result from buffered stream
         String xmlstring = new String(content.toByteArray());
         xmlstring	= xmlstring.replace("< ", "<");
-        
     	
     	DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     	DocumentBuilder db = factory.newDocumentBuilder();
