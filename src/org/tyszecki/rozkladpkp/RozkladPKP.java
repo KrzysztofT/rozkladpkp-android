@@ -2,19 +2,29 @@ package org.tyszecki.rozkladpkp;
 
 import android.app.TabActivity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.preference.Preference;
+import android.preference.PreferenceManager;
+import android.util.Log;
 import android.widget.TabHost;
+import android.widget.TabHost.OnTabChangeListener;
 
 public class RozkladPKP extends TabActivity {
+    TabHost tabHost;
+    SharedPreferences sp;
+    
     /** Called when the activity is first created. */
+	
     @Override
     public void onCreate(Bundle savedInstanceState) {
     	super.onCreate(savedInstanceState);
     	setContentView(R.layout.main);
-
+    	
+    	
         Resources res = getResources(); // Resource object to get Drawables
-        TabHost tabHost = getTabHost();  // The activity TabHost
+        tabHost = getTabHost();  // The activity TabHost
         TabHost.TabSpec spec;  // Reusable TabSpec for each tab
         Intent intent;  // Reusable Intent for each tab
 
@@ -39,7 +49,28 @@ public class RozkladPKP extends TabActivity {
                           res.getDrawable(R.drawable.ic_menu_show_list))
                       .setContent(intent);
         tabHost.addTab(spec);
+        
+        tabHost.setOnTabChangedListener( new OnTabChangeListener() {
+			
+			@Override
+			public void onTabChanged(String tabId) {
+					int cur = 1;
+					
+					if(tabId.equals("remembered"))cur=0;
+					if(tabId.equals("trips"))cur=1;
+					if(tabId.equals("boards"))cur=2;
+					
+					sp.edit().putInt("lastSelectedTab", cur).commit();
+				
+			}
+		});
 
-        tabHost.setCurrentTab(1);
+        sp = PreferenceManager.getDefaultSharedPreferences(this);
+        
+        int t = Integer.parseInt(sp.getString("defaultTab", "-1"));
+        if(t == -1)
+        	t = sp.getInt("lastSelectedTab", 1); 
+        	
+        tabHost.setCurrentTab(t);
     }
 }

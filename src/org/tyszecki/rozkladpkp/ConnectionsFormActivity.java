@@ -19,6 +19,7 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.Selection;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -136,6 +137,26 @@ public class ConnectionsFormActivity extends Activity {
 	        
 	        depEdit.setAutoComplete(pref.getBoolean("EnableStationAC", true));
 	        arrEdit.setAutoComplete(pref.getBoolean("EnableStationAC", true));
+	        
+	        
+	        String s = safeExtras("arrName"); 
+            if(s != null)
+            	arrEdit.setText(s);
+            	
+            String t = safeExtras("depName");
+            if(t != null)
+            	depEdit.setText(t);
+            
+            if(s == null && t != null)
+            	arrEdit.requestFocus();
+            else if(s != null && t != null)
+            {
+            	timeb.setFocusable(true);
+            	timeb.setFocusableInTouchMode(true);
+            	timeb.requestFocus();
+            	timeb.requestFocusFromTouch();
+            }
+            	
         }
         else
         {	

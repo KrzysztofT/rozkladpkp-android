@@ -19,4 +19,16 @@
 
 <string name="menuEnableAC">Włącz autouzupełnianie</string>
 <string name="menuDisableAC">Wyłącz autouzupełnianie</string>
+<string-array name="settingsTabsList">
+    <item><i>Ostatnio wybrana</i></item>
+    <item>Zapamiętane</item>
+    <item>Połączenia</item>
+    <item>Rozkłady</item>
+</string-array>
+<string-array name="settingsTabsListValues">
+    <item>-1</item>
+    <item>0</item>
+    <item>1</item>
+    <item>2</item>
+</string-array>
 </resources>

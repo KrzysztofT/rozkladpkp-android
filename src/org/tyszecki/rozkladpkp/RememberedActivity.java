@@ -8,6 +8,7 @@ import org.tyszecki.rozkladpkp.RememberedItem.TimetableType;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.format.Time;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
@@ -21,6 +22,7 @@ import android.widget.AdapterView.OnItemClickListener;
 
 public class RememberedActivity extends Activity {
 	RememberedItemAdapter adapter;
+	boolean showForm;
 	
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,7 +45,7 @@ public class RememberedActivity extends Activity {
 				{
 					TimetableItem t = (TimetableItem)b;
 					
-					ni = new Intent(arg0.getContext(),TimetableActivity.class);
+					ni = new Intent(arg0.getContext(), showForm ? TimetableFormActivity.class : TimetableActivity.class);
 					
 					ni.putExtra("Station", t.name);
 					ni.putExtra("SID",CommonUtils.SIDfromStationID(t.SID, t.name));
@@ -54,7 +56,7 @@ public class RememberedActivity extends Activity {
 				else
 				{
 					RememberedItem.RouteItem t = (RememberedItem.RouteItem)b;
-					ni = new Intent(arg0.getContext(),ConnectionListActivity.class);
+					ni = new Intent(arg0.getContext(),showForm ? ConnectionsFormActivity.class : ConnectionListActivity.class);
 					
 					ni.putExtra("ZID", CommonUtils.SIDfromStationID(t.SIDTo,t.toName));
 					ni.putExtra("SID", CommonUtils.SIDfromStationID(t.SIDFrom,t.fromName));
@@ -101,5 +103,6 @@ public class RememberedActivity extends Activity {
 		super.onResume();
 		adapter.reloadData();
 		
+		showForm = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("showFormFromRemembered", false);
 	}
 }

@@ -454,8 +454,10 @@ public class ConnectionListActivity extends Activity {
 	}
 	
 	public boolean onOptionsItemSelected (MenuItem item){
+		Bundle extras = getIntent().getExtras();
+		Intent ni = null;
 		switch(item.getItemId()){
-		case R.id.savepln:
+		/*case R.id.savepln:
 			File f = new File(Environment.getExternalStorageDirectory(),"PLN");
 			FileOutputStream w = null;
 			try {
@@ -470,11 +472,23 @@ public class ConnectionListActivity extends Activity {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			return true;
+			return true;*/
 		case R.id.item_favourite:
-			Bundle extras = getIntent().getExtras();
-			
 			RememberedManager.saveRoute(ConnectionListActivity.this, CommonUtils.StationIDfromSID(extras.getString("SID")), CommonUtils.StationIDfromSID(extras.getString("ZID")));
+			return true;
+		
+		case R.id.item_return_journey:
+			
+			ni = new Intent(getBaseContext(),ConnectionsFormActivity.class);
+			ni.putExtra("arrName",extras.getString("depName"));
+			
+		case R.id.item_continue_journey:
+			if(ni == null)
+				ni = new Intent(getBaseContext(),ConnectionsFormActivity.class);
+			
+			ni.putExtra("depName",extras.getString("arrName"));
+			
+			startActivity(ni);
 			return true;
 		}
 		return false;

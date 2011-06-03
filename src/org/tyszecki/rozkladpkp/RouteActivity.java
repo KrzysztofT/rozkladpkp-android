@@ -31,6 +31,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.widget.ListView;
 
 public class RouteActivity extends Activity {
@@ -94,6 +95,8 @@ public class RouteActivity extends Activity {
 		client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestExpectContinue.class);
         client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestUserAgent.class);
         request.addHeader("Content-Type", "text/plain");
+        
+        Log.i("RozkladPKP",data);
         
 		request.setEntity(new StringEntity(data));
 		

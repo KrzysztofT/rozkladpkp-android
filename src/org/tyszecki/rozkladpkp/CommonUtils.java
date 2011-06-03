@@ -56,7 +56,7 @@ public class CommonUtils {
 			for(String a : new String[]{"TLK","D"})
 				put(a,R.drawable.back_tlk);
 			
-			for(String a : new String[]{"EC","EIC", "EN"})
+			for(String a : new String[]{"EC","EIC", "EN", "EX"})
 				put(a,R.drawable.back_ec);
 			
 			for(String a : new String[]{"SKM","SKW", "WKD"})

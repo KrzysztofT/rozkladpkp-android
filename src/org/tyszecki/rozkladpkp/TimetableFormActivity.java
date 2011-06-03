@@ -68,11 +68,25 @@ public class TimetableFormActivity extends Activity {
         res = getResources();
         pref = getPreferences(MODE_PRIVATE);
         
+        timeb	= (TimeButton) findViewById(R.id.time_button);
+        
+        
         if(!clarify)
         {
         	StationEdit autoComplete = (StationEdit)  findViewById(R.id.station_edit);
 	        autoComplete.setHint(res.getString(R.string.hintStation));
 	        autoComplete.setAutoComplete(pref.getBoolean("EnableStationAC", true));
+	        
+	        Bundle extras = getIntent().getExtras();
+	        
+	        if(extras != null && extras.containsKey("Station"))
+	        {
+	        	autoComplete.setText(extras.getString("Station"));
+	        	timeb.setFocusable(true);
+            	timeb.setFocusableInTouchMode(true);
+            	timeb.requestFocus();
+            	timeb.requestFocusFromTouch();
+	        }
         }
         else
         {
@@ -86,7 +100,7 @@ public class TimetableFormActivity extends Activity {
         
         String ex;
         
-        timeb	= (TimeButton) findViewById(R.id.time_button);
+        
         
         ex 		= safeExtras("Time");
         if(ex == null)
@@ -240,6 +254,10 @@ public class TimetableFormActivity extends Activity {
 			SharedPreferences.Editor e = pref.edit();
 			e.putBoolean("EnableStationAC", !ac);
 			e.commit();
+			return true;
+		case R.id.item_settings:
+			Intent ni = new Intent(getBaseContext(),PreferencesActivity.class);
+			startActivity(ni);
 			return true;
 		}
 		return false;
