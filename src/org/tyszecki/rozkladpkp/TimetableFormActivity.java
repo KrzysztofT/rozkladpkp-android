@@ -1,3 +1,19 @@
+/*******************************************************************************
+ * This file is part of the RozkladPKP project.
+ * 
+ *     RozkladPKP is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ * 
+ *     RozkladPKP is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ * 
+ *     You should have received a copy of the GNU General Public License 
+ *     along with RozkladPKP.  If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
 package org.tyszecki.rozkladpkp;
 
 import org.tyszecki.rozkladpkp.widgets.DateButton;
@@ -236,25 +252,25 @@ public class TimetableFormActivity extends Activity {
 	
 	public boolean onCreateOptionsMenu(Menu menu){
 		
-		if(clarifyingForm())
-			return false;
+		//if(clarifyingForm())
+		//	return false;
 		
-		StationEdit autoComplete = (StationEdit)  findViewById(R.id.station_edit);
+		//StationEdit autoComplete = (StationEdit)  findViewById(R.id.station_edit);
 		getMenuInflater().inflate(R.menu.timetable_form, menu);
-		menu.getItem(0).setTitle(res.getString((autoComplete.autoComplete() ? R.string.menuDisableAC : R.string.menuEnableAC)));
+		//menu.getItem(0).setTitle(res.getString((autoComplete.autoComplete() ? R.string.menuDisableAC : R.string.menuEnableAC)));
 		return true;
 	}
 	
 	public boolean onOptionsItemSelected (MenuItem item){
 		switch(item.getItemId()){
-		case R.id.item01:
+		/*case R.id.item01:
 			StationEdit ed = (StationEdit)  findViewById(R.id.station_edit);
 			boolean ac = ed.autoComplete();
 			ed.setAutoComplete(!ac);
 			SharedPreferences.Editor e = pref.edit();
 			e.putBoolean("EnableStationAC", !ac);
 			e.commit();
-			return true;
+			return true;*/
 		case R.id.item_settings:
 			Intent ni = new Intent(getBaseContext(),PreferencesActivity.class);
 			startActivity(ni);

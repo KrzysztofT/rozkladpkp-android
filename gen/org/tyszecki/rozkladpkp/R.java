@@ -73,12 +73,11 @@ public final class R {
         public static final int duration_icon=0x7f080005;
         public static final int header=0x7f080027;
         public static final int icon=0x7f08001c;
-        public static final int item01=0x7f08002d;
         public static final int item_continue_journey=0x7f08002b;
-        public static final int item_delete=0x7f08002c;
+        public static final int item_delete=0x7f08002d;
         public static final int item_favourite=0x7f080029;
         public static final int item_return_journey=0x7f08002a;
-        public static final int item_settings=0x7f08002e;
+        public static final int item_settings=0x7f08002c;
         public static final int location_button=0x7f08000c;
         public static final int ok_button=0x7f080012;
         public static final int products_button=0x7f080010;
@@ -120,9 +119,11 @@ public final class R {
     }
     public static final class menu {
         public static final int connection_list=0x7f070000;
-        public static final int remembered_list_context=0x7f070001;
-        public static final int timetable=0x7f070002;
-        public static final int timetable_form=0x7f070003;
+        public static final int connections_form=0x7f070001;
+        public static final int remembered=0x7f070002;
+        public static final int remembered_list_context=0x7f070003;
+        public static final int timetable=0x7f070004;
+        public static final int timetable_form=0x7f070005;
     }
     public static final class string {
         public static final int app_name=0x7f050000;
