@@ -18,7 +18,7 @@
 <PreferenceScreen
   xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory android:title="Interfejs aplikacji">
-        <ListPreference android:dialogTitle="Wybierz kartę" android:summary="Karta pokazywana po otwarciu aplikacji" android:title="Domyślna karta" android:entryValues="@array/settingsTabsListValues" android:entries="@array/settingsTabsList" android:key="defaultTab" android:defaultValue='"1"'></ListPreference>
+        <ListPreference android:dialogTitle="Wybierz kartę" android:summary="Karta pokazywana po otwarciu aplikacji" android:title="Domyślna karta" android:entryValues="@array/settingsTabsListValues" android:entries="@array/settingsTabsList" android:key="defaultTab" android:defaultValue="1"></ListPreference>
     </PreferenceCategory>
     <PreferenceCategory android:title="Zapamiętane połączenia"><CheckBoxPreference android:title="Pozwól zmienić czas i datę" android:summary="Po wyborze elementu, pokazuj formularz wyszukiwania, zamiast od razu wyszukać połączenia" android:key="showFormFromRemembered" android:defaultValue="false"></CheckBoxPreference></PreferenceCategory>
 </PreferenceScreen>
