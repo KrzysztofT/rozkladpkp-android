@@ -18,39 +18,79 @@ package org.tyszecki.rozkladpkp;
 
 import java.util.ArrayList;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 
-class RouteItemAdapter extends ArrayAdapter<RouteItem> {
-
+class RouteItemAdapter extends BaseAdapter {
 	
     private ArrayList<RouteItem> items;
-    /*private boolean dep;
-    private String station = "";*/
+    
+    private int stationID = -1;
     private int stationPos = -1;
+    Context c;
 
-    public RouteItemAdapter(Context context, int textViewResourceId, ArrayList<RouteItem> items) {
-            super(context, textViewResourceId, items);
-            this.items = items;
+    public RouteItemAdapter(Context context) {
+    	c = context;
+    	this.items = new ArrayList<RouteItem>();    
     }
     
-    public void setCurrentStation(String id, int pos)
+    public void setData(Document doc, int sID)
     {
-    	//station = id;
-    	stationPos	= pos;
+    	stationID = sID;
+    	loadData(doc);
     }
     
+    private void loadData(Document doc) {
+    	items.clear();
+    	
+    	NodeList list = doc.getElementsByTagName("St");
+    	int j = list.getLength();
+		for(int i = 0; i < j; i++)
+        { 
+			RouteItem o = new RouteItem();
+        	Node n = list.item(i);
+        	o.station 	= n.getAttributes().getNamedItem("name").getNodeValue();
+        	
+        	
+        	Log.i("RozkladPKP", o.station);
+        	
+        	if(n.getAttributes().getNamedItem("arrTime") != null)
+        		o.arr = n.getAttributes().getNamedItem("arrTime").getNodeValue();
+        	else
+        		o.arr = null;
+        	if(n.getAttributes().getNamedItem("depTime") != null)
+        		o.dep = n.getAttributes().getNamedItem("depTime").getNodeValue();
+        	else
+        		o.dep = null;
+        	
+        	o.stid	= n.getAttributes().getNamedItem("evaId").getNodeValue();
+        	
+        	if(Integer.parseInt(o.stid) == stationID)
+        		stationPos = i;
+        	
+        	items.add(o);
+        }
+		
+		notifyDataSetChanged();
+	}
+
     
     public View getView(int position, View convertView, ViewGroup parent) {
             View v = convertView;
             if (v == null) {
-                LayoutInflater vi = (LayoutInflater)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                LayoutInflater vi = (LayoutInflater)c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 v = vi.inflate(R.layout.route_row, null);
             }
             RouteItem o = items.get(position);
@@ -95,8 +135,23 @@ class RouteItemAdapter extends ArrayAdapter<RouteItem> {
                     
                     ImageView icon = (ImageView) v.findViewById(R.id.icon);
                     
-                    icon.setImageDrawable(getContext().getResources().getDrawable(imgId));
+                    icon.setImageDrawable(c.getResources().getDrawable(imgId));
             }
             return v;
     }
+
+	@Override
+	public int getCount() {
+		return items.size();
+	}
+
+	@Override
+	public Object getItem(int position) {
+		return items.get(position);
+	}
+
+	@Override
+	public long getItemId(int position) {
+		return position;
+	}
 }

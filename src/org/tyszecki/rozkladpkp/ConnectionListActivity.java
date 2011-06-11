@@ -17,10 +17,6 @@
 package org.tyszecki.rozkladpkp;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.zip.GZIPInputStream;
@@ -41,7 +37,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.DialogInterface.OnCancelListener;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -130,10 +125,10 @@ public class ConnectionListActivity extends Activity {
 				if(b instanceof TripItem){
 					Intent ni = new Intent(arg0.getContext(),ConnectionDetailsActivity.class);
 					
+					ni.putExtra("seqnr", seqnr);
 					ni.putExtra("PLNData",plndata);
 					ni.putExtra("ConnectionIndex",((TripItem)b).t.conidx);
 					ni.putExtra("StartDate",((TripItem)b).t.date);
-					
 					startActivity(ni);
 				}
 				else if(b instanceof ScrollItem)
@@ -265,8 +260,9 @@ public class ConnectionListActivity extends Activity {
 		data.add(new SerializableNameValuePair("h2g-direct", "1"));
 		
     	String url  = "http://rozklad.sitkol.pl/bin/query.exe/pn" ;
+    	//url = "http://mobile.bahn.de/bin/mobil/query.exe";
     	
-		PLNRequest(url, data);
+		PLNRequest(url, data, true);
 	}
 	
 	protected void getFullTimetableUrl() throws Exception {
@@ -416,16 +412,49 @@ public class ConnectionListActivity extends Activity {
 		data.add(new SerializableNameValuePair("androidversion", "1.1.4"));
 		data.add(new SerializableNameValuePair("h2g-direct", "1"));
 	    	
-		PLNRequest("http://rozklad.sitkol.pl/bin/query.exe/pn",data);
+		int tries = 0;
+		do{
+			PLNRequest("http://rozklad.sitkol.pl/bin/query.exe/pn",data, false);
+		}while(pln.conCnt == 0 && tries++ < 20);
 		
+		updateDisplayedPLN();
+		if(tries > 20)
+			noMoreAlert();
+		
+			
+		/*
 		if(pln.conCnt == 0 && timetableUrl != null)
 		{
 			Log.i("RozkladPKP","Pobieram pelny");
 			getFullTimetable();
-		}
+		}*/
 	}
 	
-	private void PLNRequest(String url, ArrayList<SerializableNameValuePair> data) throws Exception
+	private void noMoreAlert() {
+		runOnUiThread(new Runnable() {
+			
+			@Override
+			public void run() {
+				AlertDialog alertDialog;
+		    	alertDialog = new AlertDialog.Builder(ConnectionListActivity.this).create();
+		    	alertDialog.setTitle("Brak połączeń!");
+		    	alertDialog.setMessage("Nie można pobrać informacji o kolejnych połączeniach.");
+		    	alertDialog.setCancelable(true);
+		    	alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				});
+		    	alertDialog.show();		
+			}
+		});
+		
+		
+	}
+
+	private void PLNRequest(String url, ArrayList<SerializableNameValuePair> data, boolean updateView) throws Exception
 	{
 		DefaultHttpClient client = new DefaultHttpClient();
 		
@@ -461,7 +490,8 @@ public class ConnectionListActivity extends Activity {
        
         
         Log.i("RozkladPKP", "pln parsed");
-		updateDisplayedPLN();
+        if(updateView)
+        	updateDisplayedPLN();
 	}
 	
 	public boolean onCreateOptionsMenu(Menu menu){

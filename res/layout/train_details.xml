@@ -15,23 +15,9 @@
       You should have received a copy of the GNU General Public License 
       along with RozkladPKP.  If not, see <http://www.gnu.org/licenses/>.
 -->
-<ScrollView
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  android:layout_width="fill_parent"
-  android:layout_height="wrap_content">
-  <LinearLayout
-  	android:layout_height="wrap_content"
-  	android:orientation="vertical"
-  	android:layout_width="fill_parent">
-  	<TextView
-  		android:id="@+id/header"
-  		android:layout_height="wrap_content"
-  		android:layout_width="fill_parent">
-  	</TextView>	
-  	<TextView
-  		android:id="@+id/content"
-  		android:layout_height="wrap_content"
-  		android:layout_width="fill_parent">
-  	</TextView>
-  </LinearLayout>
-</ScrollView>
+
+<ListView
+	xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/route"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"/>

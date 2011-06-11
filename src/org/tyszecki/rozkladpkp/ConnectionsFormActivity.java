@@ -134,8 +134,9 @@ public class ConnectionsFormActivity extends Activity {
         
         if(getIntent().getExtras() != null && getIntent().getExtras().containsKey("Attributes"))
         	attrb.setParameters((ArrayList<SerializableNameValuePair>) getIntent().getExtras().getSerializable("Attributes"));
-        else
-        	attrb.deselectAll();
+        else 
+        	attrb.readSettings(pref.getInt("Attributes", 0));
+        
         attrb.setOnClickListener(new OnClickListener() {
 			
 			@Override
@@ -293,7 +294,7 @@ public class ConnectionsFormActivity extends Activity {
 				ni.putExtra("Date", dateb.getDate());
 				ni.putExtra("Products", prodb.getProductString());
 				ni.putExtra("Attributes", attrb.getParameters());
-				pref.edit().putString("Products", prodb.getProductString()).commit();
+				pref.edit().putString("Products", prodb.getProductString()).putInt("Attributes", attrb.settingsCode()).commit();
 				
 				startActivity(ni);
 			}

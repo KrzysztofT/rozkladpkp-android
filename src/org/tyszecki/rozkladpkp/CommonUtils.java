@@ -183,4 +183,18 @@ public class CommonUtils {
 	{
 		return "A=1@O="+name+"@L="+Integer.toString(ID)+"@";
 	}
+	
+	public static String quickDepol(String in)
+	{
+		return in;
+		/*
+		String s = "ąćęłóńśżźĄĆĘŁÓŃŚŻŹ";
+		String r = "acelonszzACELONSZZ";
+		
+		for (int i = 0; i < s.length(); i++)
+		    in = in.replace(s.charAt(i),r.charAt(i));
+		    
+		return in;
+		*/
+	}
 }

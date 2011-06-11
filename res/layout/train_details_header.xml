@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   This file is part of the RozkladPKP project.
   
@@ -14,9 +15,10 @@
       You should have received a copy of the GNU General Public License 
       along with RozkladPKP.  If not, see <http://www.gnu.org/licenses/>.
 -->
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-<!-- <item android:title="Zapisz PLN" android:id="@+id/savepln"></item>-->
-<item android:title="Dodaj do zapamiętanych" android:id="@+id/item_favourite"></item>
-<item android:title="Podróż powrotna" android:id="@+id/item_return_journey"></item>
-<item android:title="Dalsza podróż" android:id="@+id/item_continue_journey"></item>
-</menu>
+
+<TextView
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/header"
+	android:layout_height="wrap_content"
+	android:layout_width="fill_parent">
+</TextView>	

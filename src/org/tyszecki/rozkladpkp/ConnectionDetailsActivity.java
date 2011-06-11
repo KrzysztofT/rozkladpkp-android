@@ -16,8 +16,14 @@
  ******************************************************************************/
 package org.tyszecki.rozkladpkp;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.tyszecki.rozkladpkp.ConnectionDetailsItem.TrainItem;
 import org.tyszecki.rozkladpkp.PLN.Connection;
 import org.tyszecki.rozkladpkp.PLN.Train;
@@ -26,9 +32,12 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 
 public class ConnectionDetailsActivity extends Activity {
@@ -37,6 +46,7 @@ public class ConnectionDetailsActivity extends Activity {
 	private PLN pln;
 	//private String startDate;
 	private int conidx;
+	private static byte[] sBuffer = new byte[512];
 	
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,7 +73,7 @@ public class ConnectionDetailsActivity extends Activity {
 				ni.putExtra("PLNData",pln.data);
 				ni.putExtra("ConnectionIndex",conidx);
 				ni.putExtra("TrainIndex", pos);
-				
+				ni.putExtra("StartDate",getIntent().getExtras().getString("StartDate"));
 				startActivity(ni);
 			}
 		});
@@ -90,5 +100,66 @@ public class ConnectionDetailsActivity extends Activity {
     	
     	
     	adapter.notifyDataSetChanged();
+	}
+	
+	public boolean onCreateOptionsMenu(Menu menu){
+		getMenuInflater().inflate(R.menu.connection_details, menu);
+		return true;
+	}
+	
+	public boolean onOptionsItemSelected (MenuItem item){
+		
+		final Bundle b = getIntent().getExtras();
+		
+		switch(item.getItemId()){
+		case R.id.item_price:
+			
+			new Runnable(){
+	            @Override
+	            public void run() {
+	                try {
+						
+	                	ArrayList<SerializableNameValuePair> data = new ArrayList<SerializableNameValuePair>();
+	                	data.add(new SerializableNameValuePair("ident",pln.id()));
+	                	data.add(new SerializableNameValuePair("seqnr",Integer.toString(b.getInt("seqnr"))));
+	                	data.add(new SerializableNameValuePair("tnumber",Integer.toString(b.getInt("ConnectionIndex"))));
+	                	
+	                	DefaultHttpClient client = new DefaultHttpClient();
+	            		
+	            		HttpGet request = new HttpGet("http://kalesonybogawojny.ath.cx/test/test.py?seqnr="+Integer.toString(b.getInt("seqnr")+1)+"&ident="+pln.id()+"&tnumber="+Integer.toString(b.getInt("ConnectionIndex")));
+	            		client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestExpectContinue.class);
+	                    client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestUserAgent.class);
+	                    //request.addHeader("Content-Type", "text/plain");
+	                    //request.setEntity(new UrlEncodedFormEntity(data,"UTF-8"));
+	                    
+	                    
+	                    HttpResponse response = client.execute(request);
+	                     
+	                    // Pull content stream from response
+	                    HttpEntity entity = response.getEntity();
+	                    InputStream inputStream = entity.getContent();
+	                    final ByteArrayOutputStream content = new ByteArrayOutputStream();
+	                    
+	                    int readBytes = 0;
+	                    while ((readBytes = inputStream.read(sBuffer)) != -1) {
+	                        content.write(sBuffer, 0, readBytes);
+	                    }
+	                    
+	                    runOnUiThread(new Runnable() {
+							@Override
+							public void run() {
+								Toast.makeText(ConnectionDetailsActivity.this, content.toString(), Toast.LENGTH_SHORT).show();
+							}
+						});
+	                	
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+	            }
+			}.run();
+			
+			return true;
+		}
+		return false;
 	}
 }

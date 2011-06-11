@@ -158,4 +158,27 @@ public class AttributesButton extends Button {
 		
 		//setCompoundDrawablesWithIntrinsicBounds(getContext().getResources().getDrawable(R.drawable.bezp), null, null, null);
 	}
+	
+	public int settingsCode()
+	{
+		int s = 0;
+		int f = 1;
+		for(int i = 0; i < ATTR_CNT; ++i)
+		{
+			if(p[i])
+				s += f;
+			f = f << 1;
+		}
+		return s;
+	}
+	
+	public void readSettings(int code)
+	{
+		for(int i = 0; i < ATTR_CNT; ++i)
+		{
+			p[i] = (code % 2 == 1);
+			code /= 2;	
+		}
+		updateText();
+	}
 }

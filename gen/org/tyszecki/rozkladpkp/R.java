@@ -61,7 +61,6 @@ public final class R {
         public static final int conn_header=0x7f080000;
         public static final int connection_details=0x7f080001;
         public static final int connection_list=0x7f080015;
-        public static final int content=0x7f080028;
         public static final int date_button=0x7f08000f;
         public static final int departure_edit=0x7f08000b;
         public static final int departure_icon=0x7f080002;
@@ -76,6 +75,7 @@ public final class R {
         public static final int item_continue_journey=0x7f08002b;
         public static final int item_delete=0x7f08002d;
         public static final int item_favourite=0x7f080029;
+        public static final int item_price=0x7f080028;
         public static final int item_return_journey=0x7f08002a;
         public static final int item_settings=0x7f08002c;
         public static final int location_button=0x7f08000c;
@@ -116,14 +116,16 @@ public final class R {
         public static final int timetable_form_clarify=0x7f030010;
         public static final int timetable_row=0x7f030011;
         public static final int train_details=0x7f030012;
+        public static final int train_details_header=0x7f030013;
     }
     public static final class menu {
-        public static final int connection_list=0x7f070000;
-        public static final int connections_form=0x7f070001;
-        public static final int remembered=0x7f070002;
-        public static final int remembered_list_context=0x7f070003;
-        public static final int timetable=0x7f070004;
-        public static final int timetable_form=0x7f070005;
+        public static final int connection_details=0x7f070000;
+        public static final int connection_list=0x7f070001;
+        public static final int connections_form=0x7f070002;
+        public static final int remembered=0x7f070003;
+        public static final int remembered_list_context=0x7f070004;
+        public static final int timetable=0x7f070005;
+        public static final int timetable_form=0x7f070006;
     }
     public static final class string {
         public static final int app_name=0x7f050000;

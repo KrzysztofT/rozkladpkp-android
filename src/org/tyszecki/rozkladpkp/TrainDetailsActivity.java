@@ -16,17 +16,40 @@
  ******************************************************************************/
 package org.tyszecki.rozkladpkp;
 
+import java.io.IOException;
+
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.apache.http.client.ClientProtocolException;
 import org.tyszecki.rozkladpkp.PLN.Train;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.ListView;
 import android.widget.TextView;
 
 public class TrainDetailsActivity extends Activity {
-
+	
+	private ProgressDialog progressDialog = null; 
+	private RouteItemAdapter adapter;
+	private Runnable viewTable;
+	
+	Train t;
+	
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.train_details);
+        
+        View v = ((LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.train_details_header, null);
+        ListView lv = (ListView)findViewById(R.id.route);
+        
+        
         setTitle("Informacje o pociągu");
         
         //startDate = getIntent().getExtras().getString("StartDate");
@@ -34,14 +57,54 @@ public class TrainDetailsActivity extends Activity {
         int conidx = getIntent().getExtras().getInt("ConnectionIndex");
         int trainidx = getIntent().getExtras().getInt("TrainIndex");
         
-        Train t = pln.connections[conidx].trains[trainidx];
+        t = pln.connections[conidx].trains[trainidx];
         
-        TextView tv = (TextView) findViewById(R.id.header);
-        tv.setText("Pociąg "+t.number);
-        
-        tv = (TextView) findViewById(R.id.content);
+        TextView tv = (TextView) v.findViewById(R.id.header);
+          
+        StringBuilder b = new StringBuilder();
+        b.append("Pociąg ");
+        b.append(t.number);
+        b.append("\n");
         
         for(String s : t.attributes)
-        	tv.append("-"+s+"\n");
+        	b.append("-"+s+"\n");
+        tv.setText(b.toString());
+        lv.addHeaderView(v);
+        
+        viewTable = new Runnable(){
+            @Override
+            public void run() {
+                try {
+					getTable();
+				} catch (Exception e) {
+					e.printStackTrace();
+				} 
+            }
+        };
+        
+        adapter = new RouteItemAdapter(this);
+        ((ListView)findViewById(R.id.route)).setAdapter(this.adapter);
+        
+        (new Thread(null, viewTable)).start();
+        
+        progressDialog = ProgressDialog.show(this,    
+              "Czekaj...", "Pobieranie trasy...", true);
+	}
+	
+	protected void getTable() throws ClientProtocolException, IOException, ParserConfigurationException, SAXException {
+		
+		Bundle extras = getIntent().getExtras();
+		final int stId = t.depstation.id;
+		
+    	final Document doc = RouteFetcher.fetchRoute(t.number, Integer.toString(t.depstation.id), "",
+    			extras.getString("StartDate"), t.deptime.toString(), "dep");
+    	
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				adapter.setData(doc,stId);
+				progressDialog.dismiss();
+			}
+		});
 	}
 }
