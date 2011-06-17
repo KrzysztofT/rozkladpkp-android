@@ -128,6 +128,7 @@ public class ConnectionListActivity extends Activity {
 					ni.putExtra("seqnr", seqnr);
 					ni.putExtra("PLNData",plndata);
 					ni.putExtra("ConnectionIndex",((TripItem)b).t.conidx);
+					ni.putExtra("ConnectionId", adapter.getTripId((TripItem)b));
 					ni.putExtra("StartDate",((TripItem)b).t.date);
 					startActivity(ni);
 				}

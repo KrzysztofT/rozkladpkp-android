@@ -25,23 +25,23 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="RememberedActivity" android:configChanges="orientation">
+        <activity android:name="RememberedActivity" android:configChanges="orientation|keyboard|keyboardHidden">
         </activity>
-        <activity android:name="TimetableActivity" android:configChanges="orientation">
+        <activity android:name="TimetableActivity" android:configChanges="orientation|keyboard|keyboardHidden">
         </activity>
-        <activity android:name="TimetableFormActivity" android:configChanges="orientation">
+        <activity android:name="TimetableFormActivity" android:configChanges="orientation|keyboard|keyboardHidden">
         </activity>
-        <activity android:name="ConnectionsFormActivity" android:configChanges="orientation">
+        <activity android:name="ConnectionsFormActivity" android:configChanges="orientation|keyboard|keyboardHidden">
         </activity>
-        <activity android:name="RouteActivity" android:configChanges="orientation">
+        <activity android:name="RouteActivity" android:configChanges="orientation|keyboard|keyboardHidden">
         </activity>
-        <activity android:name="ConnectionListActivity" android:configChanges="orientation">
+        <activity android:name="ConnectionListActivity" android:configChanges="orientation|keyboard|keyboardHidden">
         </activity>
-        <activity android:name="ConnectionDetailsActivity" android:configChanges="orientation">
+        <activity android:name="ConnectionDetailsActivity" android:configChanges="orientation|keyboard|keyboardHidden">
         </activity>
-        <activity android:name="TrainDetailsActivity" android:configChanges="orientation">
+        <activity android:name="TrainDetailsActivity" android:configChanges="orientation|keyboard|keyboardHidden">
         </activity>
-        <activity android:name="PreferencesActivity" android:configChanges="orientation">
+        <activity android:name="PreferencesActivity" android:configChanges="orientation|keyboard|keyboardHidden">
         </activity>
         
     </application>

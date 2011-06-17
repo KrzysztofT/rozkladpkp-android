@@ -104,12 +104,17 @@ public class StationSpinner extends Spinner {
 	{
 		SQLiteDatabase db = DatabaseHelper.getDbRW(getContext());
 		
-		ContentValues val = new ContentValues();
-		
-		val.put("_id",CommonUtils.StationIDfromSID(getCurrentSID()));
-		val.put("name", getText());
-		
-		db.insert("stations", null, val);
+		try{
+			ContentValues val = new ContentValues();
+			
+			val.put("_id",CommonUtils.StationIDfromSID(getCurrentSID()));
+			val.put("name", getText());
+			
+			db.insert("stations", null, val);
+		}
+		catch (Exception e) {
+			//TODO: Dowiedzieć się czemu tutaj wywala.
+		}
 		db.close();
 	}
 	

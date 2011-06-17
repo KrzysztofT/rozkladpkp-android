@@ -157,6 +157,22 @@ public class ConnectionListItemAdapter extends BaseAdapter {
 	public long getItemId(int arg0) {
 		return arg0;
 	}
+	
+	//TODO: Przypadek w którym it nie jest w items
+	public int getTripId(TripItem it)
+	{
+		int c = 0;
+		
+		for(ConnectionListItem i : items)
+		{
+			if(i == it)
+				return c;
+			else if(i instanceof TripItem)
+				++c;
+		}
+		
+		return c;
+	}
 
 	@Override
 	public int getItemViewType(int arg0) {

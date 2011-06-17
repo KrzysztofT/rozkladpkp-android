@@ -103,8 +103,8 @@ public class ConnectionDetailsActivity extends Activity {
 	}
 	
 	public boolean onCreateOptionsMenu(Menu menu){
-		getMenuInflater().inflate(R.menu.connection_details, menu);
-		return true;
+		//getMenuInflater().inflate(R.menu.connection_details, menu);
+		return false;
 	}
 	
 	public boolean onOptionsItemSelected (MenuItem item){
@@ -122,17 +122,17 @@ public class ConnectionDetailsActivity extends Activity {
 	                	ArrayList<SerializableNameValuePair> data = new ArrayList<SerializableNameValuePair>();
 	                	data.add(new SerializableNameValuePair("ident",pln.id()));
 	                	data.add(new SerializableNameValuePair("seqnr",Integer.toString(b.getInt("seqnr"))));
-	                	data.add(new SerializableNameValuePair("tnumber",Integer.toString(b.getInt("ConnectionIndex"))));
+	                	data.add(new SerializableNameValuePair("tnumber",Integer.toString(b.getInt("ConnectionId"))));
 	                	
 	                	DefaultHttpClient client = new DefaultHttpClient();
 	            		
-	            		HttpGet request = new HttpGet("http://kalesonybogawojny.ath.cx/test/test.py?seqnr="+Integer.toString(b.getInt("seqnr")+1)+"&ident="+pln.id()+"&tnumber="+Integer.toString(b.getInt("ConnectionIndex")));
+	            		HttpGet request = new HttpGet("http://cennikkolej.appspot.com/test/test.py?seqnr="+Integer.toString(b.getInt("seqnr")+1)+"&ident="+pln.id()+"&tnumber="+Integer.toString(b.getInt("ConnectionId")));
 	            		client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestExpectContinue.class);
 	                    client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestUserAgent.class);
 	                    //request.addHeader("Content-Type", "text/plain");
 	                    //request.setEntity(new UrlEncodedFormEntity(data,"UTF-8"));
 	                    
-	                    
+	                    //Log.i("RozkladPKP", )
 	                    HttpResponse response = client.execute(request);
 	                     
 	                    // Pull content stream from response
@@ -145,10 +145,27 @@ public class ConnectionDetailsActivity extends Activity {
 	                        content.write(sBuffer, 0, readBytes);
 	                    }
 	                    
+	                    final String result;
+	                    String[] spl = content.toString().split(":");
+	                    
+	                    if(spl.length == 1)
+	                    	result = spl[0];
+	                    else
+	                    {
+	                    	StringBuilder b = new StringBuilder();
+	                    	b.append(spl[0].trim());
+	                    	b.append(" km\n kl. 2: ");
+	                    	b.append(spl[1].trim());
+	                    	b.append(" zł\n kl. 1: ");
+	                    	b.append(spl[2].trim());
+	                    	b.append(" zł");
+	                    	result = b.toString();
+	                    }
+	                    
 	                    runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
-								Toast.makeText(ConnectionDetailsActivity.this, content.toString(), Toast.LENGTH_SHORT).show();
+								Toast.makeText(ConnectionDetailsActivity.this, result, Toast.LENGTH_LONG).show();
 							}
 						});
 	                	
