@@ -29,11 +29,12 @@ public class RememberedItem {
 	public static class RouteItem extends RememberedItem {
 		int SIDFrom,SIDTo;
 		String fromName, toName;
+		String cacheValid;
 	}
 	
 	public static class TimetableItem extends RememberedItem {
 		TimetableType type;
 		int SID;
-		String name;
+		String name,cacheValid;
 	}	
 }

@@ -26,9 +26,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.format.Time;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -73,7 +73,13 @@ public class RememberedActivity extends Activity {
 				else
 				{
 					RememberedItem.RouteItem t = (RememberedItem.RouteItem)b;
-					ni = new Intent(arg0.getContext(),showForm ? ConnectionsFormActivity.class : ConnectionListActivity.class);
+					
+					boolean showSaved = (t.cacheValid != null && t.cacheValid.length() > 0);
+						
+					ni = new Intent(arg0.getContext(),(showForm && !showSaved) ? ConnectionsFormActivity.class : ConnectionListActivity.class);
+					
+					if(showSaved)
+						ni.putExtra("PLNFilename", CommonUtils.ResultsHash(Integer.toString(t.SIDFrom), Integer.toString(t.SIDTo), null));
 					
 					ni.putExtra("ZID", CommonUtils.SIDfromStationID(t.SIDTo,t.toName));
 					ni.putExtra("SID", CommonUtils.SIDfromStationID(t.SIDFrom,t.fromName));

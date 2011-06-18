@@ -27,9 +27,11 @@ public class RememberedManager {
 	/*
 	 * Metoda usuwa najstarsze elementy, tak aby było ich co najwyżej 10
 	 */
-	private static void cleanupHistory(SQLiteDatabase db)
+	private static void cleanupHistory(SQLiteDatabase db, Context c)
 	{
-		Cursor cur = db.rawQuery("SELECT _id FROM stored WHERE fav IS null ORDER BY _id DESC LIMIT -1 OFFSET 10", null);
+		//TODO: Usuwanie zapamiętanych odjazdów/przyjazdów
+		
+		Cursor cur = db.rawQuery("SELECT _id, sidFrom, sidTo, type FROM stored WHERE fav IS null ORDER BY _id DESC LIMIT -1 OFFSET 10", null);
 		
 		if(cur.getCount() > 0)
 		{
@@ -40,6 +42,9 @@ public class RememberedManager {
 				SQL += cur.getString(0);
 				if(!cur.isLast())
 					SQL += ",";
+				
+				if(cur.getInt(3) == 2)
+					c.deleteFile(CommonUtils.ResultsHash(cur.getString(1), cur.getString(2), null));
 			}
 			SQL += ")";
 			
@@ -72,12 +77,12 @@ public class RememberedManager {
 			val.put("type", departure?0:1);
 			
 			db.insert("stored", null, val);
-			cleanupHistory(db);	
+			cleanupHistory(db,c);	
 		}
 		db.close();
 	}
 	
-	public static void addtoHistory(Context c, String fromSID, String toSID)
+	public static void addtoHistory(Context c, String fromSID, String toSID, String cValid)
 	{
 		SQLiteDatabase db = DatabaseHelper.getDbRW(c);
 		
@@ -89,15 +94,16 @@ public class RememberedManager {
 		cur.close();
 		
 		if(id != null)
-			db.execSQL("UPDATE stored SET _id=(SELECT _id+1 FROM stored ORDER BY _id DESC LIMIT 1) WHERE _id="+id);
+			db.execSQL("UPDATE stored SET _id=(SELECT _id+1 FROM stored ORDER BY _id DESC LIMIT 1), cacheValid='"+cValid+"' WHERE _id="+id);
 		else
 		{
 			ContentValues val = new ContentValues();
 			val.put("sidFrom", fromSID);
 			val.put("sidTo", toSID);
 			val.put("type", 2);
+			val.put("cacheValid", cValid);
 			db.insert("stored", null, val);
-			cleanupHistory(db);
+			cleanupHistory(db,c);
 		}
 		db.close();
 	}

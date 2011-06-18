@@ -184,17 +184,15 @@ public class CommonUtils {
 		return "A=1@O="+name+"@L="+Integer.toString(ID)+"@";
 	}
 	
-	public static String quickDepol(String in)
+	//Metoda używana do wygenerowania nazwy pliku z wynikami
+	public static String ResultsHash(String stationFrom, String stationTo, Boolean departure)
 	{
-		return in;
-		/*
-		String s = "ąćęłóńśżźĄĆĘŁÓŃŚŻŹ";
-		String r = "acelonszzACELONSZZ";
+		StringBuilder b = new StringBuilder();
 		
-		for (int i = 0; i < s.length(); i++)
-		    in = in.replace(s.charAt(i),r.charAt(i));
-		    
-		return in;
-		*/
+		b.append((stationFrom != null) ? stationFrom : "");
+		b.append((stationTo != null) ? stationTo : "");
+		b.append((departure != null) ? ((departure) ? "-1" : "-2") : "");
+		
+		return b.toString();
 	}
 }

@@ -28,6 +28,11 @@ import android.util.Log;
 
 public class PLN {
 	
+	public static final int DATE_GENERATED = 0;
+	public static final int DATE_START = 1;
+	public static final int DATE_END = 2;
+	
+	
 	final int ConnectionOffset = 0x4a;
 	final int ConnectionSize = 12;
 	int attributesStart,attributesEnd;
@@ -219,12 +224,14 @@ public class PLN {
 					max = connections[i].availability.length();
 		}
 		
-		@Override
-		public boolean hasNext() {
-			
+		private boolean move(boolean forward)
+		{
 			//Nie ma żadnych połączeń
 			if(conCnt == 0) 
 				return false;
+			
+			if(!forward)
+				--pos;
 			
 			int cix = pos%conCnt;
 			int dix = pos/conCnt;
@@ -235,13 +242,22 @@ public class PLN {
 					return true;
 				else
 				{
-					pos++;
+					if(forward)
+						pos++;
+					else 
+						pos--;
+					
 					cix = pos%conCnt;
 					dix = pos/conCnt;
 				}
 			}
 			
 			return false;
+		}
+		
+		@Override
+		public boolean hasNext() {
+			return move(true);
 		}
 
 		@Override
@@ -259,9 +275,24 @@ public class PLN {
 				return null;
 		}
 
+		public boolean advance(){
+			pos++;
+			return hasNext();
+		}
+		
+		public boolean back(){
+			return move(false);
+		}
+		public void moveToLast(){
+			//Przejdz do ostatniego połączenia
+			while(advance());
+			//Cofnij o jedno
+			back();
+		}
 		@Override
 		public void remove() {			
 		}
+		
 		
 	}
 	
@@ -337,6 +368,16 @@ public class PLN {
 			actualDaysCount = res.cardinality();
 		}
 		return actualDaysCount;
+	}
+	
+	public Calendar getDate(int date)
+	{
+		switch(date){
+			case DATE_GENERATED: return today;
+			case DATE_START: return sdate;
+			case DATE_END: return edate;
+		}
+		throw new IllegalArgumentException();
 	}
 
 	private int readint(int pos)

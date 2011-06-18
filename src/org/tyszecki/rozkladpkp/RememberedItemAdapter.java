@@ -26,6 +26,9 @@ import org.tyszecki.rozkladpkp.RememberedItem.TimetableType;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.opengl.Visibility;
+import android.text.format.Time;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,7 +56,7 @@ public class RememberedItemAdapter extends BaseAdapter {
 		items.add(h);
 		
 		SQLiteDatabase db = DatabaseHelper.getDb(c);
-		Cursor cur = db.rawQuery("SELECT sidFrom,sidTo,fromName,toName,_id FROM storedview WHERE type=2 AND fav=1", null);
+		Cursor cur = db.rawQuery("SELECT sidFrom,sidTo,fromName,toName,_id,cacheValid FROM storedview WHERE type=2 AND fav=1", null);
 		while(cur.moveToNext())
 		{
 			RouteItem t = new RouteItem();
@@ -62,6 +65,7 @@ public class RememberedItemAdapter extends BaseAdapter {
 			t.fromName = cur.getString(2);
 			t.toName = cur.getString(3);
 			t.id = cur.getInt(4);
+			t.cacheValid = cur.getString(5);
 			items.add(t);
 		}
 		cur.close();
@@ -69,7 +73,7 @@ public class RememberedItemAdapter extends BaseAdapter {
 		h.text = "Rozkłady";
 		items.add(h);
 		
-		cur = db.rawQuery("SELECT type,sidFrom,fromName,_id FROM storedview WHERE type != 2 AND fav=1", null);
+		cur = db.rawQuery("SELECT type,sidFrom,fromName,_id,cacheValid FROM storedview WHERE type != 2 AND fav=1", null);
 		while(cur.moveToNext())
 		{
 			TimetableItem t = new TimetableItem();
@@ -77,6 +81,7 @@ public class RememberedItemAdapter extends BaseAdapter {
 			t.SID = cur.getInt(1);
 			t.name = cur.getString(2);
 			t.id = cur.getInt(3);
+			t.cacheValid = cur.getString(4);
 			items.add(t);
 		}
 		cur.close();
@@ -86,7 +91,7 @@ public class RememberedItemAdapter extends BaseAdapter {
 		items.add(h);
 		
 		//Zwraca nazwy i SIDy ostatnio wyszukiwanych
-		cur = db.rawQuery("SELECT type,sidFrom,sidTo,fromName,toName,_id FROM storedview WHERE fav IS NULL", null);
+		cur = db.rawQuery("SELECT type,sidFrom,sidTo,fromName,toName,_id,cacheValid FROM storedview WHERE fav IS NULL", null);
 		while(cur.moveToNext())
 		{
 			//2 = trasa, 1 = przyjazdy, 0 = odjazdy
@@ -99,7 +104,7 @@ public class RememberedItemAdapter extends BaseAdapter {
 				t.toName = cur.getString(4);
 				
 				t.id = cur.getInt(5);
-				
+				t.cacheValid = cur.getString(6);
 				
 				items.add(t);
 			}
@@ -136,6 +141,11 @@ public class RememberedItemAdapter extends BaseAdapter {
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
+		
+		Time now = new Time();
+		now.setToNow();
+		Time itime = new Time();
+		
 		View v = convertView;
         RememberedItem b = items.get(position);
         
@@ -157,11 +167,34 @@ public class RememberedItemAdapter extends BaseAdapter {
         	{
         		RouteItem r = (RouteItem)b;
         		text.setText(r.fromName + " → " + r.toName);
+        		boolean showSaved = r.cacheValid != null && r.cacheValid.length() > 0;
+        		
+        		if(showSaved)
+        		{
+        			itime.parse(r.cacheValid);
+        			
+        			Log.i("RozkladPKP","ITEM: "+itime.toString());
+        			Log.i("RozkladPKP","NOW: "+now.toString());
+        			
+        			if(Time.compare(itime, now) < 0)
+        			{
+        				c.deleteFile(CommonUtils.ResultsHash(Integer.toString(r.SIDFrom), Integer.toString(r.SIDTo), null));
+        				showSaved = false;
+        				r.cacheValid = null;
+        				
+        				SQLiteDatabase db = DatabaseHelper.getDbRW(c);
+        				db.execSQL("UPDATE stored SET cacheValid='' WHERE _id="+Integer.toString(r.id));
+        				db.close();
+        			}
+        		}
+        		
+        		v.findViewById(R.id.saved_icon).setVisibility(showSaved ? View.VISIBLE : View.INVISIBLE);
         	}
         	else
         	{
         		TimetableItem t = (TimetableItem)b;
         		text.setText(((t.type == TimetableType.Departure) ? "Odjazdy z " : "Przyjazdy do ") + t.name);
+        		v.findViewById(R.id.saved_icon).setVisibility(View.INVISIBLE);
         	}
         }
         

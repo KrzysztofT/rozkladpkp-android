@@ -52,7 +52,8 @@ public class ConnectionListItemAdapter extends BaseAdapter {
 	TripIterator it;
 	
 	Context c;
-	private String lastDate;	
+	private String lastDate;
+	private boolean scrolling = true;	
 	
 
 	public ConnectionListItemAdapter(Context context) {
@@ -150,6 +151,8 @@ public class ConnectionListItemAdapter extends BaseAdapter {
 
 	@Override
 	public ConnectionListItem getItem(int arg0) {
+		if(arg0 < 0 || arg0 >= items.size())
+			return null;
 		return items.get(arg0);
 	}
 
@@ -213,7 +216,7 @@ public class ConnectionListItemAdapter extends BaseAdapter {
 		ConnectionListItem c = new ConnectionListItem();
 		
 		//FIXME: Zrobic to poprawniej, teraz jest to "skrot myslowy"
-		if(loadAll)
+		if(loadAll && scrolling)
 			items.add(c.new ScrollItem(true));
 		while(it.hasNext()){
 			
@@ -221,6 +224,8 @@ public class ConnectionListItemAdapter extends BaseAdapter {
         	if(!t.date.equals(lastDate))
         	{
         		ConnectionListItem.DateItem d = c.new DateItem();
+        		
+        		
         		d.date = t.date;
         		items.add(d);
         		lastDate = t.date;
@@ -234,7 +239,9 @@ public class ConnectionListItemAdapter extends BaseAdapter {
         		if(items.size() > PRELOAD_ITEMS)
         			break;
     	}	
-		items.add(c.new ScrollItem(false));
+		if(scrolling)
+			items.add(c.new ScrollItem(false));
+		
 		notifyDataSetChanged();
 	}
 	
@@ -263,6 +270,10 @@ public class ConnectionListItemAdapter extends BaseAdapter {
 		if(!it.hasNext())
 			items.remove(items.size()-1);
 		notifyDataSetChanged();
+	}
+
+	public void setScrollingEnabled(boolean b) {
+		scrolling = false;		
 	}
 	
 }

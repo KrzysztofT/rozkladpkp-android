@@ -17,6 +17,9 @@
 package org.tyszecki.rozkladpkp;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.zip.GZIPInputStream;
@@ -29,20 +32,27 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.tyszecki.rozkladpkp.ConnectionListItem.ScrollItem;
 import org.tyszecki.rozkladpkp.ConnectionListItem.TripItem;
+import org.tyszecki.rozkladpkp.PLN.Trip;
+import org.tyszecki.rozkladpkp.PLN.TripIterator;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.DialogInterface.OnCancelListener;
 import android.os.Bundle;
+import android.text.format.Time;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
 public class ConnectionListActivity extends Activity {
@@ -50,7 +60,6 @@ public class ConnectionListActivity extends Activity {
 	private ProgressDialog m_ProgressDialog;
 	private Runnable viewConn;
 	private static byte[] sBuffer = new byte[512];
-	private byte[] plndata;
 	private int seqnr = 0;
 	private final int TIMETABLE_DOWNLOAD_INTERVAL = 5000;
 	
@@ -67,39 +76,69 @@ public class ConnectionListActivity extends Activity {
 	@SuppressWarnings("unchecked")
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
 		setContentView(R.layout.connection_list);
-		
-		Log.i("RozkladPKP", "Start listy");
 		
         adapter = new ConnectionListItemAdapter(this);
         ListView lv = (ListView)findViewById(R.id.connection_list);
-        lv.setAdapter(this.adapter);
         
-        Bundle extras = getIntent().getExtras();
+        
+        final Bundle extras = getIntent().getExtras();
         setTitle("Połączenia "+extras.getString("depName")+" - "+extras.getString("arrName"));
         
         //Pola wykorzystywane przy wszystkich żądaniach
-        
         commonFieldsList = (ArrayList<SerializableNameValuePair>) extras.getSerializable("Attributes");
         commonFieldsList.add(new SerializableNameValuePair("SID", extras.getString("SID")));
         commonFieldsList.add(new SerializableNameValuePair("ZID", extras.getString("ZID")));
         commonFieldsList.add(new SerializableNameValuePair("REQ0JourneyProduct_prod_list_1",extras.getString("Products")));
         commonFieldsList.add(new SerializableNameValuePair("start", "1"));
         
-        RememberedManager.addtoHistory(this, CommonUtils.StationIDfromSID(extras.getString("SID")), CommonUtils.StationIDfromSID(extras.getString("ZID")));
         
-        if(savedInstanceState != null && savedInstanceState.containsKey("PLNData")){
+        if(extras.containsKey("PLNFilename"))
+        {
+        	TextView t = new TextView(this);
+			t.setText("Oglądasz w tej chwili zapisane wyniki wyszukiwania. Dotknij tutaj, aby rozpocząć nowe wyszukiwanie.");
+			t.setPadding(6, 6, 6, 6);
+			t.setTextSize(15);
+			t.setGravity(Gravity.CENTER);
+			
+			t.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					newSearch();
+				}
+			});
+			
+			lv.addHeaderView(t);
+			lv.setAdapter(this.adapter);
+        	try {
+				FileInputStream fis = openFileInput(extras.getString("PLNFilename"));
+				
+				ByteArrayOutputStream content = new ByteArrayOutputStream();
+			        
+			    int readBytes = 0;
+			    while ((readBytes = fis.read(sBuffer)) != -1)
+			    	content.write(sBuffer, 0, readBytes);
+			    
+			    adapter.setScrollingEnabled(false);
+			    pln = new PLN(content.toByteArray());
+			    updateDisplayedPLN();
+			    
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+        }
+        else if(savedInstanceState != null && savedInstanceState.containsKey("PLNData")){
         	pln = new PLN(savedInstanceState.getByteArray("PLNData"));
-        	plndata = pln.data;
         	seqnr = savedInstanceState.getInt("SeqNr");
         	hasFullTable = savedInstanceState.getBoolean("hasFullTable");
         	timetableUrl = savedInstanceState.getString("timetableURL");
         	
+        	lv.setAdapter(this.adapter);
         	updateDisplayedPLN();
         }
         else
         {
+        	lv.setAdapter(this.adapter);
         	viewConn = new Runnable(){
 					            @Override
 					            public void run() {
@@ -119,14 +158,21 @@ public class ConnectionListActivity extends Activity {
 
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View v, int pos, long id) {
+
+				//Kiedy użytkownik użyje klawiatury do kliknięcia informacji o tym, że wyświetlają się zapisane połączenia,
+				//Wywoła się ten listener z id=-1...
+				if(id == -1)
+					newSearch();
 				
-				final ConnectionListItem b =  adapter.getItem(pos);
+				final ConnectionListItem b =  adapter.getItem((int) id);
+				if(b == null)
+					return;
 				
 				if(b instanceof TripItem){
 					Intent ni = new Intent(arg0.getContext(),ConnectionDetailsActivity.class);
 					
 					ni.putExtra("seqnr", seqnr);
-					ni.putExtra("PLNData",plndata);
+					ni.putExtra("PLNData",pln.data);
 					ni.putExtra("ConnectionIndex",((TripItem)b).t.conidx);
 					ni.putExtra("ConnectionId", adapter.getTripId((TripItem)b));
 					ni.putExtra("StartDate",((TripItem)b).t.date);
@@ -159,6 +205,15 @@ public class ConnectionListActivity extends Activity {
 		});
 	}
 
+	public void newSearch()
+	{
+		Bundle extras = getIntent().getExtras();
+		Intent ni = new Intent(getBaseContext(),ConnectionsFormActivity.class);
+		ni.putExtra("arrName",extras.getString("arrName"));
+		ni.putExtra("depName",extras.getString("depName"));
+		startActivity(ni);
+	}
+	
 	public void showLoader()
 	{
 		Runnable uit = new Runnable(){
@@ -376,9 +431,8 @@ public class ConnectionListActivity extends Activity {
 	            content.write(sBuffer, 0, readBytes);
 	        }
 	        
-	        plndata = content.toByteArray();
 	        Log.i("RozkladPKP", "jest pełny PLN" + Integer.toString(content.size()));
-	        pln = new PLN(plndata);
+	        pln = new PLN(content.toByteArray());
 	        
 	        hasFullTable = true;
 	        updateDisplayedPLN();
@@ -485,9 +539,8 @@ public class ConnectionListActivity extends Activity {
         }
 
         // Return result from buffered stream
-        plndata = content.toByteArray();
         Log.i("RozkladPKP", "jestPLN");
-        pln = new PLN(plndata);
+        pln = new PLN(content.toByteArray());
        
         
         Log.i("RozkladPKP", "pln parsed");
@@ -568,6 +621,45 @@ public class ConnectionListActivity extends Activity {
 	protected void onPause() {
 		super.onPause();
 		inFront = false;
+		
+		TripIterator p = pln.tripIterator();
+		p.moveToLast();
+		Trip t = p.next();
+		
+		
+		//Do poprawienia jest ogólnie większość rzeczy związana z zapamiętywaniem czasu w PLN.
+		//FIXME: Tutaj zakładamy, że hafas zwraca wyniki w strefie czasowej użytkownika, co nie jest prawdą.
+		//Z drugiej strony, nie wiadomo w jakiej strefie te wyniki są zwracane.
+		Time time = new Time();
+		
+		String r[] = t.date.split("\\.");
+		String u[] = t.con.trains[0].deptime.toString().split(":");
+		
+		time.set(0, Integer.parseInt(u[1]), ((Integer.parseInt(u[0])+23)%24)+1, Integer.parseInt(r[0]), Integer.parseInt(r[1])-1, Integer.parseInt(r[2]));
+		
+		
+		Bundle extras = getIntent().getExtras(); 
+		
+		String Sid, Zid;
+		Sid = CommonUtils.StationIDfromSID(extras.getString("SID"));
+		Zid = CommonUtils.StationIDfromSID(extras.getString("ZID"));
+		
+		//Zapisanie w histori...
+		RememberedManager.addtoHistory(this, Sid, Zid, time.format2445());
+		
+		//Zapisanie pliku
+		if(!extras.containsKey("PLNFilename"))
+		{
+			String s = CommonUtils.ResultsHash(Sid, Zid, null);
+			try {
+				FileOutputStream fos = openFileOutput(s, Context.MODE_PRIVATE);
+				fos.write(pln.data);
+				fos.close();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+		}
+		}
 	}
 	
 	

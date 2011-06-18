@@ -15,10 +15,20 @@
       You should have received a copy of the GNU General Public License 
       along with RozkladPKP.  If not, see <http://www.gnu.org/licenses/>.
 -->
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-	android:id="@+id/text"
-    android:gravity="center_vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="?android:attr/listPreferredItemHeight"
-    android:padding="6dip"
-/>
+<TableLayout 
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:stretchColumns="0"
+	android:layout_width="fill_parent"
+	android:layout_height="?android:attr/listPreferredItemHeight"
+	>
+<TableRow
+	android:paddingBottom="6dip"
+	android:paddingTop="6dip"
+	android:gravity="center_vertical">
+	<TextView 
+		android:id="@+id/text"/>
+	<ImageView 
+	    android:id="@+id/saved_icon" 
+	    android:src="@drawable/saved"/>
+</TableRow>
+</TableLayout>

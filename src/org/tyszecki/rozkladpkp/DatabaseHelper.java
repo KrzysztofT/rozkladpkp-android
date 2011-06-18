@@ -38,7 +38,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 
 	private static String DB_NAME = "rozkladpkp";
 
-	private final static int DB_VERSION = 2;
+	private final static int DB_VERSION = 3;
 	
 	private SQLiteDatabase myDataBase; 
 
@@ -55,7 +55,6 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 		
 		/*try {
 			File sd = Environment.getExternalStorageDirectory();
-			File data = Environment.getDataDirectory();
 
 			if (sd.canWrite()) {
 				File currentDB = new File(DB_PATH+DB_NAME);
@@ -208,6 +207,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 		Log.i("RozkladPKP","myCreate called!");
 		SQLiteDatabase db = SQLiteDatabase.openDatabase(DB_PATH+DB_NAME, null, SQLiteDatabase.OPEN_READWRITE);
 		createFavTables(db);
+		addResultsCache(db);
 		
 		db.setVersion(DB_VERSION);
 		db.close();
@@ -217,8 +217,17 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 		Log.i("RozkladPKP","myUpgrade called!");
 		if(oldVersion < 2)
 			createFavTables(db);
+		if(oldVersion < 3)
+			addResultsCache(db);
 	}
 	
+	private void addResultsCache(SQLiteDatabase db) {
+		db.execSQL("ALTER TABLE 'stored' ADD column 'cacheValid' INTEGER;");
+		db.execSQL("DROP VIEW 'storedview';");
+		db.execSQL("CREATE VIEW storedview AS SELECT stored._id AS _id,sidFrom,sidTo,s.name AS fromName,stations.name AS toName,type,fav,cacheValid FROM stored LEFT JOIN stations AS s on s._id=sidFrom LEFT join stations on stations._id=sidTo ORDER BY stored._id DESC");
+		
+	}
+
 	private void createFavTables(SQLiteDatabase db)
 	{
 		db.execSQL("CREATE TABLE 'stored' ('_id' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,'sidFrom' INTEGER NOT NULL,'sidTo' INTEGER,'type' INTEGER,'fav' INTEGER);");
