@@ -17,7 +17,6 @@
 package org.tyszecki.rozkladpkp;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -27,6 +26,8 @@ import org.xml.sax.SAXException;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.os.Bundle;
 import android.widget.ListView;
 
@@ -44,7 +45,7 @@ public class RouteActivity extends Activity {
             @Override
             public void run() {
                 try {
-					getTable();
+                	getTable();
 				} catch (Exception e) {
 					e.printStackTrace();
 				} 
@@ -54,10 +55,19 @@ public class RouteActivity extends Activity {
         adapter = new RouteItemAdapter(this);
         ((ListView)findViewById(R.id.route)).setAdapter(this.adapter);
         
-        (new Thread(null, viewTable)).start();
+        final Thread th = new Thread(null, viewTable);
+        th.start();
         
         progressDialog = ProgressDialog.show(RouteActivity.this,    
-              "Czekaj...", "Pobieranie rozkładu...", true);
+              "Czekaj...", "Pobieranie rozkładu...", true, true, new OnCancelListener() {
+				
+				@Override
+				public void onCancel(DialogInterface dialog) {
+					th.interrupt();
+					progressDialog.dismiss();
+					RouteActivity.this.finish();
+				}
+			});
 	}
 
 	protected void getTable() throws ClientProtocolException, IOException, ParserConfigurationException, SAXException {

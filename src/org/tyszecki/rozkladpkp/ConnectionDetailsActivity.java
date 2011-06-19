@@ -92,7 +92,7 @@ public class ConnectionDetailsActivity extends Activity {
     	for(int i = 0; i < con.trains.length; ++i)
     	{
     		Train t = con.trains[i];
-    		Log.i("RozkladPKP", t.arrstation.name);
+    		//Log.i("RozkladPKP", t.arrstation.name);
     		TrainItem ti = c.new TrainItem();
     		ti.t = t;
     		items.add(ti);

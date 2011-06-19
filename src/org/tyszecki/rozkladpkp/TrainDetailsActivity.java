@@ -28,6 +28,8 @@ import org.xml.sax.SAXException;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -85,10 +87,21 @@ public class TrainDetailsActivity extends Activity {
         adapter = new RouteItemAdapter(this);
         ((ListView)findViewById(R.id.route)).setAdapter(this.adapter);
         
-        (new Thread(null, viewTable)).start();
-        
-        progressDialog = ProgressDialog.show(this,    
-              "Czekaj...", "Pobieranie trasy...", true);
+        if(CommonUtils.onlineCheck(this, "Nie można pobrać trasy, brak połączenia internetowego."))
+        {
+	        final Thread th = new Thread(null, viewTable);
+	        th.start();
+	        
+	        progressDialog = ProgressDialog.show(this,    
+	              "Czekaj...", "Pobieranie trasy...", true, true, new OnCancelListener() {
+					
+					@Override
+					public void onCancel(DialogInterface dialog) {
+						th.interrupt();
+						progressDialog.dismiss();
+					}
+				});
+        }
 	}
 	
 	protected void getTable() throws ClientProtocolException, IOException, ParserConfigurationException, SAXException {

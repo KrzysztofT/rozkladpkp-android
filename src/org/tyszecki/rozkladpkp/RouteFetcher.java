@@ -48,7 +48,7 @@ public class RouteFetcher {
         client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestUserAgent.class);
         request.addHeader("Content-Type", "text/plain");
         
-        Log.i("RozkladPKP",data);
+        //Log.i("RozkladPKP",data);
         
 		request.setEntity(new StringEntity(data));
 		

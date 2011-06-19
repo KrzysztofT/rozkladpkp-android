@@ -173,8 +173,8 @@ public class RememberedItemAdapter extends BaseAdapter {
         		{
         			itime.parse(r.cacheValid);
         			
-        			Log.i("RozkladPKP","ITEM: "+itime.toString());
-        			Log.i("RozkladPKP","NOW: "+now.toString());
+        			//Log.i("RozkladPKP","ITEM: "+itime.toString());
+        			//Log.i("RozkladPKP","NOW: "+now.toString());
         			
         			if(Time.compare(itime, now) < 0)
         			{

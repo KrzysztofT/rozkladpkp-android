@@ -65,7 +65,7 @@ class RouteItemAdapter extends BaseAdapter {
         	o.station 	= n.getAttributes().getNamedItem("name").getNodeValue();
         	
         	
-        	Log.i("RozkladPKP", o.station);
+        	//Log.i("RozkladPKP", o.station);
         	
         	if(n.getAttributes().getNamedItem("arrTime") != null)
         		o.arr = n.getAttributes().getNamedItem("arrTime").getNodeValue();

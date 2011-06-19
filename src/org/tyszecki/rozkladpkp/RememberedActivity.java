@@ -26,7 +26,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.format.Time;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -62,6 +61,9 @@ public class RememberedActivity extends Activity {
 				{
 					TimetableItem t = (TimetableItem)b;
 					
+					if(!CommonUtils.onlineCheck(RememberedActivity.this))
+						return;
+					
 					ni = new Intent(arg0.getContext(), showForm ? TimetableFormActivity.class : TimetableActivity.class);
 					
 					ni.putExtra("Station", t.name);
@@ -75,6 +77,9 @@ public class RememberedActivity extends Activity {
 					RememberedItem.RouteItem t = (RememberedItem.RouteItem)b;
 					
 					boolean showSaved = (t.cacheValid != null && t.cacheValid.length() > 0);
+					
+					if(!showSaved && !CommonUtils.onlineCheck(RememberedActivity.this))
+						return;
 						
 					ni = new Intent(arg0.getContext(),(showForm && !showSaved) ? ConnectionsFormActivity.class : ConnectionListActivity.class);
 					

@@ -18,7 +18,6 @@ package org.tyszecki.rozkladpkp;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -346,7 +345,7 @@ public class ConnectionListActivity extends Activity {
         String t= "";
         for(SerializableNameValuePair p : data)
         	t+=p.name+"="+p.value+"&";
-        Log.i("RozkladPKP","TTData: "+ t);
+        //Log.i("RozkladPKP","TTData: "+ t);
         
         HttpResponse response = client.execute(request);
          
@@ -403,7 +402,7 @@ public class ConnectionListActivity extends Activity {
 	        String[] parts = content.toString().split("\n");
 	        
 	        
-	        Log.i("RozkladPKP","GFT:"+content.toString());
+	        //Log.i("RozkladPKP","GFT:"+content.toString());
 	        
 	        for (String s : parts){
 	        	if(s.startsWith("url=")){
@@ -416,7 +415,7 @@ public class ConnectionListActivity extends Activity {
         }
         if(url != null)
         {
-        	Log.i("RozkladPKP","PLN: "+url);
+        	//Log.i("RozkladPKP","PLN: "+url);
 	        //Pobranie PLN
 	        request = new HttpGet(url);
 	        response = client.execute(request);
@@ -431,18 +430,18 @@ public class ConnectionListActivity extends Activity {
 	            content.write(sBuffer, 0, readBytes);
 	        }
 	        
-	        Log.i("RozkladPKP", "jest pełny PLN" + Integer.toString(content.size()));
+	        //Log.i("RozkladPKP", "jest pełny PLN" + Integer.toString(content.size()));
 	        pln = new PLN(content.toByteArray());
 	        
 	        hasFullTable = true;
 	        updateDisplayedPLN();
         }
-        else
-        	Log.i("RozkladPKP","Jeszcze w8");
+        //else
+        	//Log.i("RozkladPKP","Jeszcze w8");
         }
         catch(InterruptedException e)
         {
-        	Log.d("RozkladPKP","Pobieranie pełnego rozkładu anulowane");
+        	//Log.d("RozkladPKP","Pobieranie pełnego rozkładu anulowane");
         	return;
         }
          
@@ -522,7 +521,7 @@ public class ConnectionListActivity extends Activity {
         String t= "";
         for(SerializableNameValuePair p : data)
         	t+=p.name+"="+p.value+"&";
-        Log.i("RozkladPKP","PLNReq: "+ t);
+        //Log.i("RozkladPKP","PLNReq: "+ t);
         
         HttpResponse response = client.execute(request);
          
@@ -539,11 +538,11 @@ public class ConnectionListActivity extends Activity {
         }
 
         // Return result from buffered stream
-        Log.i("RozkladPKP", "jestPLN");
+        //Log.i("RozkladPKP", "jestPLN");
         pln = new PLN(content.toByteArray());
        
         
-        Log.i("RozkladPKP", "pln parsed");
+        //Log.i("RozkladPKP", "pln parsed");
         if(updateView)
         	updateDisplayedPLN();
 	}
@@ -637,8 +636,12 @@ public class ConnectionListActivity extends Activity {
 				
 				String r[] = t.date.split("\\.");
 				String u[] = t.con.trains[0].deptime.toString().split(":");
+				String jt[] = t.con.journeyTime.toString().split(":");
 				
 				time.set(0, Integer.parseInt(u[1]), ((Integer.parseInt(u[0])+23)%24)+1, Integer.parseInt(r[0]), Integer.parseInt(r[1])-1, Integer.parseInt(r[2]));
+				time.hour += Integer.parseInt(jt[0])+3;
+				time.minute += Integer.parseInt(jt[1]);
+				time.normalize(false);
 			}
 			catch(Exception e){
 				//Coś poszło nie tak...

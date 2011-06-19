@@ -306,18 +306,18 @@ public class PLN {
 		attributesStart	= readint(0x3a);
 		attributesEnd	= readint(0x3e);
 		
-		Log.i("PLN","Daty..."); 
+		//Log.i("PLN","Daty..."); 
 		setupDates();
-		Log.i("PLN","Stringi...");
+		//Log.i("PLN","Stringi...");
 		readStringTable();
-		Log.i("PLN","Stacje...");
+		//Log.i("PLN","Stacje...");
 		readStations();
 		readHeaderStations();
-		Log.i("PLN","Atrybuty...");
+		//Log.i("PLN","Atrybuty...");
 		readAttributes();
-		Log.i("PLN","Dostępność...");
+		//Log.i("PLN","Dostępność...");
 		readAvailabilities();
-		Log.i("PLN","Połączenia...");
+		//Log.i("PLN","Połączenia...");
 		readConnections();
 		//readMessages();
 	}
@@ -523,7 +523,7 @@ public class PLN {
 			stations[i].x	= readLong(pos+6);
 			stations[i].y	= readLong(pos+10);
 			
-			Log.i("PLN","Station: "+stations[i].name+"["+readint(pos)+"] ("+Integer.toString(stations[i].id)+")");
+			//Log.i("PLN","Station: "+stations[i].name+"["+readint(pos)+"] ("+Integer.toString(stations[i].id)+")");
 		}
 	}
 	

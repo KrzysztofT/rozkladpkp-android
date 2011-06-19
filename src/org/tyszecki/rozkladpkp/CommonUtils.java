@@ -42,13 +42,18 @@ public class CommonUtils {
 	 */
 	public static boolean onlineCheck(Context c)
 	{
+		return onlineCheck(c, "Nie można wykonać tej operacji - brak połączenia internetowego.");
+	}
+	
+	public static boolean onlineCheck(Context c, String msgError)
+	{
 		ConnectivityManager cm = (ConnectivityManager)  c.getSystemService(Context.CONNECTIVITY_SERVICE);
 	    NetworkInfo netInfo = cm.getActiveNetworkInfo();
 	    if (netInfo != null && netInfo.isConnectedOrConnecting()) {
 	        return true;
 	    }
 
-	    Toast.makeText(c.getApplicationContext(), "Nie można wykonać tej operacji - brak połączenia internetowego.", Toast.LENGTH_SHORT).show();
+	    Toast.makeText(c.getApplicationContext(), msgError, Toast.LENGTH_SHORT).show();
 	    return false;
 	}
 	

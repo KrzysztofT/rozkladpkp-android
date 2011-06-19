@@ -131,7 +131,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 	 * */
 	
 	private void copyDataBase() throws IOException{
-		Log.i("RozkladPKP","kopiowanie!");
+		//Log.i("RozkladPKP","kopiowanie!");
 		//Open your local db as the input stream
 		InputStream myInput = myContext.getAssets().open(DB_NAME);
 
@@ -204,7 +204,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 	 * co sprawiłoby że zmiany przez nią wprowadzone zostałyby cofnięte. 
 	 */
 	public void myCreate() {
-		Log.i("RozkladPKP","myCreate called!");
+		//Log.i("RozkladPKP","myCreate called!");
 		SQLiteDatabase db = SQLiteDatabase.openDatabase(DB_PATH+DB_NAME, null, SQLiteDatabase.OPEN_READWRITE);
 		createFavTables(db);
 		addResultsCache(db);
@@ -214,7 +214,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 	}
 	
 	public void myUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		Log.i("RozkladPKP","myUpgrade called!");
+		//Log.i("RozkladPKP","myUpgrade called!");
 		if(oldVersion < 2)
 			createFavTables(db);
 		if(oldVersion < 3)

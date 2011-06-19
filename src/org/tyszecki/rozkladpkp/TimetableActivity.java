@@ -78,7 +78,7 @@ public class TimetableActivity extends Activity {
         
         SID = getIntent().getExtras().getString("SID");
         
-        Log.i("RozkladPKP",SID);
+        //Log.i("RozkladPKP",SID);
         dep = getIntent().getExtras().getString("Type").equals("dep");
         
         RememberedManager.addtoHistory(this, CommonUtils.StationIDfromSID(SID), dep);
@@ -209,7 +209,7 @@ public class TimetableActivity extends Activity {
 			String prod = getIntent().getExtras().getString("Products");
 			String type = dep?"dep":"arr";
 			
-			Log.i("Sitkol",date);
+			//Log.i("Sitkol",date);
 			
 			String data = "L=vs_java3&productsFilter="+prod+"&inputTripelId="+s+"@&maxJourneys=50&boardType="+type+"&time="+time+"&date="+date+"&start=yes";
         	String url  = "http://rozklad.sitkol.pl/bin/stboard.exe/pn" ;
@@ -276,7 +276,7 @@ public class TimetableActivity extends Activity {
             	m_items.add(o);
             }
           } catch (Exception e) { 
-            Log.e("BACKGROUND_PROC", e.getMessage());
+            //Log.e("BACKGROUND_PROC", e.getMessage());
           }
           runOnUiThread(returnRes);
     }
