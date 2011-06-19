@@ -574,6 +574,7 @@ public class ConnectionListActivity extends Activity {
 			}
 			return true;*/
 		case R.id.item_favourite:
+			RememberedManager.addtoHistory(ConnectionListActivity.this, CommonUtils.StationIDfromSID(extras.getString("SID")), CommonUtils.StationIDfromSID(extras.getString("ZID")),"");
 			RememberedManager.saveRoute(ConnectionListActivity.this, CommonUtils.StationIDfromSID(extras.getString("SID")), CommonUtils.StationIDfromSID(extras.getString("ZID")));
 			return true;
 		
@@ -622,21 +623,28 @@ public class ConnectionListActivity extends Activity {
 		super.onPause();
 		inFront = false;
 		
-		TripIterator p = pln.tripIterator();
-		p.moveToLast();
-		Trip t = p.next();
-		
-		
 		//Do poprawienia jest ogólnie większość rzeczy związana z zapamiętywaniem czasu w PLN.
 		//FIXME: Tutaj zakładamy, że hafas zwraca wyniki w strefie czasowej użytkownika, co nie jest prawdą.
 		//Z drugiej strony, nie wiadomo w jakiej strefie te wyniki są zwracane.
 		Time time = new Time();
 		
-		String r[] = t.date.split("\\.");
-		String u[] = t.con.trains[0].deptime.toString().split(":");
-		
-		time.set(0, Integer.parseInt(u[1]), ((Integer.parseInt(u[0])+23)%24)+1, Integer.parseInt(r[0]), Integer.parseInt(r[1])-1, Integer.parseInt(r[2]));
-		
+		if(pln != null)
+		{
+			try{
+				TripIterator p = pln.tripIterator();
+				p.moveToLast();
+				Trip t = p.next();
+				
+				String r[] = t.date.split("\\.");
+				String u[] = t.con.trains[0].deptime.toString().split(":");
+				
+				time.set(0, Integer.parseInt(u[1]), ((Integer.parseInt(u[0])+23)%24)+1, Integer.parseInt(r[0]), Integer.parseInt(r[1])-1, Integer.parseInt(r[2]));
+			}
+			catch(Exception e){
+				//Coś poszło nie tak...
+				return;
+			}
+		}
 		
 		Bundle extras = getIntent().getExtras(); 
 		
@@ -645,10 +653,10 @@ public class ConnectionListActivity extends Activity {
 		Zid = CommonUtils.StationIDfromSID(extras.getString("ZID"));
 		
 		//Zapisanie w histori...
-		RememberedManager.addtoHistory(this, Sid, Zid, time.format2445());
+		RememberedManager.addtoHistory(this, Sid, Zid, (pln != null) ? time.format2445() : "");
 		
 		//Zapisanie pliku
-		if(!extras.containsKey("PLNFilename"))
+		if(!extras.containsKey("PLNFilename") && pln != null)
 		{
 			String s = CommonUtils.ResultsHash(Sid, Zid, null);
 			try {

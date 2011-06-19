@@ -18,12 +18,13 @@
 <TableLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="wrap_content"  
     android:stretchColumns="2">
 	<TableRow>
-		<ImageView
+		<View
 	        android:id="@+id/icon"
 	        android:layout_height="fill_parent"
+	        android:padding="0dip"
 	        android:layout_marginRight="6dip"/>
 	   			<TableLayout
 	    			android:layout_width="wrap_content"
@@ -53,4 +54,5 @@
 	        android:paddingLeft="15dip"
 	        android:gravity="center_vertical" />
      </TableRow>
+     
 </TableLayout>

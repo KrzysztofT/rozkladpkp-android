@@ -37,8 +37,8 @@ class RouteItemAdapter extends BaseAdapter {
 	
     private ArrayList<RouteItem> items;
     
-    private int stationID = -1;
-    private int stationPos = -1;
+    private int startStationID = -1, endStationID = -1;
+    private int startStationPos = -1, endStationPos = -1;
     Context c;
 
     public RouteItemAdapter(Context context) {
@@ -46,9 +46,10 @@ class RouteItemAdapter extends BaseAdapter {
     	this.items = new ArrayList<RouteItem>();    
     }
     
-    public void setData(Document doc, int sID)
+    public void setData(Document doc, int sID, int eID)
     {
-    	stationID = sID;
+    	startStationID = sID;
+    	endStationID = eID;
     	loadData(doc);
     }
     
@@ -77,8 +78,11 @@ class RouteItemAdapter extends BaseAdapter {
         	
         	o.stid	= n.getAttributes().getNamedItem("evaId").getNodeValue();
         	
-        	if(Integer.parseInt(o.stid) == stationID)
-        		stationPos = i;
+        	int id = Integer.parseInt(o.stid); 
+        	if(id == startStationID)
+        		startStationPos = i;
+        	else if(id == endStationID)
+        		endStationPos = i;
         	
         	items.add(o);
         }
@@ -118,24 +122,29 @@ class RouteItemAdapter extends BaseAdapter {
                     //Start
                     if(position == 0)
                     {
-                    	if(stationPos == 0)
+                    	if(startStationPos == 0)
                     		imgId = R.drawable.start_green;
                     	else
                     		imgId = R.drawable.start_gray;
                     }
                     else if(last)
-                    	imgId = R.drawable.end_green;
+                    {
+                    	if(endStationPos == items.size() -1)
+                    		imgId = R.drawable.end_green;
+                    	else
+                    		imgId = R.drawable.end_gray;
+                    }	
                     else
                     {
-                    	if(position == stationPos)
+                    	if(position == startStationPos)
                     		imgId	= R.drawable.sta_graygreen;
-                    	else if(position > stationPos)
+                    	else if(position == endStationPos)
+                    		imgId	= R.drawable.sta_greengray;
+                    	else if(position > startStationPos && position < endStationPos)
                     		imgId	= R.drawable.sta_green;
                     }
                     
-                    ImageView icon = (ImageView) v.findViewById(R.id.icon);
-                    
-                    icon.setImageDrawable(c.getResources().getDrawable(imgId));
+                    v.findViewById(R.id.icon).setBackgroundDrawable(c.getResources().getDrawable(imgId));
             }
             return v;
     }

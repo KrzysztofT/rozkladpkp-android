@@ -63,15 +63,16 @@ public class RouteActivity extends Activity {
 	protected void getTable() throws ClientProtocolException, IOException, ParserConfigurationException, SAXException {
 		
 		Bundle extras = getIntent().getExtras();
-		final String sID = getIntent().getExtras().getString("startID");
+		final String sID = extras.getString("startID");
+		final String dID = extras.getString("destID");
 		
-    	final Document doc = RouteFetcher.fetchRoute(extras.getString("number"), sID, extras.getString("destID"),
+    	final Document doc = RouteFetcher.fetchRoute(extras.getString("number"), sID, dID,
     			extras.getString("date"), extras.getString("time"), extras.getString("Type"));
     	
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				adapter.setData(doc,Integer.parseInt(sID));
+				adapter.setData(doc,Integer.parseInt(sID),Integer.parseInt(dID));
 				progressDialog.dismiss();
 			}
 		});

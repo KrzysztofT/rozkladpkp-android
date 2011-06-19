@@ -27,10 +27,12 @@ import org.tyszecki.rozkladpkp.widgets.TimeButton;
 import org.tyszecki.rozkladpkp.widgets.StationSpinner.onDataLoaded;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.text.Editable;
@@ -184,7 +186,28 @@ public class ConnectionsFormActivity extends Activity {
         		public void dataLoaded() {
         			loading--;
         			if(loading == 0)
+        			{
         				progressDialog.dismiss();
+        				if(arrSelect.getStationCount() == 0 || depSelect.getStationCount() == 0)
+        				{
+        					runOnUiThread(new Runnable() {
+								public void run() {
+									AlertDialog alertDialog;
+		        			    	alertDialog = new AlertDialog.Builder(ConnectionsFormActivity.this).create();
+		        			    	alertDialog.setTitle("Błąd wyszukiwania!");
+		        			    	alertDialog.setMessage("Nie można odnaleźć wskazanej stacji.");
+		        			    	alertDialog.setCancelable(false);
+		        			    	
+		        			    	alertDialog.setButton("Powrót", new DialogInterface.OnClickListener() {
+		        						public void onClick(DialogInterface arg0, int arg1) {
+		        							ConnectionsFormActivity.this.finish();
+		        						}
+		        					});
+		        			    	alertDialog.show();		
+								}
+							});
+        				}
+        			}
         		}
         	};
      

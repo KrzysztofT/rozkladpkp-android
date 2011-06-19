@@ -95,6 +95,11 @@ public class StationSpinner extends Spinner {
 		return stations[getSelectedItemPosition()][1];
 	}
 	
+	public int getStationCount()
+	{
+		return stations.length;
+	}
+	
 	public String getText()
 	{
 		return stations[getSelectedItemPosition()][0];
@@ -138,12 +143,10 @@ public class StationSpinner extends Spinner {
 	        try {
 	            InputStream inputStream = new StationSearch().search(station);
 	       
-	            
 	            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 	            DocumentBuilder db = dbf.newDocumentBuilder();
-	            
-	            
 	            Document doc = db.parse(inputStream);
+	            
 	            NodeList list = doc.getElementsByTagName("MLc");
 	            
 	            int j = list.getLength();

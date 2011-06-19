@@ -31,23 +31,20 @@ public final class R {
         public static final int departure=0x7f02000d;
         public static final int end_gray=0x7f02000e;
         public static final int end_green=0x7f02000f;
-        public static final int ic=0x7f020010;
-        public static final int ic_grey=0x7f020011;
-        public static final int ic_love=0x7f020012;
-        public static final int ic_menu_change_order=0x7f020013;
-        public static final int ic_menu_show_list=0x7f020014;
-        public static final int ic_menu_today=0x7f020015;
-        public static final int ic_mylocation=0x7f020016;
-        public static final int ic_white=0x7f020017;
-        public static final int icon=0x7f020018;
-        public static final int saved=0x7f020019;
-        public static final int sta_gray=0x7f02001a;
-        public static final int sta_graygreen=0x7f02001b;
-        public static final int sta_green=0x7f02001c;
-        public static final int sta_greengray=0x7f02001d;
-        public static final int start_gray=0x7f02001e;
-        public static final int start_green=0x7f02001f;
-        public static final int time=0x7f020020;
+        public static final int ic_love=0x7f020010;
+        public static final int ic_menu_change_order=0x7f020011;
+        public static final int ic_menu_show_list=0x7f020012;
+        public static final int ic_menu_today=0x7f020013;
+        public static final int ic_mylocation=0x7f020014;
+        public static final int icon=0x7f020015;
+        public static final int saved=0x7f020016;
+        public static final int sta_gray=0x7f020017;
+        public static final int sta_graygreen=0x7f020018;
+        public static final int sta_green=0x7f020019;
+        public static final int sta_greengray=0x7f02001a;
+        public static final int start_gray=0x7f02001b;
+        public static final int start_green=0x7f02001c;
+        public static final int time=0x7f02001d;
     }
     public static final class id {
         public static final int arrival_edit=0x7f08000d;

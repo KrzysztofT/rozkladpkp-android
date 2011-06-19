@@ -56,7 +56,7 @@ public class RememberedActivity extends Activity {
 			public void onItemClick(AdapterView<?> arg0, View v, int pos, long id) {
 				
 				final RememberedItem b =  adapter.getItem(pos);
-				Intent ni;
+				Intent ni = null;
 				
 				if(b instanceof RememberedItem.TimetableItem)
 				{
@@ -70,7 +70,7 @@ public class RememberedActivity extends Activity {
 					ni.putExtra("Type", t.type == TimetableType.Arrival ? "arr" : "dep");
 					
 				}
-				else
+				else if(b instanceof RememberedItem.RouteItem)
 				{
 					RememberedItem.RouteItem t = (RememberedItem.RouteItem)b;
 					
@@ -88,14 +88,16 @@ public class RememberedActivity extends Activity {
 					ni.putExtra("Attributes", new ArrayList<SerializableNameValuePair>());
 					
 				}
-				
-				ni.putExtra("Products", getPreferences(MODE_PRIVATE).getString("Products", "11110001111111"));
-				Time time = new Time();
-				time.setToNow();
-				
-				ni.putExtra("Time", time.format("%H:%M"));
-				ni.putExtra("Date", time.format("%d.%m.%Y"));
-				startActivity(ni);
+				if(ni != null)
+				{
+					ni.putExtra("Products", getPreferences(MODE_PRIVATE).getString("Products", "11110001111111"));
+					Time time = new Time();
+					time.setToNow();
+					
+					ni.putExtra("Time", time.format("%H:%M"));
+					ni.putExtra("Date", time.format("%d.%m.%Y"));
+					startActivity(ni);
+				}
 			}
 		});
         
