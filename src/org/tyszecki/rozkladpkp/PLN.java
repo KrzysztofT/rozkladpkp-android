@@ -54,6 +54,7 @@ public class PLN {
 	private HashMap<Integer,Availability> availabilities;
 	
 	public int conCnt;
+	boolean delayInfo = false;
 
 	byte[] data;
 	private Calendar sdate,edate,today;
@@ -96,6 +97,11 @@ public class PLN {
 			return ((days>0)?(Integer.toString(days)+" dni "):"")+toString();
 		}
 		
+		public int intValue()
+		{
+			return val;
+		}
+		
 		public Time difference(Time b)
 		{
 			int va = val+days*2400;
@@ -109,6 +115,7 @@ public class PLN {
 	}
 	
 	class Availability{
+		private int length;
 		public Availability(String m,int offset, int dayOffset, int len) {
 			msg = m;
 			dOffset = dayOffset;
@@ -119,12 +126,13 @@ public class PLN {
 				for(int j = 7; j >= 0; j--)
 					days.set(ix++, ((data[offset+i] >>j) & 1) != 0);
 			
+			length = days.length();
 		}
 		
 		public boolean available(int day)
 		{
 			day -= dOffset*8;
-			if(day >= 0 && day < days.length())
+			if(day >= 0 && day < length)
 				return days.get(day);
 			return false;
 		}
@@ -168,6 +176,7 @@ public class PLN {
 		String number;
 		Station depstation,arrstation;
 		String attributes[];
+		TrainChange change;
 		
 		public String toString()
 		{
@@ -185,12 +194,17 @@ public class PLN {
 		String realdepplatform,realarrplatform;
 	}
 	
+	public class ConnectionChange {
+		int departureDelay;
+	}
+	
 	public class Connection {
 		public int changes,trOffset;
 		Time journeyTime;
 		Train[] trains;
 		Message[] messages;
 		Availability availability;
+		ConnectionChange change;
 		
 		public String toString()
 		{
@@ -301,25 +315,19 @@ public class PLN {
 		strings = new HashMap<Integer, String>();
 		attributes = new HashMap<Integer, String[]>();
 		
-
 		stationsStart	= readint(0x36);
 		attributesStart	= readint(0x3a);
 		attributesEnd	= readint(0x3e);
 		
-		//Log.i("PLN","Daty..."); 
 		setupDates();
-		//Log.i("PLN","Stringi...");
 		readStringTable();
-		//Log.i("PLN","Stacje...");
 		readStations();
 		readHeaderStations();
-		//Log.i("PLN","Atrybuty...");
 		readAttributes();
-		//Log.i("PLN","Dostępność...");
 		readAvailabilities();
-		//Log.i("PLN","Połączenia...");
 		readConnections();
-		//readMessages();
+		readChanges();
+		
 	}
 
 	public TripIterator tripIterator(){
@@ -565,13 +573,69 @@ public class PLN {
 
 	private void readConnections() {
 		conCnt	= readint(0x1e);
-		//Log.i("PLN","Connections: "+Integer.toString(conCnt));
 		connections = new Connection[conCnt];
 		
 		for(int i = 0; i < conCnt; i++)
-		{
-			//Log.i("PLN","Connection: "+Integer.toString(i));
 			connections[i] = readConnection(ConnectionOffset+ConnectionSize*i);
-		}
 	}
+	
+	private void readChanges() {
+		int chinfo = readint(attributesEnd+0xe);
+		if(chinfo == 0)
+			return;
+		
+		chinfo += conCnt*2+4;
+		for(int i = 0; i < conCnt; ++i)
+		{
+			connections[i].change = readConnectionChanges(chinfo);
+			
+			chinfo += 8;
+			for(int j = 0; j < connections[i].trains.length; ++j)
+			{
+				connections[i].trains[j].change = readTrainChanges(chinfo);			
+				chinfo += 8;
+			}
+		}
+		
+	}
+
+	private TrainChange readTrainChanges(int offset) {
+		
+		int rd = readint(offset);
+		int ra = readint(offset+2);
+		int rdp = readint(offset+4);
+		int rap = readint(offset+6);
+		
+		if(ra == 0xffff && rd == 0xffff && rdp == 0 && rap == 0)
+			return null;
+		
+		delayInfo = true;
+		
+		TrainChange tc = new TrainChange();
+		tc.realdeptime = (rd == 0xffff) ? null : new Time(rd);
+		tc.realarrtime = (ra == 0xffff) ? null : new Time(ra);
+		tc.realdepplatform = (rdp == 0 || !strings.containsKey(rdp)) ? null : strings.get(rdp);
+		tc.realarrplatform = (rap == 0 || !strings.containsKey(rap)) ? null : strings.get(rap);
+		
+		return tc;
+	}
+
+	private ConnectionChange readConnectionChanges(int offset) {
+		int delay = readint(offset+2);
+		if(delay == 255)
+			return null;
+		
+		ConnectionChange ch = new ConnectionChange();
+		ch.departureDelay = delay;	
+	
+		delayInfo = true;
+		
+		return ch;
+	}
+
+	boolean hasDelayInfo()
+	{
+		return delayInfo;
+	}
+	
 }

@@ -16,7 +16,7 @@
       along with RozkladPKP.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      package="org.tyszecki.rozkladpkp" android:versionName="0.1r6" android:versionCode="6">
+      package="org.tyszecki.rozkladpkp" android:versionName="0.1r7" android:versionCode="7">
     <application android:icon="@drawable/icon" android:label="@string/app_name" android:name="RozkladPKPApplication">
         <activity android:name=".RozkladPKP" android:theme="@android:style/Theme.NoTitleBar"
                   android:label="@string/app_name">
@@ -43,6 +43,8 @@
         </activity>
         <activity android:name="PreferencesActivity" android:configChanges="orientation|keyboard|keyboardHidden">
         </activity>
+        
+        <service android:name="RememberedService"></service>
         
     </application>
 <uses-permission android:name="android.permission.INTERNET"/>

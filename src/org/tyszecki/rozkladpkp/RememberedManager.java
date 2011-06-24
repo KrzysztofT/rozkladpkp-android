@@ -94,7 +94,7 @@ public class RememberedManager {
 		cur.close();
 		
 		if(id != null)
-			db.execSQL("UPDATE stored SET _id=(SELECT _id+1 FROM stored ORDER BY _id DESC LIMIT 1), cacheValid='"+cValid+"' WHERE _id="+id);
+			db.execSQL("UPDATE stored SET _id=(SELECT _id+1 FROM stored ORDER BY _id DESC LIMIT 1)"+((cValid != null)?", cacheValid='"+cValid+"'":"")+" WHERE _id="+id);
 		else
 		{
 			ContentValues val = new ContentValues();

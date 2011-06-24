@@ -28,14 +28,17 @@
 	        android:id="@+id/departure_icon" 
 	        android:src="@drawable/departure"/>
         <TextView
-            android:id="@+id/departure_time"
+            android:id="@+id/departure_time" 
+            android:textStyle="bold"
             android:layout_marginLeft="3dip"
-            android:layout_marginRight="13dip"/>
+            android:layout_marginRight="13dip"
+            />
         <ImageView 
 	        android:id="@+id/arrival_icon" 
 	        android:src="@drawable/arrival"/>
         <TextView
             android:id="@+id/arrival_time"
+            android:textStyle="bold"
             android:layout_marginLeft="3dip"
             android:layout_marginRight="13dip"/>
         <ImageView 

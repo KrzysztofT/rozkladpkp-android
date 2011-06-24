@@ -17,16 +17,30 @@
 package org.tyszecki.rozkladpkp;
 
 import android.app.Application;
+import android.content.Context;
+
 import org.acra.*;
 import org.acra.annotation.*;
+import org.tyszecki.rozkladpkp.widgets.StationEdit;
 
 @ReportsCrashes(formKey = "dFlJOVYyS1hYbENUWEVmQnE5azlKNFE6MQ")
 
 public class RozkladPKPApplication extends Application {
+	
+	private static Context context;
+	
 	@Override
     public void onCreate() {
         // The following line triggers the initialization of ACRA
-        ACRA.init(this);
+        //ACRA.init(this);
         super.onCreate();
+        context = getApplicationContext();
+        StationEdit.initTree();
     }
+	
+	public static Context getAppContext()
+	{
+		return context;
+	}
+	
 }

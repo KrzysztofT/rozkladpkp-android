@@ -103,8 +103,8 @@ public class ConnectionDetailsActivity extends Activity {
 	}
 	
 	public boolean onCreateOptionsMenu(Menu menu){
-		getMenuInflater().inflate(R.menu.connection_details, menu);
-		return true;
+		//getMenuInflater().inflate(R.menu.connection_details, menu);
+		return false;
 	}
 	
 	public boolean onOptionsItemSelected (MenuItem item){

@@ -17,8 +17,11 @@
 package org.tyszecki.rozkladpkp;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.zip.GZIPInputStream;
@@ -42,6 +45,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.DialogInterface.OnCancelListener;
 import android.os.Bundle;
+import android.os.Environment;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.Gravity;
@@ -273,7 +277,7 @@ public class ConnectionListActivity extends Activity {
 				}
 				else
 				{
-					adapter.setPLN(pln, !hasFullTable);
+					adapter.setPLN(pln, !hasFullTable, pln.hasDelayInfo());
 					hideLoader();
 				}
 			}
@@ -556,7 +560,7 @@ public class ConnectionListActivity extends Activity {
 		Bundle extras = getIntent().getExtras();
 		Intent ni = null;
 		switch(item.getItemId()){
-		/*case R.id.savepln:
+		case R.id.savepln:
 			File f = new File(Environment.getExternalStorageDirectory(),"PLN");
 			FileOutputStream w = null;
 			try {
@@ -571,7 +575,7 @@ public class ConnectionListActivity extends Activity {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			return true;*/
+			return true;
 		case R.id.item_favourite:
 			RememberedManager.addtoHistory(ConnectionListActivity.this, CommonUtils.StationIDfromSID(extras.getString("SID")), CommonUtils.StationIDfromSID(extras.getString("ZID")),"");
 			RememberedManager.saveRoute(ConnectionListActivity.this, CommonUtils.StationIDfromSID(extras.getString("SID")), CommonUtils.StationIDfromSID(extras.getString("ZID")));
@@ -622,55 +626,16 @@ public class ConnectionListActivity extends Activity {
 		super.onPause();
 		inFront = false;
 		
-		//Do poprawienia jest ogólnie większość rzeczy związana z zapamiętywaniem czasu w PLN.
-		//FIXME: Tutaj zakładamy, że hafas zwraca wyniki w strefie czasowej użytkownika, co nie jest prawdą.
-		//Z drugiej strony, nie wiadomo w jakiej strefie te wyniki są zwracane.
-		Time time = new Time();
-		
-		if(pln != null)
-		{
-			try{
-				TripIterator p = pln.tripIterator();
-				p.moveToLast();
-				Trip t = p.next();
-				
-				String r[] = t.date.split("\\.");
-				String u[] = t.con.trains[0].deptime.toString().split(":");
-				String jt[] = t.con.journeyTime.toString().split(":");
-				
-				time.set(0, Integer.parseInt(u[1]), ((Integer.parseInt(u[0])+23)%24)+1, Integer.parseInt(r[0]), Integer.parseInt(r[1])-1, Integer.parseInt(r[2]));
-				time.hour += Integer.parseInt(jt[0])+3;
-				time.minute += Integer.parseInt(jt[1]);
-				time.normalize(false);
-			}
-			catch(Exception e){
-				//Coś poszło nie tak...
-				return;
-			}
-		}
-		
 		Bundle extras = getIntent().getExtras(); 
+		Intent in = new Intent(this,RememberedService.class);
 		
-		String Sid, Zid;
-		Sid = CommonUtils.StationIDfromSID(extras.getString("SID"));
-		Zid = CommonUtils.StationIDfromSID(extras.getString("ZID"));
+		if(pln != null && !extras.containsKey("PLNFilename"))
+			in.putExtra("pln", pln.data);
 		
-		//Zapisanie w histori...
-		RememberedManager.addtoHistory(this, Sid, Zid, (pln != null) ? time.format2445() : "");
+		in.putExtra("SID", CommonUtils.StationIDfromSID(extras.getString("SID")));
+		in.putExtra("ZID", CommonUtils.StationIDfromSID(extras.getString("ZID")));
 		
-		//Zapisanie pliku
-		if(!extras.containsKey("PLNFilename") && pln != null)
-		{
-			String s = CommonUtils.ResultsHash(Sid, Zid, null);
-			try {
-				FileOutputStream fos = openFileOutput(s, Context.MODE_PRIVATE);
-				fos.write(pln.data);
-				fos.close();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-		}
-		}
+		startService(in);
 	}
 	
 	

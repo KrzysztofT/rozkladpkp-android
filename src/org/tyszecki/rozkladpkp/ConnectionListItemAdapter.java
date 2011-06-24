@@ -21,12 +21,22 @@ import org.tyszecki.rozkladpkp.ConnectionListItem.DateItem;
 import org.tyszecki.rozkladpkp.ConnectionListItem.ScrollItem;
 import org.tyszecki.rozkladpkp.ConnectionListItem.TripItem;
 import org.tyszecki.rozkladpkp.PLN.Connection;
+import org.tyszecki.rozkladpkp.PLN.Train;
+import org.tyszecki.rozkladpkp.PLN.TrainChange;
 import org.tyszecki.rozkladpkp.PLN.Trip;
 import org.tyszecki.rozkladpkp.PLN.TripIterator;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.text.Html;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.TextPaint;
+import android.text.style.ForegroundColorSpan;
+import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -53,18 +63,34 @@ public class ConnectionListItemAdapter extends BaseAdapter {
 	
 	Context c;
 	private String lastDate;
-	private boolean scrolling = true;	
+	private boolean scrolling = true;
+	private boolean delayInfo = false;
 	
+	private int dep_width,arr_width;
+	private int textSize;
+	private SpannableStringBuilder spanBuilder = new SpannableStringBuilder();
+	private ForegroundColorSpan greenSpan = new ForegroundColorSpan(Color.rgb(73,194,98));
+	private ForegroundColorSpan redSpan = new ForegroundColorSpan(Color.rgb(220, 59, 76));
+	private ForegroundColorSpan yellowSpan = new ForegroundColorSpan(Color.rgb(197,170,73));
 
 	public ConnectionListItemAdapter(Context context) {
 		c = context;
+		TypedArray t = c.obtainStyledAttributes(new int[]{android.R.attr.textSize});
+		textSize = t.getDimensionPixelSize(0, -1);
+		if(textSize == -1)
+			textSize = (int) ((new TextView(c)).getTextSize());
 		
 		items = new ArrayList<ConnectionListItem>();
 	}
 	
-	public void setPLN(PLN file, boolean loadAll)
+	public void setPLN(PLN file, boolean loadAll, boolean delays)
 	{
 		pln = file;
+		
+		delayInfo = delays;
+		if(delays)
+			calculateTextSizes();
+			
 		it = pln.tripIterator();
 	
 		lastDate = "";
@@ -72,6 +98,37 @@ public class ConnectionListItemAdapter extends BaseAdapter {
 	}
 	
 	
+
+	private void calculateTextSizes() {
+		 TextPaint tp = new TextPaint();
+         tp.setTypeface(Typeface.DEFAULT_BOLD);
+         tp.setTextSize(textSize);
+         
+         //Obliczenie wielkości pola tekstowego dla odjazdów
+         int t = 0;
+         for(int i = 0; i < pln.connectionCount(); ++i)
+         {
+        	 Connection c =  pln.connections[i];
+        	 if(c.change != null && Math.abs(c.change.departureDelay) > t)
+        		 t = Math.abs(c.change.departureDelay);
+         }
+         
+         float timew = tp.measureText("23:55 +"+Integer.toString(t));
+         dep_width = (int) (timew+1);
+         
+         //Obliczenie wielkości pola tekstowego dla przyjazdów
+         t = 0;
+         for(int i = 0; i < pln.connectionCount(); ++i)
+         {
+        	 Train tr =  pln.connections[i].trains[pln.connections[i].trains.length-1];
+        	 TrainChange c =  tr.change;
+        	 if(c != null && c.realarrtime != null && tr.arrtime.difference(c.realarrtime).intValue() > t)
+        		 t = tr.arrtime.difference(c.realarrtime).intValue();
+         }
+         
+         timew = tp.measureText("23:55 +"+Integer.toString(t));
+         arr_width = (int) (timew+1);
+	}
 
 	public View getView(int position, View convertView, ViewGroup parent) {
         View v = convertView;
@@ -93,15 +150,69 @@ public class ConnectionListItemAdapter extends BaseAdapter {
         		
                 TextView tt = (TextView) v.findViewById(R.id.departure_time);
                 TextView bt = (TextView) v.findViewById(R.id.arrival_time);
+
                 
                 int tl = o.trains.length;
                 
-                if (tt != null) 
-                	tt.setText(Html.fromHtml("<b>"+o.trains[0].deptime+"</b>"));
-                      
-                if(bt != null)
-                	bt.setText(Html.fromHtml("<b>"+o.trains[tl-1].arrtime+"</b>"));
+                if(delayInfo)
+                {
+                	tt.setWidth(dep_width);
+                	bt.setWidth(arr_width);
+                }
                 
+                
+                String deptime = o.trains[0].deptime.toString();
+                if(o.change != null && o.change.departureDelay != -1)
+                {
+                	
+                	int delay = o.change.departureDelay;
+                	ForegroundColorSpan span;
+                	
+                	if(delay <= 0)
+                		span = greenSpan;
+                	else if(delay <= 5)
+                		span = yellowSpan;
+                	else
+                		span = redSpan;
+                	
+                	 
+                	deptime += (delay >= 0) ? " +" : " ";
+                	deptime += Integer.toString(delay);
+                	spanBuilder.clear();
+                	spanBuilder.append(deptime);
+                	spanBuilder.setSpan(span, 6, deptime.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+                	tt.setText(spanBuilder);
+                }
+                else 
+                	tt.setText(deptime);
+          
+                String arrtime = o.trains[tl-1].arrtime.toString();
+                if(o.trains[tl-1].change != null && o.trains[tl-1].change.realarrtime != null)
+                {
+                	int delay = o.trains[tl-1].change.realarrtime.difference(o.trains[tl-1].arrtime).intValue();
+                	ForegroundColorSpan span;
+                	
+                	if(delay <= 0)
+                		span = greenSpan;
+                	else if(delay <= 5)
+                		span = yellowSpan;
+                	else
+                		span = redSpan;
+                	
+                	
+                	arrtime += (delay >= 0) ? " +" : " ";
+                	arrtime += Integer.toString(delay);
+                	
+                	spanBuilder.clear();
+                	spanBuilder.append(arrtime);
+                	spanBuilder.setSpan(span, 6, arrtime.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+                	
+                	bt.setText(spanBuilder);
+                }
+                else 
+                	bt.setText(arrtime);
+                	
+                 
                 ((TextView) v.findViewById(R.id.changes)).setText(Integer.toString(o.changes));
                 ((TextView) v.findViewById(R.id.duration)).setText(o.journeyTime.toLongString());
                 
