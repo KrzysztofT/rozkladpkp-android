@@ -89,9 +89,9 @@ public class ConnectionDetailsActivity extends Activity {
     	Connection con = pln.connections[conidx];
     	
     	
-    	for(int i = 0; i < con.trains.length; ++i)
+    	for(int i = 0; i < con.getTrainCount(); ++i)
     	{
-    		Train t = con.trains[i];
+    		Train t = con.getTrain(i);
     		//Log.i("RozkladPKP", t.arrstation.name);
     		TrainItem ti = c.new TrainItem();
     		ti.t = t;
@@ -103,8 +103,8 @@ public class ConnectionDetailsActivity extends Activity {
 	}
 	
 	public boolean onCreateOptionsMenu(Menu menu){
-		//getMenuInflater().inflate(R.menu.connection_details, menu);
-		return false;
+		getMenuInflater().inflate(R.menu.connection_details, menu);
+		return true;
 	}
 	
 	public boolean onOptionsItemSelected (MenuItem item){

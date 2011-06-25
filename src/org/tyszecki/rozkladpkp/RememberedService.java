@@ -41,8 +41,8 @@ public class RememberedService extends IntentService {
 				Trip t1 = p.next();
 				
 				String r[] = t1.date.split("\\.");
-				String u[] = t1.con.trains[0].deptime.toString().split(":");
-				String jt[] = t1.con.journeyTime.toString().split(":");
+				String u[] = t1.con.getTrain(0).deptime.toString().split(":");
+				String jt[] = t1.con.getJourneyTime().toString().split(":");
 				
 				
 				time.set(0, Integer.parseInt(u[1]), ((Integer.parseInt(u[0])+23)%24)+1, Integer.parseInt(r[0]), Integer.parseInt(r[1])-1, Integer.parseInt(r[2]));

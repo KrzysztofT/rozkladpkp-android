@@ -30,6 +30,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.os.SystemClock;
 import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -109,29 +110,37 @@ public class ConnectionListItemAdapter extends BaseAdapter {
          for(int i = 0; i < pln.connectionCount(); ++i)
          {
         	 Connection c =  pln.connections[i];
-        	 if(c.change != null && Math.abs(c.change.departureDelay) > t)
-        		 t = Math.abs(c.change.departureDelay);
+        	 if(c.getChange() != null && Math.abs(c.getChange().departureDelay) > t)
+        		 t = Math.abs(c.getChange().departureDelay);
          }
          
          float timew = tp.measureText("23:55 +"+Integer.toString(t));
          dep_width = (int) (timew+1);
          
          //Obliczenie wielkości pola tekstowego dla przyjazdów
-         t = 0;
+         t = -1000;
          for(int i = 0; i < pln.connectionCount(); ++i)
          {
-        	 Train tr =  pln.connections[i].trains[pln.connections[i].trains.length-1];
-        	 TrainChange c =  tr.change;
-        	 if(c != null && c.realarrtime != null && tr.arrtime.difference(c.realarrtime).intValue() > t)
-        		 t = tr.arrtime.difference(c.realarrtime).intValue();
+        	 Train tr =  pln.connections[i].getTrain(pln.connections[i].getTrainCount()-1);
+        	 TrainChange c =  tr.getChange();
+        	 
+        	 if(c != null && c.realarrtime != null && c.realarrtime.difference(tr.arrtime).intValue() > t)
+        		 t = c.realarrtime.difference(tr.arrtime).intValue();
+        	 
          }
          
-         timew = tp.measureText("23:55 +"+Integer.toString(t));
-         arr_width = (int) (timew+1);
+         if(t != -1000)
+         {
+        	 timew = tp.measureText("23:55 +"+Integer.toString(t));
+        	 arr_width = (int) (timew+1);
+         }
+         else
+        	 arr_width = -1;
 	}
 
 	public View getView(int position, View convertView, ViewGroup parent) {
         View v = convertView;
+        
         ConnectionListItem con = items.get(position);
         if (v == null) {
         	
@@ -152,20 +161,21 @@ public class ConnectionListItemAdapter extends BaseAdapter {
                 TextView bt = (TextView) v.findViewById(R.id.arrival_time);
 
                 
-                int tl = o.trains.length;
+                int tl = o.getTrainCount();
                 
                 if(delayInfo)
                 {
                 	tt.setWidth(dep_width);
-                	bt.setWidth(arr_width);
+                	if(arr_width > 0)
+                		bt.setWidth(arr_width);
                 }
                 
                 
-                String deptime = o.trains[0].deptime.toString();
-                if(o.change != null && o.change.departureDelay != -1)
+                String deptime = o.getTrain(0).deptime.toString();
+                if(o.getChange() != null && o.getChange().departureDelay != -1)
                 {
                 	
-                	int delay = o.change.departureDelay;
+                	int delay = o.getChange().departureDelay;
                 	ForegroundColorSpan span;
                 	
                 	if(delay <= 0)
@@ -178,6 +188,8 @@ public class ConnectionListItemAdapter extends BaseAdapter {
                 	 
                 	deptime += (delay >= 0) ? " +" : " ";
                 	deptime += Integer.toString(delay);
+                	
+                	spanBuilder.clearSpans();
                 	spanBuilder.clear();
                 	spanBuilder.append(deptime);
                 	spanBuilder.setSpan(span, 6, deptime.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
@@ -186,10 +198,11 @@ public class ConnectionListItemAdapter extends BaseAdapter {
                 else 
                 	tt.setText(deptime);
           
-                String arrtime = o.trains[tl-1].arrtime.toString();
-                if(o.trains[tl-1].change != null && o.trains[tl-1].change.realarrtime != null)
+                Train last = o.getTrain(tl-1);
+                String arrtime = last.arrtime.toString();
+                if(last.getChange() != null && last.getChange().realarrtime != null)
                 {
-                	int delay = o.trains[tl-1].change.realarrtime.difference(o.trains[tl-1].arrtime).intValue();
+                	int delay = last.getChange().realarrtime.difference(last.arrtime).intValue();
                 	ForegroundColorSpan span;
                 	
                 	if(delay <= 0)
@@ -203,6 +216,7 @@ public class ConnectionListItemAdapter extends BaseAdapter {
                 	arrtime += (delay >= 0) ? " +" : " ";
                 	arrtime += Integer.toString(delay);
                 	
+                	spanBuilder.clearSpans();
                 	spanBuilder.clear();
                 	spanBuilder.append(arrtime);
                 	spanBuilder.setSpan(span, 6, arrtime.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
@@ -214,17 +228,17 @@ public class ConnectionListItemAdapter extends BaseAdapter {
                 	
                  
                 ((TextView) v.findViewById(R.id.changes)).setText(Integer.toString(o.changes));
-                ((TextView) v.findViewById(R.id.duration)).setText(o.journeyTime.toLongString());
+                ((TextView) v.findViewById(R.id.duration)).setText(o.getJourneyTime().toLongString());
                 
                 LinearLayout lay = (LinearLayout)v.findViewById(R.id.type_icons);
                 
                 lay.removeAllViews();
                 for(int i = 0; i < tl; i++)
                 { 
-                	if(o.trains[i].number.equals("Fußweg") || o.trains[i].number.equals("Übergang"))
+                	if(o.getTrain(i).number.equals("Fußweg") || o.getTrain(i).number.equals("Übergang"))
                 		continue;
                 	
-                	String s = CommonUtils.trainType(o.trains[i].number);
+                	String s = CommonUtils.trainType(o.getTrain(i).number);
                 	
                 	TextView t = new TextView(c);
                 	t.setText(s.length() > 0 ? s : "OS");

@@ -59,7 +59,7 @@ public class TrainDetailsActivity extends Activity {
         int conidx = getIntent().getExtras().getInt("ConnectionIndex");
         int trainidx = getIntent().getExtras().getInt("TrainIndex");
         
-        t = pln.connections[conidx].trains[trainidx];
+        t = pln.connections[conidx].getTrain(trainidx);
         
         TextView tv = (TextView) v.findViewById(R.id.header);
           
@@ -68,8 +68,8 @@ public class TrainDetailsActivity extends Activity {
         b.append(t.number);
         b.append("\n");
         
-        for(String s : t.attributes)
-        	b.append("-"+s+"\n");
+        for(int i = 0; i < t.getAttributeCount(); i++)
+        	b.append("-"+t.getAttribute(i)+"\n");
         tv.setText(b.toString());
         lv.addHeaderView(v);
         

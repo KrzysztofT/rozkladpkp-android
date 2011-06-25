@@ -279,6 +279,17 @@ public class ConnectionListActivity extends Activity {
 				{
 					adapter.setPLN(pln, !hasFullTable, pln.hasDelayInfo());
 					hideLoader();
+					
+					Bundle extras = ConnectionListActivity.this.getIntent().getExtras(); 
+					Intent in = new Intent(ConnectionListActivity.this,RememberedService.class);
+					
+					if(pln != null && !extras.containsKey("PLNFilename"))
+						in.putExtra("pln", pln.data);
+					
+					in.putExtra("SID", CommonUtils.StationIDfromSID(extras.getString("SID")));
+					in.putExtra("ZID", CommonUtils.StationIDfromSID(extras.getString("ZID")));
+					
+					startService(in);
 				}
 			}
 		};
@@ -625,17 +636,6 @@ public class ConnectionListActivity extends Activity {
 	protected void onPause() {
 		super.onPause();
 		inFront = false;
-		
-		Bundle extras = getIntent().getExtras(); 
-		Intent in = new Intent(this,RememberedService.class);
-		
-		if(pln != null && !extras.containsKey("PLNFilename"))
-			in.putExtra("pln", pln.data);
-		
-		in.putExtra("SID", CommonUtils.StationIDfromSID(extras.getString("SID")));
-		in.putExtra("ZID", CommonUtils.StationIDfromSID(extras.getString("ZID")));
-		
-		startService(in);
 	}
 	
 	

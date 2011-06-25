@@ -18,6 +18,7 @@ package org.tyszecki.rozkladpkp;
 
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -43,8 +44,9 @@ public class PLN {
 	final int TrainSize = 20;
 	final int StationSize = 14;
 	
-	private HashMap<Integer,String> strings;
-	private HashMap<Integer,String[]> attributes;
+	
+	private StringManager strings;
+	private AttributeManager attributes;
 	
 	public Connection[] connections;
 	private Station[] stations;
@@ -54,27 +56,39 @@ public class PLN {
 	private HashMap<Integer,Availability> availabilities;
 	
 	public int conCnt;
-	boolean delayInfo = false;
+	Boolean delayInfo = null;
 
 	byte[] data;
-	private Calendar sdate,edate,today;
+	private android.text.format.Time sdate,edate,today;
 	
-	public static String combine(String[] s, String glue)
-	{
-		if (s == null)
-			return "[null]";
-		int k = s.length;
+	
+	
+	class StringManager{
+		HashMap<Integer,String> cache = new HashMap<Integer, String>();
 		
-		if (k==0)
-			return null;
+		String get(int offset)
+		{
+			if(cache.containsKey(offset))
+				return cache.get(offset);
+			
+			String t = getString(offset+stringStart);
+			cache.put(offset, t);
+			return t;
+		}
+	}
+	
+	class AttributeManager{
+		private HashMap<Integer,String[]> cache = new HashMap<Integer, String[]>();
 		
-		StringBuilder out = new StringBuilder();
-		out.append(s[0]);
-		
-		for (int x=1;x<k;++x)
-			out.append(glue).append(s[x]);
-		
-		return out.toString();
+		String[] get(int offset)
+		{
+			if(cache.containsKey(offset))
+				return cache.get(offset);
+			
+			String[] t = readAttributeList(offset);
+			cache.put(offset, t);
+			return t;
+		}
 	}
 	
 	class Time{
@@ -116,17 +130,18 @@ public class PLN {
 	
 	class Availability{
 		private int length;
-		public Availability(String m,int offset, int dayOffset, int len) {
-			msg = m;
+		public Availability(int m,int offset, int dayOffset, int len) {
+			msgOffset = m;
 			dOffset = dayOffset;
 			days	= new BitSet(len*8);
 			int ix = 0;
 			
 			for(int i = 0; i < len; i++)
-				for(int j = 7; j >= 0; j--)
-					days.set(ix++, ((data[offset+i] >>j) & 1) != 0);
+				for(int j = 7; j >= 0; j--, ix++)
+					if(((data[offset+i] >>j) & 1) != 0)
+						days.set(ix);
 			
-			length = days.length();
+			length = len*8;
 		}
 		
 		public boolean available(int day)
@@ -156,9 +171,16 @@ public class PLN {
 		{
 			return dOffset;
 		}
-		String msg;
+		
+		private String getMessage()
+		{
+			if(msg == null)
+				msg = strings.get(msgOffset);
+			return msg;
+		}
+		private String msg;
 		private BitSet days;
-		private int dOffset;
+		private int dOffset,msgOffset;
 	}
 	
 	public class Station {
@@ -175,12 +197,34 @@ public class PLN {
 		Time deptime,arrtime;
 		String number;
 		Station depstation,arrstation;
-		String attributes[];
-		TrainChange change;
+		private String attr[] = null;
 		
-		public String toString()
+		private int changeOffset = -1, attributesOffset;
+		private TrainChange change;
+		
+		public TrainChange getChange()
 		{
-			return depstation+" ("+deptime+") "+arrstation+" ("+arrtime+"); "+combine(attributes,",");
+			if(changeOffset == -1)
+				return null;
+			if(change != null)
+				return change;
+			
+			change = readTrainChanges(changeOffset);
+			return change;
+		}
+		
+		public int getAttributeCount()
+		{
+			if(attr == null)
+				attr = attributes.get(attributesOffset);
+			return attr.length;
+		}
+		
+		public String getAttribute(int index)
+		{
+			if(attr == null)
+				attr = attributes.get(attributesOffset);
+			return attr[index];
 		}
 	}
 	
@@ -200,18 +244,53 @@ public class PLN {
 	
 	public class Connection {
 		public int changes,trOffset;
-		Time journeyTime;
-		Train[] trains;
+		
+		private int timeOffset, trainsOffset, trainCount, changeOffset = -1;
+		
+		private Time journeyTime = null;
+		private Train[] trains = null;
+		
 		Message[] messages;
 		Availability availability;
-		ConnectionChange change;
+		private ConnectionChange change;
 		
-		public String toString()
+		public Time getJourneyTime()
 		{
-			String str = journeyTime+" ("+Integer.toString(changes)+") ch";
-			for(int i = 0; i < trains.length; i++)
-				str += "\n"+trains[i];
-			return str;
+			if(journeyTime == null)
+				journeyTime = new Time(timeOffset);
+			return journeyTime;
+		}
+		
+		public int getTrainCount()
+		{
+			return trainCount;
+		}
+		
+		public Train getTrain(int index)
+		{
+			if(trains == null)
+				trains = new Train[trainCount];
+			else if(trains[index] != null)
+				return trains[index];
+			
+			Train t = readTrain(trainsOffset + index*TrainSize);
+			trains[index] = t;
+			
+			if(changeOffset != -1)
+				t.changeOffset = changeOffset+8*(index+1);
+			
+			return t;
+		}
+		
+		public ConnectionChange getChange()
+		{
+			if(changeOffset == -1)
+				return null;
+			if(change != null)
+				return change;
+			
+			change = readConnectionChanges(changeOffset);
+			return change;
 		}
 	}
 	
@@ -230,9 +309,14 @@ public class PLN {
 	public class TripIterator implements Iterator<Trip>{
 		int pos = 0;
 		int max = -1;
+		int dix = 0, ldix = 0;
+		android.text.format.Time time = new android.text.format.Time(sdate);
 		
 		public TripIterator()
 		{
+			time.allDay = true;
+			time.normalize(false);
+			
 			for(int i = 0; i < conCnt; ++i)
 				if(connections[i].availability.length() > max)
 					max = connections[i].availability.length();
@@ -248,7 +332,7 @@ public class PLN {
 				--pos;
 			
 			int cix = pos%conCnt;
-			int dix = pos/conCnt;
+			dix = pos/conCnt;
 			
 			while(dix <= max)
 			{
@@ -262,7 +346,7 @@ public class PLN {
 						pos--;
 					
 					cix = pos%conCnt;
-					dix = pos/conCnt;
+					dix	= pos/conCnt;
 				}
 			}
 			
@@ -279,11 +363,16 @@ public class PLN {
 			if(hasNext())
 			{
 				int cix = pos%conCnt;
-				int dix = pos/conCnt;
-				GregorianCalendar cal = (GregorianCalendar) sdate.clone();
-				cal.add(Calendar.DAY_OF_MONTH, dix);
+				
+				if(ldix != dix)
+				{
+					time.monthDay -= (ldix-dix);
+					time.normalize(false);
+					ldix = dix;
+				}
+				
 				pos++;
-				return new Trip(connections[cix], cix, new SimpleDateFormat("dd.MM.yyyy").format(cal.getTime()));
+				return new Trip(connections[cix], cix, time.format("%d.%m.%Y"));
 			}
 			else
 				return null;
@@ -312,8 +401,8 @@ public class PLN {
 	
 	public PLN(byte[] byte_data) {
 		data = byte_data;
-		strings = new HashMap<Integer, String>();
-		attributes = new HashMap<Integer, String[]>();
+		strings = new StringManager();
+		attributes = new AttributeManager();
 		
 		stationsStart	= readint(0x36);
 		attributesStart	= readint(0x3a);
@@ -323,11 +412,8 @@ public class PLN {
 		readStringTable();
 		readStations();
 		readHeaderStations();
-		readAttributes();
 		readAvailabilities();
 		readConnections();
-		readChanges();
-		
 	}
 
 	public TripIterator tripIterator(){
@@ -378,16 +464,6 @@ public class PLN {
 		return actualDaysCount;
 	}
 	
-	public Calendar getDate(int date)
-	{
-		switch(date){
-			case DATE_GENERATED: return today;
-			case DATE_START: return sdate;
-			case DATE_END: return edate;
-		}
-		throw new IllegalArgumentException();
-	}
-
 	private int readint(int pos)
 	{
 		int r =  (int) (data[pos] & 0x000000FF);
@@ -439,44 +515,46 @@ public class PLN {
 		int tcnt	= readint(pos+6);
 		int toff	= readint(pos+2);
 		ret.changes	= readint(pos+8);
-		ret.journeyTime	= new Time(readint(pos+10));
-
-		//Log.i("PLN","Trains: "+Integer.toString(tcnt)+" offset: "+Integer.toString(toff)+" changes: "+Integer.toString(ret.changes)+" time: "+ret.journeyTime);
+		ret.timeOffset	= pos+10;
+		ret.trainsOffset = ConnectionOffset+toff;
+		ret.trainCount = tcnt;
 		
-		ret.trains = readTrains(toff,tcnt);
 		ret.availability = availabilities.get(readint(pos));
-			
 		return ret;
 	}
 	
 	private void setupDates()
 	{
-		sdate = new GregorianCalendar();
-		sdate.set(1979, 11, 31);
-		edate = (Calendar) sdate.clone();
-		today = (Calendar) sdate.clone();
+		sdate = new android.text.format.Time();
+		sdate.year = 1979;
+		sdate.month = 11;
+		sdate.monthDay = 31;
 		
-		sdate.add(Calendar.DATE, readint(0x28));
-		edate.add(Calendar.DATE, readint(0x2a));
-		today.add(Calendar.DATE, readint(0x2c));
+		edate = new android.text.format.Time(sdate);
+		today = new android.text.format.Time(sdate);
+		
+		sdate.monthDay += readint(0x28);
+		edate.monthDay += readint(0x2a);
+		today.monthDay += readint(0x2c);
+		
+		sdate.normalize(false);
+		edate.normalize(false);
+		today.normalize(false);
 	}
 	
-	private Train[] readTrains(int toff, int tcnt) {
-		Train[] ret = new Train[tcnt];
-		int pos = ConnectionOffset+toff;
-		for(int i = 0; i < tcnt; i++)
-		{
-			ret[i] = new Train();
-			ret[i].deptime	= new Time(readint(pos));
-			ret[i].depstation = stations[readint(pos+2)];
-			ret[i].arrtime	= new Time(readint(pos+4));
-			ret[i].arrstation = stations[readint(pos+6)];
-			ret[i].number	= strings.get(readint(pos+10));
-			
-			ret[i].attributes = attributes.get(readint(pos+18));
-			pos+=TrainSize;
-		}
-		return ret;
+	private Train readTrain(int pos)
+	{
+		Train r = new Train();
+		
+		r.deptime	= new Time(readint(pos));
+		r.depstation = stations[readint(pos+2)];
+		r.arrtime	= new Time(readint(pos+4));
+		r.arrstation = stations[readint(pos+6)];
+		r.number	= strings.get(readint(pos+10));
+		
+		r.attributesOffset = readint(pos+18);
+		
+		return r;
 	}
 
 
@@ -485,17 +563,6 @@ public class PLN {
 	{
 		stringStart = readint(0x24);
 		availabilitiesStart	  = readint(0x20);
-		
-		int pos   = stringStart;
-		
-		while(pos < availabilitiesStart)
-		{
-			String t = getString(pos);
-			
-			strings.put(pos-stringStart, t);
-			//Log.i("PLN","String: "+Integer.toString(pos)+" "+t);
-			pos += t.length()+1;
-		}
 	}
 	
 	private void readHeaderStations()
@@ -541,26 +608,24 @@ public class PLN {
 		for(int i = 0, pos = availabilitiesStart; pos < stationsStart; i++, pos += 6)
 		{
 			int len = readint(pos+4);
-			availabilities.put(pos-availabilitiesStart, new Availability(strings.get(readint(pos)),pos+6,readint(pos+2),len));
+			int dOffset = readint(pos+2);
+			availabilities.put(pos-availabilitiesStart, new Availability(readint(pos),pos+6,dOffset,len));
+						
 			pos += len;
 		}
 	}
 	
-	private void readAttributes() {
+	private String[] readAttributeList(int offset) {
+		int pos = offset + attributesStart;
 		
-		for(int pos = attributesStart; pos < attributesEnd;)
-		{
-			int cnt = readint(pos);
-			String[] tab = new String[cnt];
-			
-			int p = pos+2;
-			for(int i = 0; i < cnt; i++,p+=2)
-				tab[i] = strings.get(readint(p));
-			
-			attributes.put(pos-attributesStart, tab);
-			pos = p;
-		}
+		int cnt = readint(pos);
+		String[] tab = new String[cnt];
 
+		int p = pos+2;
+		for(int i = 0; i < cnt; i++,p+=2)
+			tab[i] = strings.get(readint(p));
+
+		return tab;
 	}
 	
 	private void readMessages() {
@@ -575,30 +640,22 @@ public class PLN {
 		conCnt	= readint(0x1e);
 		connections = new Connection[conCnt];
 		
-		for(int i = 0; i < conCnt; i++)
-			connections[i] = readConnection(ConnectionOffset+ConnectionSize*i);
-	}
-	
-	private void readChanges() {
 		int chinfo = readint(attributesEnd+0xe);
-		if(chinfo == 0)
-			return;
+		boolean hasChanges = (chinfo != 0);
+		if(hasChanges)
+			chinfo += conCnt*2+4;
 		
-		chinfo += conCnt*2+4;
-		for(int i = 0; i < conCnt; ++i)
+		for(int i = 0; i < conCnt; i++)
 		{
-			connections[i].change = readConnectionChanges(chinfo);
-			
-			chinfo += 8;
-			for(int j = 0; j < connections[i].trains.length; ++j)
+			connections[i] = readConnection(ConnectionOffset+ConnectionSize*i);
+			if(hasChanges)
 			{
-				connections[i].trains[j].change = readTrainChanges(chinfo);			
-				chinfo += 8;
+				connections[i].changeOffset = chinfo;
+				chinfo += (connections[i].trainCount+1)*8;
 			}
 		}
-		
 	}
-
+	
 	private TrainChange readTrainChanges(int offset) {
 		
 		int rd = readint(offset);
@@ -614,8 +671,8 @@ public class PLN {
 		TrainChange tc = new TrainChange();
 		tc.realdeptime = (rd == 0xffff) ? null : new Time(rd);
 		tc.realarrtime = (ra == 0xffff) ? null : new Time(ra);
-		tc.realdepplatform = (rdp == 0 || !strings.containsKey(rdp)) ? null : strings.get(rdp);
-		tc.realarrplatform = (rap == 0 || !strings.containsKey(rap)) ? null : strings.get(rap);
+		tc.realdepplatform = (rdp == 0) ? null : strings.get(rdp);
+		tc.realarrplatform = (rap == 0) ? null : strings.get(rap);
 		
 		return tc;
 	}
@@ -635,7 +692,40 @@ public class PLN {
 
 	boolean hasDelayInfo()
 	{
+		if(delayInfo == null)
+		{
+			int chinfo = readint(attributesEnd+0xe);
+			if(chinfo == 0)
+				return false;
+			
+			delayInfo = hasDelay(chinfo + conCnt*2+4);
+		}
 		return delayInfo;
+	}
+	
+	boolean hasDelay(int p)
+	{
+		//0,0,xff,0,xff,xff,xff,xff <- puste polaczenie
+		//xff,xff,xff,xff,0,0,0,0 <- pusty pociag
+		for(int i = 0; i < conCnt; ++i)
+		{
+			if(data[p++] != 0) return true;
+			if(data[p++] != 0) return true;
+			if(data[p++] != -1) return true;
+			if(data[p++] != 0) return true;
+			
+			for(int k = 0; k < 4; ++k)
+				if(data[p++] != -1) return true;
+			
+			for(int j = 0; j < connections[i].getTrainCount(); ++j)
+			{
+				for(int k = 0; k < 4; ++k)
+					if(data[p++] != -1) return true;
+				for(int k = 0; k < 4; ++k)
+					if(data[p++] != 0) return true;
+			}
+		}	
+		return false;
 	}
 	
 }

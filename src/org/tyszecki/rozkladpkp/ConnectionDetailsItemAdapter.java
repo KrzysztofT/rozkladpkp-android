@@ -49,6 +49,7 @@ public class ConnectionDetailsItemAdapter extends BaseAdapter {
             LayoutInflater vi = (LayoutInflater)c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             if(con instanceof TrainItem) 
             	v = vi.inflate(R.layout.connection_details_row, null);
+            
             else if(con instanceof DateItem)
             	v = vi.inflate(R.layout.common_date_header_row, null);
             else 
