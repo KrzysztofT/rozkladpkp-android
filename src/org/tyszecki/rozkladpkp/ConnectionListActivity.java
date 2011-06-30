@@ -587,8 +587,8 @@ public class ConnectionListActivity extends Activity {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			return true;
-		*/case R.id.item_favourite:
+			return true;*/
+		case R.id.item_favourite:
 			RememberedManager.addtoHistory(ConnectionListActivity.this, CommonUtils.StationIDfromSID(extras.getString("SID")), CommonUtils.StationIDfromSID(extras.getString("ZID")),"");
 			RememberedManager.saveRoute(ConnectionListActivity.this, CommonUtils.StationIDfromSID(extras.getString("SID")), CommonUtils.StationIDfromSID(extras.getString("ZID")));
 			return true;

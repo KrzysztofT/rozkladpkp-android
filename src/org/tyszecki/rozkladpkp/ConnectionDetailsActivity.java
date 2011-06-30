@@ -24,14 +24,10 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.tyszecki.rozkladpkp.ConnectionDetailsItem.TrainItem;
-import org.tyszecki.rozkladpkp.PLN.Connection;
-import org.tyszecki.rozkladpkp.PLN.Train;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -42,7 +38,6 @@ import android.widget.AdapterView.OnItemClickListener;
 
 public class ConnectionDetailsActivity extends Activity {
 	private ConnectionDetailsItemAdapter adapter;
-	private ArrayList<ConnectionDetailsItem> items;
 	private PLN pln;
 	//private String startDate;
 	private int conidx;
@@ -57,8 +52,7 @@ public class ConnectionDetailsActivity extends Activity {
         pln = new PLN(getIntent().getExtras().getByteArray("PLNData"));
         conidx = getIntent().getExtras().getInt("ConnectionIndex");
         
-        items = new ArrayList<ConnectionDetailsItem>();
-        adapter = new ConnectionDetailsItemAdapter(this,  items);
+        adapter = new ConnectionDetailsItemAdapter(this, pln, conidx);
             
         ListView lv = (ListView)findViewById(R.id.connection_details);
         lv.setAdapter(this.adapter);
@@ -78,28 +72,6 @@ public class ConnectionDetailsActivity extends Activity {
 			}
 		});
         
-        loadData();
-	}
-	
-	private void loadData()
-	{
-		items.clear();
-    	
-    	ConnectionDetailsItem c = new ConnectionDetailsItem();
-    	Connection con = pln.connections[conidx];
-    	
-    	
-    	for(int i = 0; i < con.getTrainCount(); ++i)
-    	{
-    		Train t = con.getTrain(i);
-    		//Log.i("RozkladPKP", t.arrstation.name);
-    		TrainItem ti = c.new TrainItem();
-    		ti.t = t;
-    		items.add(ti);
-    	}
-    	
-    	
-    	adapter.notifyDataSetChanged();
 	}
 	
 	public boolean onCreateOptionsMenu(Menu menu){

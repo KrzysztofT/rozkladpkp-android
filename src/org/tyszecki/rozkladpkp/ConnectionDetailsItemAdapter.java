@@ -19,9 +19,15 @@ import java.util.ArrayList;
 
 import org.tyszecki.rozkladpkp.ConnectionDetailsItem.DateItem;
 import org.tyszecki.rozkladpkp.ConnectionDetailsItem.TrainItem;
+import org.tyszecki.rozkladpkp.PLN.Connection;
 import org.tyszecki.rozkladpkp.PLN.Train;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.UnderlineSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,10 +42,48 @@ public class ConnectionDetailsItemAdapter extends BaseAdapter {
 	
 	private ArrayList<ConnectionDetailsItem> items;
 	Context c;
-
-	public ConnectionDetailsItemAdapter(Context context, ArrayList<ConnectionDetailsItem> objects) {
+	
+	private PLN pln;
+	private int conidx;
+	private boolean platformInfo,delayInfo;
+	
+	private SpannableStringBuilder spanBuilder = new SpannableStringBuilder();
+	private ForegroundColorSpan greenSpan = new ForegroundColorSpan(Color.rgb(73,194,98));
+	private ForegroundColorSpan redSpan = new ForegroundColorSpan(Color.rgb(220, 59, 76));
+	private ForegroundColorSpan yellowSpan = new ForegroundColorSpan(Color.rgb(197,170,73));
+	
+	public ConnectionDetailsItemAdapter(Context context, PLN pln, int connectionIndex) {
 		c = context;
-		this.items = objects;
+		this.items = new ArrayList<ConnectionDetailsItem>();
+		
+		conidx = connectionIndex;
+		this.pln = pln; 
+		loadData();
+	}
+	
+	private void loadData()
+	{
+		items.clear();
+    
+		platformInfo = false;
+		delayInfo = false;
+		
+    	ConnectionDetailsItem c = new ConnectionDetailsItem();
+    	Connection con = pln.connections[conidx];
+    	
+    	for(int i = 0; i < con.getTrainCount(); ++i)
+    	{
+    		Train t = con.getTrain(i);
+    		
+    		if(t.getChange() != null)
+    			delayInfo = true;
+    		
+    		TrainItem ti = c.new TrainItem();
+    		ti.t = t;
+    		items.add(ti);
+    	}
+    	
+    	notifyDataSetChanged();
 	}
 	
 	public View getView(int position, View convertView, ViewGroup parent) {
@@ -59,8 +103,77 @@ public class ConnectionDetailsItemAdapter extends BaseAdapter {
         if (con instanceof TrainItem) {
         	Train t = ((TrainItem)con).t;
         	
-        	((TextView) v.findViewById(R.id.departure_time)).setText(t.deptime.toString());
-        	((TextView) v.findViewById(R.id.arrival_time)).setText(t.arrtime.toString());
+        	
+        	String platform;
+        	
+        	
+        	if(t.getDeparturePlatform().equals("---"))
+        		platform = "";
+        	else 
+        		platform = " "+t.getDeparturePlatform().trim();
+        	
+        	if(t.getChange() != null)
+        	{
+        		spanBuilder.clearSpans();
+            	spanBuilder.clear();
+            	spanBuilder.append(t.deptime.toString());
+            	
+            	ForegroundColorSpan span;
+            	
+            	int delay = t.getChange().realdeptime.difference(t.deptime).intValue();
+            	if(delay <= 0)
+            		span = greenSpan;
+            	else if(delay <= 5)
+            		span = yellowSpan;
+            	else
+            		span = redSpan;
+            	
+            	spanBuilder.append(" +");
+            	spanBuilder.append(Integer.toString(delay));
+            	
+            	int len = spanBuilder.length();
+            	spanBuilder.setSpan(span, 6, len, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+            	spanBuilder.append(platform);
+            	
+            	((TextView) v.findViewById(R.id.departure_time)).setText(spanBuilder);
+        	}
+        	else
+        		((TextView) v.findViewById(R.id.departure_time)).setText(t.deptime.toString()+platform);
+        	
+        	if(t.getArrivalPlatform().equals("---"))
+        		platform = "";
+        	else 
+        		platform = " "+t.getArrivalPlatform().trim();
+        	
+        	if(t.getChange() != null)
+        	{
+        		spanBuilder.clearSpans();
+            	spanBuilder.clear();
+            	spanBuilder.append(t.arrtime.toString());
+            	
+            	ForegroundColorSpan span;
+            	
+            	int delay = t.getChange().realarrtime.difference(t.arrtime).intValue();
+            	if(delay <= 0)
+            		span = greenSpan;
+            	else if(delay <= 5)
+            		span = yellowSpan;
+            	else
+            		span = redSpan;
+            	
+            	spanBuilder.append(" +");
+            	spanBuilder.append(Integer.toString(delay));
+            	
+            	int len = spanBuilder.length();
+            	spanBuilder.setSpan(span, 6, len, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+            	spanBuilder.append(platform);
+            	
+            	((TextView) v.findViewById(R.id.arrival_time)).setText(spanBuilder);
+        	}
+        	else
+        		((TextView) v.findViewById(R.id.arrival_time)).setText(t.arrtime.toString()+platform);
+        	
+        	
         	
         	((TextView) v.findViewById(R.id.departure_station)).setText(t.depstation.name);
         	((TextView) v.findViewById(R.id.arrival_station)).setText(t.arrstation.name);
