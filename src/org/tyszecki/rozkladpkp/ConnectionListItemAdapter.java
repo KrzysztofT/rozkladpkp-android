@@ -16,10 +16,12 @@
  ******************************************************************************/
 package org.tyszecki.rozkladpkp;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.tyszecki.rozkladpkp.ConnectionListItem.DateItem;
 import org.tyszecki.rozkladpkp.ConnectionListItem.ScrollItem;
 import org.tyszecki.rozkladpkp.ConnectionListItem.TripItem;
+import org.tyszecki.rozkladpkp.ExternalDelayFetcher.ExternalDelayFetcherCallback;
 import org.tyszecki.rozkladpkp.PLN.Connection;
 import org.tyszecki.rozkladpkp.PLN.Train;
 import org.tyszecki.rozkladpkp.PLN.TrainChange;
@@ -28,14 +30,21 @@ import org.tyszecki.rozkladpkp.PLN.TripIterator;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.os.SystemClock;
 import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.TextPaint;
+import android.text.style.BackgroundColorSpan;
 import android.text.style.ForegroundColorSpan;
+import android.text.style.ImageSpan;
+import android.text.style.LineBackgroundSpan;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -74,7 +83,24 @@ public class ConnectionListItemAdapter extends BaseAdapter {
 	private ForegroundColorSpan redSpan = new ForegroundColorSpan(Color.rgb(220, 59, 76));
 	private ForegroundColorSpan yellowSpan = new ForegroundColorSpan(Color.rgb(197,170,73));
 
+	/*Drawable d;
+	private class mySpan implements LineBackgroundSpan {
+
+		@Override
+		public void drawBackground (Canvas c, Paint p, int left, int right, int top, 
+				int baseline, int bottom, CharSequence text, int start, int end, int lnum) {
+			
+			Log.i("RozkladPKP","maluje");
+            d.setBounds(left, top, right, bottom);
+				d.draw(c);
+		}
+		
+	}*/
+	
 	public ConnectionListItemAdapter(Context context) {
+		//d = context.getResources().getDrawable(R.drawable.time);
+    	//d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
+    	
 		c = context;
 		TypedArray t = c.obtainStyledAttributes(new int[]{android.R.attr.textSize});
 		textSize = t.getDimensionPixelSize(0, -1);
@@ -96,6 +122,25 @@ public class ConnectionListItemAdapter extends BaseAdapter {
 	
 		lastDate = "";
 		loadData(loadAll);
+		
+		ExternalDelayFetcher.requestUpdate(new ExternalDelayFetcherCallback() {
+			
+			@Override
+			public void ready(HashMap<String, Integer> delays, boolean cached) {
+				lastDate = "";
+				it = pln.tripIterator();
+				
+				pln.addExternalDelayInfo(delays);
+				
+				if(pln.hasDelayInfo())
+				{
+					delayInfo = true;
+					calculateTextSizes();
+				}
+				
+				loadData(true);
+			}
+		});
 	}
 	
 	
@@ -226,8 +271,32 @@ public class ConnectionListItemAdapter extends BaseAdapter {
                 else 
                 	bt.setText(arrtime);
                 	
-                 
+                
+                /*spanBuilder.clearSpans();
+            	spanBuilder.clear();
+            	
+            	
+            	LineBackgroundSpan ispan = new LineBackgroundSpan() {
+					
+					@Override
+					public void drawBackground(Canvas c, Paint p, int left, int right, int top,
+							int baseline, int bottom, CharSequence text, int start, int end,
+							int lnum) {
+						Log.i("RozkladPKP","maluje");
+			            d.setBounds(left, top, right, bottom);
+			            c.skew(10, 10);
+							d.draw(c);
+						
+					}
+				};
+            	String ts = Integer.toString(o.changes);
+            	spanBuilder.append("bla ");
+            	spanBuilder.append(ts);
+            	spanBuilder.append("bla");
+            	spanBuilder.setSpan(ispan, 1, 5, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+*/            	
                 ((TextView) v.findViewById(R.id.changes)).setText(Integer.toString(o.changes));
+            	//((TextView) v.findViewById(R.id.changes)).setText(spanBuilder);
                 ((TextView) v.findViewById(R.id.duration)).setText(o.getJourneyTime().toLongString());
                 
                 LinearLayout lay = (LinearLayout)v.findViewById(R.id.type_icons);

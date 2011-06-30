@@ -25,6 +25,8 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import org.tyszecki.rozkladpkp.ExternalDelayFetcher.ExternalDelayFetcherCallback;
+
 import android.util.Log;
 
 public class PLN {
@@ -54,14 +56,14 @@ public class PLN {
 	private int totalConCnt = -1;
 	private int actualDaysCount = -1;
 	private HashMap<Integer,Availability> availabilities;
+	private HashMap<String,Integer> exDelays = new HashMap<String, Integer>();
 	
 	public int conCnt;
+	private int tripCount = 0;
 	Boolean delayInfo = null;
 
 	byte[] data;
 	private android.text.format.Time sdate,edate,today;
-	
-	
 	
 	class StringManager{
 		HashMap<Integer,String> cache = new HashMap<Integer, String>();
@@ -100,6 +102,20 @@ public class PLN {
 			val %= 2400;
 		}
 		
+		public void normalize() {
+			if(val % 100 > 59)
+			{
+				val += 100;
+				val -= 60;
+				
+				if(val > 2400)
+				{
+					days++;
+					val -= 2400;
+				}
+			}
+		}
+		
 		public String toString() {
 			String t   = Integer.toString(val);
 			while(t.length() < 4)
@@ -130,6 +146,7 @@ public class PLN {
 	
 	class Availability{
 		private int length;
+		private int card = 0;
 		public Availability(int m,int offset, int dayOffset, int len) {
 			msgOffset = m;
 			dOffset = dayOffset;
@@ -139,7 +156,10 @@ public class PLN {
 			for(int i = 0; i < len; i++)
 				for(int j = 7; j >= 0; j--, ix++)
 					if(((data[offset+i] >>j) & 1) != 0)
+					{
 						days.set(ix);
+						++card;
+					}
 			
 			length = len*8;
 		}
@@ -159,7 +179,7 @@ public class PLN {
 		
 		public int daysCount()
 		{
-			return days.cardinality();
+			return card;
 		}
 		
 		public BitSet bitset()
@@ -204,12 +224,34 @@ public class PLN {
 		
 		public TrainChange getChange()
 		{
-			if(changeOffset == -1)
+			if(changeOffset == -1 && !exDelays.containsKey(number))
 				return null;
 			if(change != null)
 				return change;
 			
-			change = readTrainChanges(changeOffset);
+			if(changeOffset != -1)
+				change = readTrainChanges(changeOffset);
+			if(change == null && exDelays.containsKey(number))
+			{
+				change = new TrainChange();
+				
+				int arr = arrtime.intValue();
+				int mindel = exDelays.get(number);
+				int hrs = mindel/60; 
+				arr += hrs*100;
+				mindel -= hrs*60;
+				arr += mindel;
+				
+				change.realarrtime = new Time(arr);
+				change.realarrtime.normalize();
+				
+				int dep = deptime.intValue();
+				dep += hrs*100;
+				dep += mindel;
+				
+				change.realdeptime = new Time(dep);
+				change.realdeptime.normalize();
+			}
 			return change;
 		}
 		
@@ -257,7 +299,7 @@ public class PLN {
 		public Time getJourneyTime()
 		{
 			if(journeyTime == null)
-				journeyTime = new Time(timeOffset);
+				journeyTime = new Time(readint(timeOffset));
 			return journeyTime;
 		}
 		
@@ -284,12 +326,20 @@ public class PLN {
 		
 		public ConnectionChange getChange()
 		{
-			if(changeOffset == -1)
+			if(changeOffset == -1 && !exDelays.containsKey(getTrain(0).number))
 				return null;
 			if(change != null)
 				return change;
 			
-			change = readConnectionChanges(changeOffset);
+			if(changeOffset != -1)
+				change = readConnectionChanges(changeOffset);
+			if(change == null && exDelays.containsKey(getTrain(0).number))
+			{
+				Log.i("RozkladPKP","Czytam exdelay");
+				change = new ConnectionChange();
+				Train t = getTrain(0);
+				change.departureDelay = t.getChange().realdeptime.difference(t.deptime).intValue(); 
+			}
 			return change;
 		}
 	}
@@ -310,6 +360,7 @@ public class PLN {
 		int pos = 0;
 		int max = -1;
 		int dix = 0, ldix = 0;
+		int tripsLeft = tripCount;
 		android.text.format.Time time = new android.text.format.Time(sdate);
 		
 		public TripIterator()
@@ -329,7 +380,12 @@ public class PLN {
 				return false;
 			
 			if(!forward)
+			{
 				--pos;
+				tripsLeft++;
+			}
+			else if(tripsLeft == 0)
+				return false;
 			
 			int cix = pos%conCnt;
 			dix = pos/conCnt;
@@ -372,6 +428,7 @@ public class PLN {
 				}
 				
 				pos++;
+				tripsLeft--;
 				return new Trip(connections[cix], cix, time.format("%d.%m.%Y"));
 			}
 			else
@@ -395,8 +452,6 @@ public class PLN {
 		@Override
 		public void remove() {			
 		}
-		
-		
 	}
 	
 	public PLN(byte[] byte_data) {
@@ -407,6 +462,7 @@ public class PLN {
 		stationsStart	= readint(0x36);
 		attributesStart	= readint(0x3a);
 		attributesEnd	= readint(0x3e);
+		conCnt			= readint(0x1e);
 		
 		setupDates();
 		readStringTable();
@@ -414,6 +470,7 @@ public class PLN {
 		readHeaderStations();
 		readAvailabilities();
 		readConnections();
+		Log.i("RozkladPKP", Integer.toString(tripCount));
 	}
 
 	public TripIterator tripIterator(){
@@ -520,6 +577,7 @@ public class PLN {
 		ret.trainCount = tcnt;
 		
 		ret.availability = availabilities.get(readint(pos));
+		tripCount += ret.availability.daysCount();
 		return ret;
 	}
 	
@@ -597,12 +655,11 @@ public class PLN {
 			stations[i].id	= readLong(pos+2);
 			stations[i].x	= readLong(pos+6);
 			stations[i].y	= readLong(pos+10);
-			
-			//Log.i("PLN","Station: "+stations[i].name+"["+readint(pos)+"] ("+Integer.toString(stations[i].id)+")");
 		}
 	}
 	
 	private void readAvailabilities() {
+		
 		availabilities	= new HashMap<Integer, Availability>();
 		
 		for(int i = 0, pos = availabilitiesStart; pos < stationsStart; i++, pos += 6)
@@ -610,7 +667,7 @@ public class PLN {
 			int len = readint(pos+4);
 			int dOffset = readint(pos+2);
 			availabilities.put(pos-availabilitiesStart, new Availability(readint(pos),pos+6,dOffset,len));
-						
+			
 			pos += len;
 		}
 	}
@@ -637,7 +694,7 @@ public class PLN {
 	}
 
 	private void readConnections() {
-		conCnt	= readint(0x1e);
+		
 		connections = new Connection[conCnt];
 		
 		int chinfo = readint(attributesEnd+0xe);
@@ -696,9 +753,24 @@ public class PLN {
 		{
 			int chinfo = readint(attributesEnd+0xe);
 			if(chinfo == 0)
-				return false;
-			
-			delayInfo = hasDelay(chinfo + conCnt*2+4);
+				delayInfo = false;
+			else
+				delayInfo = hasDelay(chinfo + conCnt*2+4);
+		}
+		if((delayInfo == null || !delayInfo) && !exDelays.isEmpty())
+		{
+			//FIXME: Nie trzeba wszystkiego odczytywać.
+			for(int i = 0; i < conCnt; i++)
+			{
+				Connection c = connections[i];
+				for(int j = 0; j < c.getTrainCount(); ++j)
+					if(exDelays.containsKey(c.getTrain(j).number))
+					{
+						delayInfo = true;
+						return true;
+					}
+			}
+			delayInfo = false;
 		}
 		return delayInfo;
 	}
@@ -728,4 +800,8 @@ public class PLN {
 		return false;
 	}
 	
+	public void addExternalDelayInfo(HashMap<String,Integer> delays)
+	{
+		exDelays.putAll(delays);
+	}
 }

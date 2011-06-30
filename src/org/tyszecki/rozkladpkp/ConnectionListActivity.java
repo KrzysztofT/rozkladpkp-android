@@ -71,6 +71,7 @@ public class ConnectionListActivity extends Activity {
 	private String timetableUrl = null;
 	private ArrayList<SerializableNameValuePair> commonFieldsList;
 	private Thread loadingThread;
+	private boolean populated = false;
 	
 	PLN pln;
 	
@@ -571,7 +572,7 @@ public class ConnectionListActivity extends Activity {
 		Bundle extras = getIntent().getExtras();
 		Intent ni = null;
 		switch(item.getItemId()){
-		case R.id.savepln:
+		/*case R.id.savepln:
 			File f = new File(Environment.getExternalStorageDirectory(),"PLN");
 			FileOutputStream w = null;
 			try {
@@ -587,7 +588,7 @@ public class ConnectionListActivity extends Activity {
 				e.printStackTrace();
 			}
 			return true;
-		case R.id.item_favourite:
+		*/case R.id.item_favourite:
 			RememberedManager.addtoHistory(ConnectionListActivity.this, CommonUtils.StationIDfromSID(extras.getString("SID")), CommonUtils.StationIDfromSID(extras.getString("ZID")),"");
 			RememberedManager.saveRoute(ConnectionListActivity.this, CommonUtils.StationIDfromSID(extras.getString("SID")), CommonUtils.StationIDfromSID(extras.getString("ZID")));
 			return true;
