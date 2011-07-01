@@ -42,5 +42,4 @@ public class RozkladPKPApplication extends Application {
 	{
 		return context;
 	}
-	
 }

@@ -10,6 +10,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.os.AsyncTask;
+import android.text.TextUtils;
 import android.text.format.Time;
 import android.util.Log;
 
@@ -50,8 +51,6 @@ public class ExternalDelayFetcher {
 
 					DefaultHttpClient client = new DefaultHttpClient();
 					HttpGet request = new HttpGet(url);
-					client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestExpectContinue.class);
-					client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestUserAgent.class);
 					request.addHeader("Content-Type", "application/x-www-form-urlencoded");
 
 
@@ -80,14 +79,17 @@ public class ExternalDelayFetcher {
 						e.printStackTrace();
 					}
 					// Return result from buffered stream
-					String result = new String(content.toByteArray());
-					String[] items = result.split("\n");
+					
+					TextUtils.StringSplitter lineSplitter = new TextUtils.SimpleStringSplitter('\n');
+					lineSplitter.setString(new String(content.toByteArray()));
+					
 					delays.clear();
 
-					for(String s : items)
+					for(String s : lineSplitter)
 					{
-						String[] t = s.split(":");
-						delays.put(t[0], Integer.parseInt(t[1]));
+						int col = s.indexOf(':');
+						if(col > -1)
+							delays.put(s.substring(0, col), Integer.parseInt(s.substring(col+1)));
 					}
 					return null;
 				}

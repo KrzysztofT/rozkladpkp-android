@@ -104,15 +104,15 @@ public class ConnectionDetailsItemAdapter extends BaseAdapter {
         	Train t = ((TrainItem)con).t;
         	
         	
-        	String platform;
+        	String aplatform,dplatform;
         	
         	
         	if(t.getDeparturePlatform().equals("---"))
-        		platform = "";
+        		dplatform = "";
         	else 
-        		platform = " "+t.getDeparturePlatform().trim();
+        		dplatform = ", "+t.getDeparturePlatform().trim();
         	
-        	if(t.getChange() != null)
+        	if(t.getChange() != null && t.getChange().realdeptime != null)
         	{
         		spanBuilder.clearSpans();
             	spanBuilder.clear();
@@ -133,19 +133,17 @@ public class ConnectionDetailsItemAdapter extends BaseAdapter {
             	
             	int len = spanBuilder.length();
             	spanBuilder.setSpan(span, 6, len, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
-            	spanBuilder.append(platform);
-            	
             	((TextView) v.findViewById(R.id.departure_time)).setText(spanBuilder);
         	}
         	else
-        		((TextView) v.findViewById(R.id.departure_time)).setText(t.deptime.toString()+platform);
+        		((TextView) v.findViewById(R.id.departure_time)).setText(t.deptime.toString());
         	
         	if(t.getArrivalPlatform().equals("---"))
-        		platform = "";
+        		aplatform = "";
         	else 
-        		platform = " "+t.getArrivalPlatform().trim();
+        		aplatform = ", "+t.getArrivalPlatform().trim();
         	
-        	if(t.getChange() != null)
+        	if(t.getChange() != null && t.getChange().realarrtime != null)
         	{
         		spanBuilder.clearSpans();
             	spanBuilder.clear();
@@ -166,17 +164,16 @@ public class ConnectionDetailsItemAdapter extends BaseAdapter {
             	
             	int len = spanBuilder.length();
             	spanBuilder.setSpan(span, 6, len, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
-            	spanBuilder.append(platform);
             	
             	((TextView) v.findViewById(R.id.arrival_time)).setText(spanBuilder);
         	}
         	else
-        		((TextView) v.findViewById(R.id.arrival_time)).setText(t.arrtime.toString()+platform);
+        		((TextView) v.findViewById(R.id.arrival_time)).setText(t.arrtime.toString());
         	
         	
         	
-        	((TextView) v.findViewById(R.id.departure_station)).setText(t.depstation.name);
-        	((TextView) v.findViewById(R.id.arrival_station)).setText(t.arrstation.name);
+        	((TextView) v.findViewById(R.id.departure_station)).setText(t.depstation.name+dplatform);
+        	((TextView) v.findViewById(R.id.arrival_station)).setText(t.arrstation.name+aplatform);
         	
         	((TextView) v.findViewById(R.id.train_number)).setText(CommonUtils.trainDisplayName(t.number));
         	((TextView) v.findViewById(R.id.train_number)).setBackgroundResource(CommonUtils.drawableForTrainType(CommonUtils.trainType(t.number)));

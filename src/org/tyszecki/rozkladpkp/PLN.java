@@ -122,7 +122,7 @@ public class PLN {
 		
 		public int intValue()
 		{
-			return val;
+			return val+days*2400;
 		}
 		
 		public Time difference(Time b)

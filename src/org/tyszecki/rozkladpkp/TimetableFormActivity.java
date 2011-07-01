@@ -22,13 +22,16 @@ import org.tyszecki.rozkladpkp.widgets.StationEdit;
 import org.tyszecki.rozkladpkp.widgets.StationSpinner;
 import org.tyszecki.rozkladpkp.widgets.TimeButton;
 import org.tyszecki.rozkladpkp.widgets.TimetableTypeButton;
+import org.tyszecki.rozkladpkp.widgets.StationSpinner.onDataLoaded;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.Selection;
@@ -106,11 +109,36 @@ public class TimetableFormActivity extends Activity {
         }
         else
         {
-        	ProgressDialog progressDialog = ProgressDialog.show(TimetableFormActivity.this, 
+        	final ProgressDialog progressDialog = ProgressDialog.show(TimetableFormActivity.this, 
         			res.getString(R.string.progressTitle), res.getString(R.string.progressSearchingStation), true);
         	
-            StationSpinner sp = (StationSpinner)  findViewById(R.id.station_select);
-            sp.setProgressDialog(progressDialog);
+            final StationSpinner sp = (StationSpinner)  findViewById(R.id.station_select);
+            sp.setOnDataLoaded(new onDataLoaded() {
+				
+				@Override
+				public void dataLoaded() {
+					progressDialog.dismiss();
+					if(sp.getStationCount() == 0)
+					{
+						runOnUiThread(new Runnable() {
+							public void run() {
+								AlertDialog alertDialog;
+	        			    	alertDialog = new AlertDialog.Builder(TimetableFormActivity.this).create();
+	        			    	alertDialog.setTitle("Błąd wyszukiwania!");
+	        			    	alertDialog.setMessage("Nie można odnaleźć wskazanej stacji.");
+	        			    	alertDialog.setCancelable(false);
+	        			    	
+	        			    	alertDialog.setButton("Powrót", new DialogInterface.OnClickListener() {
+	        						public void onClick(DialogInterface arg0, int arg1) {
+	        							TimetableFormActivity.this.finish();
+	        						}
+	        					});
+	        			    	alertDialog.show();		
+							}
+						});
+					}
+				}
+			}); 
             sp.setUserInput(getIntent().getExtras().getString("userText"));
         }
         
