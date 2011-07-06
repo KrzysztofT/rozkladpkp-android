@@ -34,6 +34,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.DialogInterface;
 import android.content.res.Resources;
+import android.opengl.Visibility;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.Selection;
@@ -54,8 +55,8 @@ public class ConnectionsFormActivity extends Activity {
 	private AttributesButton attrb;
 	private SharedPreferences pref;
 	
-	private StationEdit depEdit,arrEdit;
-	private StationSpinner depSelect, arrSelect;
+	private StationEdit depEdit,arrEdit,viaEdit;
+	private StationSpinner depSelect, arrSelect,viaSelect;
 	private boolean clarify;
 	private Resources res;
 	private int loading;
@@ -152,13 +153,15 @@ public class ConnectionsFormActivity extends Activity {
         {
 	        depEdit = (StationEdit) findViewById(R.id.departure_edit);
 	        arrEdit = (StationEdit) findViewById(R.id.arrival_edit);
+	        viaEdit = (StationEdit) findViewById(R.id.via_edit);
 	        
 	        depEdit.setHint(res.getText(R.string.hintDepartureStation));
-	        arrEdit.setHint(res.getText(R.string.hintArrivalStaton));
+	        arrEdit.setHint(res.getText(R.string.hintArrivalStation));
+	        viaEdit.setHint(res.getText(R.string.hintViaStation));
 	        
 	        depEdit.setAutoComplete(pref.getBoolean("EnableStationAC", true));
 	        arrEdit.setAutoComplete(pref.getBoolean("EnableStationAC", true));
-	        
+	        viaEdit.setAutoComplete(pref.getBoolean("EnableStationAC", true));
 	        
 	        String s = safeExtras("arrName"); 
             if(s != null)
@@ -210,19 +213,30 @@ public class ConnectionsFormActivity extends Activity {
         			}
         		}
         	};
-     
+        	Bundle extra = getIntent().getExtras();
+        	
         	depSelect = (StationSpinner) findViewById(R.id.departure_select);
         	arrSelect = (StationSpinner) findViewById(R.id.arrival_select);
         	
-        	
-        	
+        	if(extra.containsKey("viaText"))
+        	{
+        		viaSelect = (StationSpinner) findViewById(R.id.via_select);
+        		viaSelect.setVisibility(View.VISIBLE);
+        		viaSelect.setOnDataLoaded(dl);
+        		loading = 3;
+        		
+        		if(extra.containsKey("viaSID"))
+                	viaSelect.setUserInput(extra.getString("viaText"),extra.getString("viaSID"));
+                else
+                	viaSelect.setUserInput(extra.getString("viaText"));
+        	}
             
             depSelect.setOnDataLoaded(dl);
             arrSelect.setOnDataLoaded(dl);
             
             progressDialog = ProgressDialog.show(ConnectionsFormActivity.this, res.getText(R.string.progressTitle), res.getText(R.string.progressSearchingStation), true);
             
-            Bundle extra = getIntent().getExtras();
+            
             if(extra.containsKey("depSID"))
             	depSelect.setUserInput(extra.getString("depText"),extra.getString("depSID"));
             else
@@ -252,6 +266,11 @@ public class ConnectionsFormActivity extends Activity {
 						Toast.makeText(getApplicationContext(), res.getText(R.string.toastArrivalEmpty), Toast.LENGTH_SHORT).show();
 						return;
 					}
+					else if(viaEdit.isShown() && viaEdit.getText().toString().trim().length() == 0)
+					{
+						Toast.makeText(getApplicationContext(), res.getText(R.string.toastViaEmpty), Toast.LENGTH_SHORT).show();
+						return;
+					}
 					
 					//Do dalszych operacji potrzebny internet
 					if(!CommonUtils.onlineCheck(getBaseContext()))
@@ -261,8 +280,10 @@ public class ConnectionsFormActivity extends Activity {
 					String sidd = depEdit.getCurrentSID();
 					String sida = arrEdit.getCurrentSID();
 					
+					String sidv = viaEdit.isShown() ? viaEdit.getCurrentSID() : null;
+					
 					//Trzeba doprecyzować nazwę co najmniej jednej stacji
-					if(sidd.equals("") || sida.equals(""))
+					if(sidd.equals("") || sida.equals("") || (sidv != null && sidv.equals("")))
 					{
 						ni = new Intent(arg0.getContext(),ConnectionsFormActivity.class);
 						ni.putExtra("clarify", true);
@@ -271,14 +292,21 @@ public class ConnectionsFormActivity extends Activity {
 							
 						ni.putExtra("depText", depEdit.getText().toString());
 							
-						
 						if(!sida.equals(""))
 							ni.putExtra("arrSID", sida);
+						
+						if(sidv != null)
+						{
+							if(!sidv.equals(""))
+								ni.putExtra("viaSID", sidv);
+							
+							ni.putExtra("viaText", viaEdit.getText().toString());
+						}
 					
 						ni.putExtra("arrText", arrEdit.getText().toString());
 					}
 					//Wpisano dwie takie same stacje
-					else if(arrEdit.getCurrentSID().equals(depEdit.getCurrentSID()))
+					else if(sida.equals(sidd) || sida.equals(sidv) || sidd.equals(sidv))
 					{
 						Toast.makeText(getApplicationContext(), res.getText(R.string.toastSameStationsError), Toast.LENGTH_SHORT).show();
 							return;
@@ -287,8 +315,12 @@ public class ConnectionsFormActivity extends Activity {
 					else
 					{
 						ni = new Intent(arg0.getContext(),ConnectionListActivity.class);
-						ni.putExtra("ZID", arrEdit.getCurrentSID());
-						ni.putExtra("SID", depEdit.getCurrentSID());
+						ni.putExtra("ZID", sida);
+						ni.putExtra("SID", sidd);
+						
+						if(sidv != null)
+							ni.putExtra("VID1", sidv);
+						
 						ni.putExtra("depName", depEdit.getText().toString());
 						ni.putExtra("arrName", arrEdit.getText().toString());
 					}
@@ -297,6 +329,9 @@ public class ConnectionsFormActivity extends Activity {
 				{
 					depSelect.saveInDatabase();
 		        	arrSelect.saveInDatabase();
+		        	
+		        	if(viaSelect != null)
+		        		viaSelect.saveInDatabase();
 		        	
 					//Wybrano dwie takie same stacje z listy
 					if(arrSelect.getCurrentSID().equals(depSelect.getCurrentSID()))
@@ -308,7 +343,11 @@ public class ConnectionsFormActivity extends Activity {
 					ni = new Intent(arg0.getContext(),ConnectionListActivity.class);
 					
 					ni.putExtra("ZID", arrSelect.getCurrentSID());
-					ni.putExtra("SID", depSelect.getCurrentSID());		
+					ni.putExtra("SID", depSelect.getCurrentSID());
+					
+					if(viaSelect != null)
+						ni.putExtra("VID1", viaSelect.getCurrentSID());
+					
 					ni.putExtra("depName", depSelect.getText());
 					ni.putExtra("arrName", arrSelect.getText());
 				}
@@ -359,12 +398,27 @@ public class ConnectionsFormActivity extends Activity {
 		return true;
 	}
 	
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		
+		if(viaEdit == null)
+			menu.findItem(R.id.item_via).setVisible(false);
+		else if(viaEdit.isShown())
+			menu.findItem(R.id.item_via).setTitle(R.string.menuRemoveVia);
+		else
+			menu.findItem(R.id.item_via).setTitle(R.string.menuAddVia);
+		
+		return super.onPrepareOptionsMenu(menu);
+	}
+	
 	public boolean onOptionsItemSelected (MenuItem item){
 		switch(item.getItemId()){
 		case R.id.item_settings:
 			Intent ni = new Intent(getBaseContext(),PreferencesActivity.class);
 			startActivity(ni);
 			return true;
+		case R.id.item_via:
+			viaEdit.setVisibility(viaEdit.isShown() ? View.GONE : View.VISIBLE);
 		}
 		return false;
 	}

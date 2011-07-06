@@ -23,15 +23,24 @@
 	
 	<string name="toastLocationError">Nie można wskazać Twojej lokalizacji. Sprawdź czy masz zaznaczoną opcję \"Lokalizacja/Skorzystaj z sieci bezprzewodowych" z ustawień systemowych i ponów próbę.</string>
 	
-	<string name="toastSameStationsError">Stacja początkowa i docelowa muszą być różne.</string><string name="toastArrivalEmpty">Wprowadź nazwę stacji decelowej.</string><string name="toastDepartureEmpty">Wprowadź nazwę stacji początkowej.</string><string name="toastStationEmpty">Wprowadź nazwę stacji.</string><string name="departureShortLabel">O:</string>
+	<string name="toastSameStationsError">Stacja początkowa i docelowa muszą być różne.</string>
+	<string name="toastArrivalEmpty">Wprowadź nazwę stacji decelowej.</string>
+	<string name="toastDepartureEmpty">Wprowadź nazwę stacji początkowej.</string>
+	<string name="toastViaEmpty">Wprowadź nazwę stacji przesiadkowej.</string>
+	<string name="toastStationEmpty">Wprowadź nazwę stacji.</string>
+	<string name="departureShortLabel">O:</string>
 	<string name="arrivalShortLabel">P:</string>
 
 
 
 
-<string name="hintArrivalStaton">Stacja docelowa</string>
+<string name="hintArrivalStation">Stacja docelowa</string>
 <string name="hintDepartureStation">Stacja początkowa</string>
+<string name="hintViaStation">Stacja przesiadkowa</string>
 <string name="hintStation">Stacja kolejowa</string>
+
+<string name="menuAddVia">Dodaj przesiadkę</string>
+<string name="menuRemoveVia">Usuń Przesiadkę</string>
 
 <string name="menuEnableAC">Włącz autouzupełnianie</string>
 <string name="menuDisableAC">Wyłącz autouzupełnianie</string>

@@ -673,6 +673,8 @@ public class PLN {
 			
 			pos += len;
 		}
+		
+		
 	}
 	
 	private String[] readAttributeList(int offset) {

@@ -16,12 +16,12 @@
  ******************************************************************************/
 package org.tyszecki.rozkladpkp;
 
+import org.acra.ACRA;
+import org.acra.annotation.ReportsCrashes;
+import org.tyszecki.rozkladpkp.widgets.StationEdit;
+
 import android.app.Application;
 import android.content.Context;
-
-import org.acra.*;
-import org.acra.annotation.*;
-import org.tyszecki.rozkladpkp.widgets.StationEdit;
 
 @ReportsCrashes(formKey = "dFlJOVYyS1hYbENUWEVmQnE5azlKNFE6MQ")
 

@@ -48,6 +48,7 @@ public class ExternalDelayFetcher {
 					//- Jeśli PR coś zmienią w formacie danych, wystarczy zmiana skryptu żeby działała ta aplikacja
 					//- Mogę dodawać do skryptu dane o opóźnieniach z innych źródeł
 					String url  = "http://opoznienia.appspot.com";
+					
 
 					DefaultHttpClient client = new DefaultHttpClient();
 					HttpGet request = new HttpGet(url);
@@ -88,8 +89,13 @@ public class ExternalDelayFetcher {
 					for(String s : lineSplitter)
 					{
 						int col = s.indexOf(':');
+						try{
 						if(col > -1)
 							delays.put(s.substring(0, col), Integer.parseInt(s.substring(col+1)));
+						}catch(Exception e)
+						{
+							return null;
+						}
 					}
 					return null;
 				}

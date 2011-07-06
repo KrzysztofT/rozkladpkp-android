@@ -30,23 +30,12 @@ import org.tyszecki.rozkladpkp.PLN.TripIterator;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
-import android.os.SystemClock;
-import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
-import android.text.Spanned;
 import android.text.TextPaint;
-import android.text.style.BackgroundColorSpan;
 import android.text.style.ForegroundColorSpan;
-import android.text.style.ImageSpan;
-import android.text.style.LineBackgroundSpan;
-import android.util.Log;
-import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -407,17 +396,16 @@ public class ConnectionListItemAdapter extends BaseAdapter {
 	
 	private void loadData(boolean loadAll) {
 		items.clear();
-		ConnectionListItem c = new ConnectionListItem();
 		
 		//FIXME: Zrobic to poprawniej, teraz jest to "skrot myslowy"
 		if(loadAll && scrolling)
-			items.add(c.new ScrollItem(true));
+			items.add(new ConnectionListItem.ScrollItem(true));
 		while(it.hasNext()){
 			
         	Trip t = it.next();
         	if(!t.date.equals(lastDate))
         	{
-        		ConnectionListItem.DateItem d = c.new DateItem();
+        		ConnectionListItem.DateItem d = new ConnectionListItem.DateItem();
         		
         		
         		d.date = t.date;
@@ -425,7 +413,7 @@ public class ConnectionListItemAdapter extends BaseAdapter {
         		lastDate = t.date;
         	}
         		
-        	TripItem ti = c.new TripItem();
+        	TripItem ti = new ConnectionListItem.TripItem();
         	ti.t = t;
         	items.add(ti);
         	
@@ -434,14 +422,13 @@ public class ConnectionListItemAdapter extends BaseAdapter {
         			break;
     	}	
 		if(scrolling)
-			items.add(c.new ScrollItem(false));
+			items.add(new ConnectionListItem.ScrollItem(false));
 		
 		notifyDataSetChanged();
 	}
 	
 	void loadMore()
 	{
-		ConnectionListItem c = new ConnectionListItem();
 		int i = 0;
 		int s = items.size()-2;
 		
@@ -450,14 +437,14 @@ public class ConnectionListItemAdapter extends BaseAdapter {
         	Trip t = it.next();
         	if(!t.date.equals(lastDate))
         	{
-        		ConnectionListItem.DateItem d = c.new DateItem();
+        		ConnectionListItem.DateItem d = new ConnectionListItem.DateItem();
         		d.date = t.date;
         		items.add(s+i,d);
         		s++;
         		lastDate = t.date;
         	}
         		
-        	TripItem ti = c.new TripItem();
+        	TripItem ti = new ConnectionListItem.TripItem();
         	ti.t = t;
         	items.add(s+i,ti);
     	}	

@@ -92,6 +92,10 @@ public class ConnectionListActivity extends Activity {
         //Pola wykorzystywane przy wszystkich żądaniach
         commonFieldsList = (ArrayList<SerializableNameValuePair>) extras.getSerializable("Attributes");
         commonFieldsList.add(new SerializableNameValuePair("SID", extras.getString("SID")));
+        
+        if(extras.containsKey("VID1"))
+        	commonFieldsList.add(new SerializableNameValuePair("VID1", extras.getString("VID1")));
+        
         commonFieldsList.add(new SerializableNameValuePair("ZID", extras.getString("ZID")));
         commonFieldsList.add(new SerializableNameValuePair("REQ0JourneyProduct_prod_list_1",extras.getString("Products")));
         commonFieldsList.add(new SerializableNameValuePair("start", "1"));
