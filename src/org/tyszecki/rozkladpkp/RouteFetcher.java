@@ -42,6 +42,8 @@ public class RouteFetcher {
 		String data = "start=yes&REQTrain_name="+train_number+"&date="+date+"&time="+time+"&sTI=1&dirInput="+station_d+"&L=vs_java3&input="+station_s+"&boardType="+type;
     	String url  = "http://rozklad.sitkol.pl/bin/stboard.exe/pn";
     	
+    	Log.i("RozkladPKP",data);
+    	
     	DefaultHttpClient client = new DefaultHttpClient();
 		HttpPost request = new HttpPost(url);
 		client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestExpectContinue.class);
@@ -69,7 +71,7 @@ public class RouteFetcher {
         // Return result from buffered stream
         String xmlstring = new String(content.toByteArray());
         xmlstring	= xmlstring.replace("< ", "<");
-    	
+        Log.i("RozkladPKP",xmlstring);
     	DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     	DocumentBuilder db = factory.newDocumentBuilder();
     	InputSource inStream = new InputSource();

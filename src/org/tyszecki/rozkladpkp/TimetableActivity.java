@@ -20,8 +20,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -31,6 +29,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.tyszecki.rozkladpkp.CommonUtils.StationIDfromNameProgress;
 import org.tyszecki.rozkladpkp.TimetableItem.DateItem;
 import org.tyszecki.rozkladpkp.TimetableItem.TrainItem;
 import org.w3c.dom.Document;
@@ -55,7 +54,7 @@ import android.widget.AdapterView.OnItemClickListener;
 
 public class TimetableActivity extends Activity {
 	
-	private ProgressDialog m_ProgressDialog = null; 
+	
 	private ArrayList<TimetableItem> m_items = null;
 	private TimetableItemAdapter m_adapter;
 	private Runnable viewBoard;
@@ -65,12 +64,10 @@ public class TimetableActivity extends Activity {
 	NodeList destList = null;
 	TimetableItem item;
 	String startID = null,destID = null;
-	Pattern p;
-	Matcher m;
-	AdapterView<?> av;
-	Runnable showTimetable;
+	
 	TrainItem titem;
 	Thread loadingThread;
+	private ProgressDialog m_ProgressDialog;
 	
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -115,83 +112,56 @@ public class TimetableActivity extends Activity {
         //Ponieważ nie rozpracowałem jeszcze formatu PLN, używana jest wyszukiwarka.
         lv.setOnItemClickListener(new OnItemClickListener() {
 			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1, int pos,
+			public void onItemClick(final AdapterView<?> arg0, View arg1, int pos,
 					long id) {
-				p = Pattern.compile(".*L=(\\d+)@.*");
-				m = p.matcher(SID);
-				startID = null;
-				destID = null;
-				av = arg0;
 				
-				if(m.matches())
-					startID	= m.group(1);
-			
 				item = m_items.get(pos);
 				if(item instanceof TimetableItem.DateItem)
 					return;
 				
 				titem = (TrainItem)item;
 				
-				m_ProgressDialog = ProgressDialog.show(TimetableActivity.this,    
-			              "Czekaj...", "Wyszukiwanie stacji...", true);
-				
-				showTimetable = new Runnable() {
-					@Override
-					public void run() {
-						m_ProgressDialog.dismiss();
-			             
-						if(destList != null)
-				            for(int i = 0; i < destList.getLength(); i++)
-				            { 
-				            	Node n = destList.item(i);
-				            	if(n.getAttributes().getNamedItem("n").getNodeValue().equalsIgnoreCase(titem.station))
-				            	{
-				            		m = p.matcher(n.getAttributes().getNamedItem("i").getNodeValue());
-				            		if(m.matches())
-				            			destID	= m.group(1);
-				            		
-				            		break;
-				            	}
-				            }
+				startID = CommonUtils.StationIDfromSID(SID);
+				try {
+					CommonUtils.StationIDfromName(titem.station, new StationIDfromNameProgress() {
 						
-						//Mamy oba ID, mozna pobrac rozklad
-						if(startID != null && destID != null)
-						{
-							Intent ni = new Intent(av.getContext(),RouteActivity.class);
-							ni.putExtra("startID",startID);
-							ni.putExtra("destID",destID);
-							ni.putExtra("number",titem.number);
-							ni.putExtra("date", titem.date);
-							ni.putExtra("time", titem.time);
-							ni.putExtra("Type", dep?"dep":"arr");
+						ProgressDialog dialog = null;
+						
+						@Override
+						public void finished(final String ID) {
 							
-							startActivity(ni);
-						}
-						else
-						{
-							//Blad
-							Log.e("RozkladPKP","Nie mozna pobrac identyfikatora stacji");
+							runOnUiThread(new Runnable(){
+								@Override
+								public void run() {
+									if(dialog != null)
+										dialog.dismiss();
+									if(ID != null)
+									{
+										Intent ni = new Intent(arg0.getContext(),RouteActivity.class);
+										ni.putExtra("startID",startID);
+										ni.putExtra("destID",ID);
+										ni.putExtra("number",titem.number);
+										ni.putExtra("date", titem.date);
+										ni.putExtra("time", titem.time);
+										ni.putExtra("Type", dep?"dep":"arr");
+										
+										startActivity(ni);
+									}
+									else
+									{
+										//Blad
+										Log.e("RozkladPKP","Nie mozna pobrac identyfikatora stacji");
+									}
+								}
+							});
 						}
 						
-					}
-				};
-				
-				Runnable destSearch = new Runnable(){
-		            @Override
-		            public void run() {
-						try {
-							destList = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new StationSearch().search(titem.station)).getElementsByTagName("MLc");
-							runOnUiThread(showTimetable);
-						} catch (Exception e) {
-							e.printStackTrace();
+						@Override
+						public void downloadStarted() {
+							dialog = ProgressDialog.show(TimetableActivity.this,"Czekaj...", "Wyszukiwanie stacji...", true);
 						}
-		            }
-		        };
-		        loadingThread =  new Thread(null,destSearch, "DestSearch");
-		        loadingThread.start();
-		        
-		        
-				
+					});
+				} catch (Exception e) {}
 			}
 		});
 	}
@@ -235,6 +205,8 @@ public class TimetableActivity extends Activity {
 
             // Return result from buffered stream
             String xmlstring = new String(content.toByteArray());
+            
+            
         	
         	DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         	DocumentBuilder db = factory.newDocumentBuilder();
@@ -258,6 +230,10 @@ public class TimetableActivity extends Activity {
             	o.date 		= n.getAttributes().getNamedItem("fpDate").getNodeValue();
             	o.delay		= n.getAttributes().getNamedItem("delay").getNodeValue();
             	o.number 	= n.getAttributes().getNamedItem("prod").getNodeValue();
+            	
+            	int hix = o.number.indexOf('#');
+            	if(hix > 0)
+            		o.number = o.number.substring(0, hix);
             	
             	if(!pdate.equals(o.date)){
             		DateItem d = bi.new DateItem();

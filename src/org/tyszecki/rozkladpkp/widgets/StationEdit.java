@@ -135,13 +135,9 @@ public class StationEdit extends  AutoCompleteTextView {
 	                 {
 	                	 ArrayList<String> results = new ArrayList<String>();
 	                	 
-	                	 System.out.println("Słowo:"+ node.v);
-	                	 if(node.m_center != null)
-	                	 {	 
+	                	 if(node.m_center != null)	 
 	                		 Matching(node.m_center,results); 
-	                		 for(String u: results)
-	                			 System.out.println(u);
-	                	 }
+	                	
 	                	 return results;
 	                 }
 	                 node = node.m_center;

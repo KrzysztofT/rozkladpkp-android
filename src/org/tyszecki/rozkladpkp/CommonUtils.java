@@ -16,10 +16,18 @@
  ******************************************************************************/
 package org.tyszecki.rozkladpkp;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -27,6 +35,8 @@ import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -158,22 +168,58 @@ public class CommonUtils {
         public abstract void gotLocality(String s);
     }
 	
-	// http://stackoverflow.com/questions/2833474/how-to-toggle-orientation-lock-in-android
-	public static void setActivityOrientation(Activity activity, int preferenceOrientation) {
-	    if (preferenceOrientation == Configuration.ORIENTATION_LANDSCAPE) { 
-	        if( activity.getRequestedOrientation() != ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE){ 
-	        // You need to check if your desired orientation isn't already set because setting orientation restarts your Activity which takes long
-	            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-	        }
-	    } else if (preferenceOrientation == Configuration.ORIENTATION_PORTRAIT) {
-	        if( activity.getRequestedOrientation() != ActivityInfo.SCREEN_ORIENTATION_PORTRAIT){
-	            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-	        }    
-	    } else {
-	        if( activity.getRequestedOrientation() != ActivityInfo.SCREEN_ORIENTATION_SENSOR){
-	            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
-	        }
-	    }
+	public static abstract class StationIDfromNameProgress{
+		public abstract void downloadStarted();
+		public abstract void finished(String ID);
+	}
+	
+	public static String StationIDfromName(final String name, final StationIDfromNameProgress prog) throws IllegalStateException, SAXException, IOException, ParserConfigurationException
+	{
+		SQLiteDatabase db =  DatabaseHelper.getDb(RozkladPKPApplication.getAppContext());
+        Cursor cur = db.query("stations", new String[]{"_id"}, "name = ?", new String[]{name}, null, null, null);
+        
+        String res = "";
+        if(cur.moveToNext())
+        	res = cur.getString(0);
+        
+        db.close();
+        
+        if(prog != null)
+        {
+        	if(res.equals(""))
+        	{
+        		prog.downloadStarted();
+        		
+        		new Thread(new Runnable() {
+					
+					@Override
+					public void run() {
+						NodeList destList = null;
+						try {
+							destList = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new StationSearch().search(name)).getElementsByTagName("MLc");
+						} catch (Exception e) {} 
+						
+		        		if(destList != null)
+		        		{
+		        			for(int i = 0; i < destList.getLength(); i++)
+				            { 
+				            	Node n = destList.item(i);
+				            	if(n.getAttributes().getNamedItem("n").getNodeValue().equalsIgnoreCase(name))
+				            	{
+				            		String ID = StationIDfromSID(n.getAttributes().getNamedItem("i").getNodeValue());
+				            		prog.finished(ID);
+				            		return;
+				            	}
+				            }
+		        		}
+		        		prog.finished(null);
+					}
+				}).start();
+        	}
+        	else
+        		prog.finished(res);
+        }
+        return res;
 	}
 	
 	public static String StationIDfromSID(String ID)
