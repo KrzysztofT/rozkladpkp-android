@@ -157,6 +157,8 @@ public class StationSpinner extends Spinner {
 	            	Node n = list.item(i);
 	            	stations[i][0] = n.getAttributes().getNamedItem("n").getNodeValue();
 	            	stations[i][1] = n.getAttributes().getNamedItem("i").getNodeValue();
+	            	
+	            	Log.i("RozkladPKP", stations[i][1]);
 	            }
 
 	            acHandler.post(showUpdate);

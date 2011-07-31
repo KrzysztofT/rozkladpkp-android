@@ -19,6 +19,7 @@ package org.tyszecki.rozkladpkp;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -232,7 +233,16 @@ public class CommonUtils {
 	
 	public static String SIDfromStationID(int ID, String name)
 	{
-		return "A=1@O="+name+"@L="+Integer.toString(ID)+"@";
+		SQLiteDatabase db =  DatabaseHelper.getDb(RozkladPKPApplication.getAppContext());
+        Cursor cur = db.query("stations", new String[]{"_id","x","y"}, "_id = "+ID, null, null, null, null,"1");
+		
+        if(cur.moveToNext())
+        {
+        	db.close();
+        	return "A=1@O="+name+"@X="+cur.getInt(1)+"@Y="+cur.getInt(2)+"@L="+Integer.toString(cur.getInt(0))+"@";
+        }
+        db.close();
+        return "";
 	}
 	
 	//Metoda używana do wygenerowania nazwy pliku z wynikami
@@ -246,4 +256,35 @@ public class CommonUtils {
 		
 		return b.toString();
 	}
+	 private final static Map<Character,Character> chmap = new HashMap<Character,Character>(){
+	 		private static final long serialVersionUID = 1L;
+	 		{
+	 			  put('ą','a');
+	 			  put('ć','c');
+	 			  put('ę','e');
+	 			  put('ł','l');
+	 			  put('ń','n');
+	 			  put('ó','o');
+	 			  put('ś','s');
+	 			  put('ż','z');
+	 			  put('ź','z');
+	 		  }
+	 		};
+	 	
+	     private static char strip(char in)
+	     {
+	    	 in = Character.toLowerCase(in);
+	    	 if(chmap.containsKey(in))
+	    		 in = chmap.get(in);
+	    	 return in;
+	     }
+	     
+	     public static String depol(String t)
+	     {
+	    	 String r = "";
+	    	 for(int i = 0; i < t.length(); ++i)
+	    		 r += strip(t.charAt(i));
+	    	 
+	    	 return r;
+	     }
 }

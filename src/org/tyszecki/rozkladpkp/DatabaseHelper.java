@@ -23,8 +23,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.FileChannel;
+import java.util.ArrayList;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -38,27 +40,28 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 
 	private static String DB_NAME = "rozkladpkp";
 
-	private final static int DB_VERSION = 3;
+	private final static int DB_VERSION = 4;
 	
 	private SQLiteDatabase myDataBase; 
 
 	private final Context myContext;
 
+	boolean preserve_stored = false;
+	int stored_col_count = 0;
+	ArrayList<String[]> stored;
 	/**
 	 * Constructor
 	 * Takes and keeps a reference of the passed context in order to access to the application assets and resources.
 	 * @param context
 	 */
-	public DatabaseHelper(Context context) {
-		super(context, DB_NAME, null, DB_VERSION);
-		this.myContext = context;
-		
-		/*try {
+	private void saveDB(String fname)
+	{
+		try {
 			File sd = Environment.getExternalStorageDirectory();
 
 			if (sd.canWrite()) {
 				File currentDB = new File(DB_PATH+DB_NAME);
-				File backupDB = new File(sd, "rozklad.db");
+				File backupDB = new File(sd, fname);
 
 				if (currentDB.exists()) {
 					FileChannel src = new FileInputStream(currentDB).getChannel();
@@ -68,7 +71,12 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 					dst.close();
 				}
 			}
-			} catch (Exception e) {}*/
+			} catch (Exception e) {}
+	}
+	
+	public DatabaseHelper(Context context) {
+		super(context, DB_NAME, null, DB_VERSION);
+		this.myContext = context;
 	}	
 
 	//TODO: Ograniczenie liczby wywołań openDatabase.
@@ -92,7 +100,6 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 				throw new Error("Error copying database");
 			}
 		}
-
 	}
 
 	/**
@@ -115,6 +122,26 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 			//getWriteableDatabase nie wywoła onUpgrade kiedy wersja starej bazy będzie równa 0
 			if(DB_VERSION > checkDB.getVersion())
 			{
+				if(checkDB.getVersion() < 4)
+				{
+					preserve_stored = true;
+					stored = new ArrayList<String[]>();
+					
+					Cursor cur = checkDB.rawQuery("SELECT * FROM stored", null);
+					stored_col_count = cur.getColumnCount();
+					
+					while(cur.moveToNext())
+					{
+						String[] arr = new String[6];
+						for(int i = 0; i < stored_col_count; ++i)
+							arr[i] = cur.getString(i);
+						
+						stored.add(arr);
+					}
+					cur.close();
+					checkDB.close();
+					return false;
+				}
 				myUpgrade(checkDB, checkDB.getVersion(), DB_VERSION);
 				checkDB.setVersion(DB_VERSION);
 			}
@@ -152,7 +179,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 		myOutput.flush();
 		myOutput.close();
 		myInput.close();
-		
+		Log.i("RozkladPKP","skopiowano");
 		myCreate();
 
 	}
@@ -205,31 +232,20 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 	 */
 	public void myCreate() {
 		SQLiteDatabase db = SQLiteDatabase.openDatabase(DB_PATH+DB_NAME, null, SQLiteDatabase.OPEN_READWRITE);
-		createFavTables(db);
-		addResultsCache(db);
 		
+		if(preserve_stored)
+			for(int i = 0; i < stored.size(); ++i)
+			{
+				String[] a = stored.get(i);
+				if(stored_col_count == 6)
+					db.execSQL("INSERT INTO stored VALUES('"+a[0]+"','"+a[1]+"','"+a[2]+"','"+a[3]+"',"+a[4]+",'"+a[5]+"')");
+				//else
+				//	db.execSQL("INSERT INTO stored VALUES('"+a[0]+"','"+a[1]+"','"+a[2]+"','"+a[3]+"',"+a[4]+",null)");
+			}
+	
 		db.setVersion(DB_VERSION);
 		db.close();
 	}
 	
-	public void myUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		if(oldVersion < 2)
-			createFavTables(db);
-		if(oldVersion < 3)
-			addResultsCache(db);
-	}
-	
-	private void addResultsCache(SQLiteDatabase db) {
-		db.execSQL("ALTER TABLE 'stored' ADD column 'cacheValid' INTEGER;");
-		db.execSQL("DROP VIEW 'storedview';");
-		db.execSQL("CREATE VIEW storedview AS SELECT stored._id AS _id,sidFrom,sidTo,s.name AS fromName,stations.name AS toName,type,fav,cacheValid FROM stored LEFT JOIN stations AS s on s._id=sidFrom LEFT join stations on stations._id=sidTo ORDER BY stored._id DESC");
-		
-	}
-
-	private void createFavTables(SQLiteDatabase db)
-	{
-		db.execSQL("CREATE TABLE 'stored' ('_id' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,'sidFrom' INTEGER NOT NULL,'sidTo' INTEGER,'type' INTEGER,'fav' INTEGER);");
-		db.execSQL("CREATE VIEW storedview AS SELECT stored._id AS _id,sidFrom,sidTo,s.name AS fromName,stations.name AS toName,type,fav FROM stored LEFT JOIN stations AS s on s._id=sidFrom LEFT join stations on stations._id=sidTo ORDER BY stored._id DESC");
-	}
-
+	public void myUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {}
 }

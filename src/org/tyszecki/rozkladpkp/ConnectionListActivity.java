@@ -341,7 +341,7 @@ public class ConnectionListActivity extends Activity {
 	}
 	
 	protected void getFullTimetableUrl() throws Exception {
-		
+		/*
 		ArrayList<SerializableNameValuePair> data = new ArrayList<SerializableNameValuePair>();
 		data.addAll(commonFieldsList);
 		
@@ -387,7 +387,7 @@ public class ConnectionListActivity extends Activity {
         	}
         }
         
-        Log.i("RozkladPKP","TT URL" + (timetableUrl != null ? timetableUrl : "NULL"));
+        Log.i("RozkladPKP","TT URL" + (timetableUrl != null ? timetableUrl : "NULL"));*/
 	}
 
 	protected void getFullTimetable() throws Exception {
@@ -541,7 +541,7 @@ public class ConnectionListActivity extends Activity {
         String t= "";
         for(SerializableNameValuePair p : data)
         	t+=p.name+"="+p.value+"&";
-        //Log.i("RozkladPKP","PLNReq: "+ t);
+        Log.i("RozkladPKP","PLNReq: "+ t);
         
         HttpResponse response = client.execute(request);
          

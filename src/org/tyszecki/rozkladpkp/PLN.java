@@ -482,7 +482,7 @@ public class PLN {
 	
 	public String id()
 	{
-		return strings.get(10);
+		return strings.get(readShort(attributesEnd+0xc));
 	}
 	
 	public int connectionCount()

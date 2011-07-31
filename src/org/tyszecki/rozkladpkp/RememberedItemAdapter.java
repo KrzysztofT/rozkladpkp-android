@@ -64,6 +64,8 @@ public class RememberedItemAdapter extends BaseAdapter {
 			t.SIDTo = cur.getInt(1);
 			t.fromName = cur.getString(2);
 			t.toName = cur.getString(3);
+			if(t.fromName == null || t.toName == null)
+				continue;
 			t.id = cur.getInt(4);
 			t.cacheValid = cur.getString(5);
 			items.add(t);
@@ -80,6 +82,8 @@ public class RememberedItemAdapter extends BaseAdapter {
 			t.type = (cur.getInt(0) == 0) ? TimetableType.Departure : TimetableType.Arrival;
 			t.SID = cur.getInt(1);
 			t.name = cur.getString(2);
+			if(t.name == null)
+				continue;
 			t.id = cur.getInt(3);
 			t.cacheValid = cur.getString(4);
 			items.add(t);
@@ -103,6 +107,9 @@ public class RememberedItemAdapter extends BaseAdapter {
 				t.fromName = cur.getString(3);
 				t.toName = cur.getString(4);
 				
+				if(t.fromName == null || t.toName == null)
+					continue;
+				
 				t.id = cur.getInt(5);
 				t.cacheValid = cur.getString(6);
 				
@@ -114,11 +121,14 @@ public class RememberedItemAdapter extends BaseAdapter {
 				t.type = (cur.getInt(0) == 0) ? TimetableType.Departure : TimetableType.Arrival;
 				t.SID = cur.getInt(1);
 				t.name = cur.getString(3);
-				
+				if(t.name == null)
+					continue;
 				t.id = cur.getInt(5);
 				
 				items.add(t);
 			}
+			
+			
 		}
 		cur.close();
 		db.close();
@@ -171,6 +181,7 @@ public class RememberedItemAdapter extends BaseAdapter {
         		
         		if(showSaved)
         		{
+        			try{
         			itime.parse(r.cacheValid);
         			
         			//Log.i("RozkladPKP","ITEM: "+itime.toString());
@@ -186,6 +197,8 @@ public class RememberedItemAdapter extends BaseAdapter {
         				db.execSQL("UPDATE stored SET cacheValid='' WHERE _id="+Integer.toString(r.id));
         				db.close();
         			}
+        			}catch(Exception e)
+        			{}
         		}
         		
         		v.findViewById(R.id.saved_icon).setVisibility(showSaved ? View.VISIBLE : View.INVISIBLE);

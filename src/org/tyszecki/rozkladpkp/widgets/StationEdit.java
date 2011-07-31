@@ -233,12 +233,12 @@ public class StationEdit extends  AutoCompleteTextView {
 		String cstation = getText().toString();
 		
 		SQLiteDatabase db =  DatabaseHelper.getDb(getContext());
-        Cursor cur = db.query("stations", new String[]{"_id"}, "name = \""+cstation+"\"", null, null, null, null,"1");
+        Cursor cur = db.query("stations", new String[]{"_id","x","y"}, "name = \""+cstation+"\"", null, null, null, null,"1");
 		
         if(cur.moveToNext())
         {
         	db.close();
-        	return "A=1@O="+cstation+"@L="+Integer.toString(cur.getInt(0))+"@";
+        	return "A=1@O="+cstation+"@X="+cur.getInt(1)+"@Y="+cur.getInt(2)+"@L="+Integer.toString(cur.getInt(0))+"@";
         }
         db.close();
         return "";
