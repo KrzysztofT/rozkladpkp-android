@@ -22,12 +22,19 @@ import java.util.ArrayList;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.tyszecki.rozkladpkp.ConnectionDetailsItem.PriceItem;
+import org.tyszecki.rozkladpkp.PLN.Connection;
+import org.tyszecki.rozkladpkp.PLN.ConnectionChange;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -62,93 +69,87 @@ public class ConnectionDetailsActivity extends Activity {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int pos, long id) {
 				
-				Intent ni = new Intent(arg0.getContext(),TrainDetailsActivity.class);
-				
-				ni.putExtra("PLNData",pln.data);
-				ni.putExtra("ConnectionIndex",conidx);
-				ni.putExtra("TrainIndex", pos);
-				ni.putExtra("StartDate",getIntent().getExtras().getString("StartDate"));
-				startActivity(ni);
+				if(adapter.getItem(pos) instanceof PriceItem)
+				{
+					final ProgressDialog pdial = ProgressDialog.show(ConnectionDetailsActivity.this, "Czekaj...", "Pobieranie informacji o cenie...");
+					
+					new Thread(new Runnable(){
+			            @Override
+			            public void run() {
+			                try {
+			                	DefaultHttpClient client = new DefaultHttpClient();
+			            		Connection c = pln.connections[conidx];
+			                	
+			                	String params;
+			                	params = "start="+Integer.toString(c.getTrain(0).depstation.id);
+			                	params += "&end="+Integer.toString(c.getTrain(c.getTrainCount()-1).arrstation.id);
+			                	params += "&date="+getIntent().getExtras().getString("StartDate");
+			                	params += "&time="+c.getTrain(0).deptime.toString();
+			                	params += "&trains=";
+			                	
+			                	int j = c.getTrainCount();
+			                	for(int i = 0; i < j; ++i)
+			                	{
+			                		params += c.getTrain(i).number;
+			                		if(i < j-1)
+			                			params += ':';
+			                	}
+			                	
+			                	Bundle extras = ConnectionDetailsActivity.this.getIntent().getExtras();
+			                	params += "&REQ0JourneyProduct_prod_list_1="+extras.getString("Products");
+			                	
+			                	//ArrayList<SerializableNameValuePair> data = (ArrayList<SerializableNameValuePair>) extras.getSerializable("Attributes");
+			                	
+			                	//for(SerializableNameValuePair p : data)
+			                	//	params += "&"+p.name+"="+p.value;
+			                	
+			                	params = params.replace(" ","%20");
+			                	Log.i("RozkladPKP", params);
+			            		HttpGet request = new HttpGet("http://2.cennikkolej.appspot.com/?"+params);
+			            		
+			                    HttpResponse response = client.execute(request);
+			                     
+			                    // Pull content stream from response
+			                    HttpEntity entity = response.getEntity();
+			                    InputStream inputStream = entity.getContent();
+			                    final ByteArrayOutputStream content = new ByteArrayOutputStream();
+			                    
+			                    int readBytes = 0;
+			                    while ((readBytes = inputStream.read(sBuffer)) != -1) {
+			                        content.write(sBuffer, 0, readBytes);
+			                    }
+			                    
+			                    final String[] spl = content.toString().split(":");
+			                    
+			                    runOnUiThread(new Runnable() {
+									@Override
+									public void run() {		
+										pdial.dismiss();
+										if(spl.length == 1)
+											adapter.setPrice("-1", null, null);
+										else
+											adapter.setPrice(spl[0].trim(),spl[2].trim(),spl[1].trim());
+									}
+								});
+			                	
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+			            }
+					}).start();
+				}
+				else
+				{
+					Intent ni = new Intent(arg0.getContext(),TrainDetailsActivity.class);
+					
+					ni.putExtra("PLNData",pln.data);
+					ni.putExtra("ConnectionIndex",conidx);
+					ni.putExtra("TrainIndex", pos);
+					ni.putExtra("StartDate",getIntent().getExtras().getString("StartDate"));
+					startActivity(ni);
+				}
 			}
 		});
         
-	}
-	
-	public boolean onCreateOptionsMenu(Menu menu){
-		getMenuInflater().inflate(R.menu.connection_details, menu);
-		return true;
-	}
-	
-	public boolean onOptionsItemSelected (MenuItem item){
-		
-		final Bundle b = getIntent().getExtras();
-		
-		switch(item.getItemId()){
-		case R.id.item_price:
-			
-			new Runnable(){
-	            @Override
-	            public void run() {
-	                try {
-						
-	                	ArrayList<SerializableNameValuePair> data = new ArrayList<SerializableNameValuePair>();
-	                	data.add(new SerializableNameValuePair("ident",pln.id()));
-	                	data.add(new SerializableNameValuePair("seqnr",Integer.toString(b.getInt("seqnr"))));
-	                	data.add(new SerializableNameValuePair("tnumber",Integer.toString(b.getInt("ConnectionId"))));
-	                	
-	                	DefaultHttpClient client = new DefaultHttpClient();
-	            		
-	            		HttpGet request = new HttpGet("http://cennikkolej.appspot.com/test/test.py?seqnr="+Integer.toString(b.getInt("seqnr")+1)+"&ident="+pln.id()+"&tnumber="+Integer.toString(b.getInt("ConnectionId")));
-	            		client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestExpectContinue.class);
-	                    client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestUserAgent.class);
-	                    //request.addHeader("Content-Type", "text/plain");
-	                    //request.setEntity(new UrlEncodedFormEntity(data,"UTF-8"));
-	                    
-	                    //Log.i("RozkladPKP", )
-	                    HttpResponse response = client.execute(request);
-	                     
-	                    // Pull content stream from response
-	                    HttpEntity entity = response.getEntity();
-	                    InputStream inputStream = entity.getContent();
-	                    final ByteArrayOutputStream content = new ByteArrayOutputStream();
-	                    
-	                    int readBytes = 0;
-	                    while ((readBytes = inputStream.read(sBuffer)) != -1) {
-	                        content.write(sBuffer, 0, readBytes);
-	                    }
-	                    
-	                    final String result;
-	                    String[] spl = content.toString().split(":");
-	                    
-	                    if(spl.length == 1)
-	                    	result = spl[0];
-	                    else
-	                    {
-	                    	StringBuilder b = new StringBuilder();
-	                    	b.append(spl[0].trim());
-	                    	b.append(" km\n kl. 2: ");
-	                    	b.append(spl[1].trim());
-	                    	b.append(" zł\n kl. 1: ");
-	                    	b.append(spl[2].trim());
-	                    	b.append(" zł");
-	                    	result = b.toString();
-	                    }
-	                    
-	                    runOnUiThread(new Runnable() {
-							@Override
-							public void run() {
-								Toast.makeText(ConnectionDetailsActivity.this, result, Toast.LENGTH_LONG).show();
-							}
-						});
-	                	
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-	            }
-			}.run();
-			
-			return true;
-		}
-		return false;
 	}
 }

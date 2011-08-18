@@ -184,6 +184,8 @@ public class ConnectionListActivity extends Activity {
 					ni.putExtra("ConnectionIndex",((TripItem)b).t.conidx);
 					ni.putExtra("ConnectionId", adapter.getTripId((TripItem)b));
 					ni.putExtra("StartDate",((TripItem)b).t.date);
+					ni.putExtra("Attributes", extras.getSerializable("Attributes"));
+					ni.putExtra("Products", extras.getString("Products"));
 					startActivity(ni);
 				}
 				else if(b instanceof ScrollItem)
@@ -290,6 +292,8 @@ public class ConnectionListActivity extends Activity {
 					
 					if(pln != null && !extras.containsKey("PLNFilename"))
 						in.putExtra("pln", pln.data);
+					
+					
 					
 					in.putExtra("SID", CommonUtils.StationIDfromSID(extras.getString("SID")));
 					in.putExtra("ZID", CommonUtils.StationIDfromSID(extras.getString("ZID")));
@@ -576,7 +580,7 @@ public class ConnectionListActivity extends Activity {
 		Bundle extras = getIntent().getExtras();
 		Intent ni = null;
 		switch(item.getItemId()){
-		/*case R.id.savepln:
+		case R.id.savepln:
 			File f = new File(Environment.getExternalStorageDirectory(),"PLN");
 			FileOutputStream w = null;
 			try {
@@ -591,7 +595,7 @@ public class ConnectionListActivity extends Activity {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			return true;*/
+			return true;
 		case R.id.item_favourite:
 			RememberedManager.addtoHistory(ConnectionListActivity.this, CommonUtils.StationIDfromSID(extras.getString("SID")), CommonUtils.StationIDfromSID(extras.getString("ZID")),"");
 			RememberedManager.saveRoute(ConnectionListActivity.this, CommonUtils.StationIDfromSID(extras.getString("SID")), CommonUtils.StationIDfromSID(extras.getString("ZID")));

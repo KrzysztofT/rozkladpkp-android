@@ -227,7 +227,10 @@ public class CommonUtils {
 	{
 		for(String t: ID.split("@"))
 			if(t.startsWith("L="))
-				return t.split("=")[1];
+				try{
+					return Integer.toString((Integer.parseInt(t.split("=")[1])));
+				}catch(Exception e){}
+				
 		return null;
 	}
 	

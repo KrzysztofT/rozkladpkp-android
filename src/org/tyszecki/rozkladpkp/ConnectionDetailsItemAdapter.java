@@ -17,13 +17,14 @@
 package org.tyszecki.rozkladpkp;
 import java.util.ArrayList;
 
-import org.tyszecki.rozkladpkp.ConnectionDetailsItem.DateItem;
+import org.tyszecki.rozkladpkp.ConnectionDetailsItem.PriceItem;
 import org.tyszecki.rozkladpkp.ConnectionDetailsItem.TrainItem;
 import org.tyszecki.rozkladpkp.PLN.Connection;
 import org.tyszecki.rozkladpkp.PLN.Train;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
@@ -37,7 +38,7 @@ import android.widget.TextView;
 
 public class ConnectionDetailsItemAdapter extends BaseAdapter {
 
-	final int HEADER = 0;
+	final int PRICE = 0;
 	final int NORMAL = 1;
 	
 	private ArrayList<ConnectionDetailsItem> items;
@@ -46,6 +47,7 @@ public class ConnectionDetailsItemAdapter extends BaseAdapter {
 	private PLN pln;
 	private int conidx;
 	private boolean platformInfo,delayInfo;
+	private String km,k1,k2;
 	
 	private SpannableStringBuilder spanBuilder = new SpannableStringBuilder();
 	private ForegroundColorSpan greenSpan = new ForegroundColorSpan(Color.rgb(73,194,98));
@@ -68,7 +70,7 @@ public class ConnectionDetailsItemAdapter extends BaseAdapter {
 		platformInfo = false;
 		delayInfo = false;
 		
-    	ConnectionDetailsItem c = new ConnectionDetailsItem();
+    	
     	Connection con = pln.connections[conidx];
     	
     	for(int i = 0; i < con.getTrainCount(); ++i)
@@ -78,12 +80,22 @@ public class ConnectionDetailsItemAdapter extends BaseAdapter {
     		if(t.getChange() != null)
     			delayInfo = true;
     		
-    		TrainItem ti = c.new TrainItem();
+    		TrainItem ti = new TrainItem();
     		ti.t = t;
     		items.add(ti);
     	}
+    	items.add(new PriceItem());
     	
     	notifyDataSetChanged();
+	}
+	
+	public void setPrice(String km, String k1, String k2)
+	{
+		this.km = km;
+		this.k1 = k1;
+		this.k2 = k2;
+		
+		notifyDataSetChanged();
 	}
 	
 	public View getView(int position, View convertView, ViewGroup parent) {
@@ -93,11 +105,8 @@ public class ConnectionDetailsItemAdapter extends BaseAdapter {
             LayoutInflater vi = (LayoutInflater)c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             if(con instanceof TrainItem) 
             	v = vi.inflate(R.layout.connection_details_row, null);
-            
-            else if(con instanceof DateItem)
-            	v = vi.inflate(R.layout.common_date_header_row, null);
-            else 
-            	v = vi.inflate(R.layout.scrollitem, null);
+            else if(con instanceof PriceItem)
+            	v = vi.inflate(R.layout.connection_details_price_row, null);
         }
         
         if (con instanceof TrainItem) {
@@ -105,7 +114,6 @@ public class ConnectionDetailsItemAdapter extends BaseAdapter {
         	
         	
         	String aplatform,dplatform;
-        	
         	
         	if(t.getDeparturePlatform().equals("---"))
         		dplatform = "";
@@ -181,10 +189,18 @@ public class ConnectionDetailsItemAdapter extends BaseAdapter {
         	
         	((TextView) v.findViewById(R.id.duration)).setText(t.arrtime.difference(t.deptime).toString());
         }
-        else if (con instanceof DateItem)
+        else if (con instanceof PriceItem)
         {
-        	//TextView head = (TextView) v.findViewById(R.id.conn_header);
-            //head.setText(((ConnectionItem.DateItem)con).date);
+        	PriceItem i = (PriceItem)con;
+        	
+        	TextView head = (TextView) v.findViewById(R.id.price);
+        	
+        	if(km == null)
+        		head.setText("Sprawdź cenę");
+        	else if(km.equals("-1"))
+        		head.setText("Błąd pobierania ceny");
+        	else
+        		head.setText(Html.fromHtml("Odległość: <b>"+km+"</b>km<br> Klasa 1: <b>"+k1+"</b>zł<br> Klasa 2: <b>"+k2+"</b>zł<br>Cena nie uwzględnia zniżek i promocji."));
         }
         
         return v;
@@ -207,12 +223,9 @@ public class ConnectionDetailsItemAdapter extends BaseAdapter {
 
 	@Override
 	public int getItemViewType(int arg0) {
-		
-		if(items.get(arg0) instanceof ConnectionDetailsItem.DateItem)
-			return HEADER;
-		else if(items.get(arg0) instanceof ConnectionDetailsItem.TrainItem)
+		if(items.get(arg0) instanceof ConnectionDetailsItem.TrainItem)
 			return NORMAL;
-		return NORMAL;
+		else return PRICE;
 	}
 
 	@Override
@@ -235,6 +248,6 @@ public class ConnectionDetailsItemAdapter extends BaseAdapter {
     }  
 	@Override
     public boolean isEnabled(int position) {  
-        return (getItemViewType(position) != HEADER);  
+        return true;//(getItemViewType(position) != PRICE);  
     }  
 }

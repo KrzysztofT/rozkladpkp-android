@@ -32,6 +32,7 @@ public class RememberedService extends IntentService {
 		String Sid = ex.getString("SID");
 		String Zid = ex.getString("ZID");
 		
+		
 		if(ex.containsKey("pln"))
 		{
 			PLN pln = new PLN(ex.getByteArray("pln"));
