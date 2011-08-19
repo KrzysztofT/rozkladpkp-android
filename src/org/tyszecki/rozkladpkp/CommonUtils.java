@@ -156,7 +156,7 @@ public class CommonUtils {
 					
 					@Override
 					public void run() {
-							p.dismiss();
+							p.dismiss();//TODO: Crash report na to był.
 					}
 				});
 			}

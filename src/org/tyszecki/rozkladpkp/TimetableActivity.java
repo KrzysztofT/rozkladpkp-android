@@ -63,7 +63,7 @@ public class TimetableActivity extends Activity {
 	private boolean dep, inFront = true, showNDDialog = false;
 	NodeList destList = null;
 	TimetableItem item;
-	String startID = null,destID = null;
+	String startID = null,destID = null, xmlstring;
 	
 	TrainItem titem;
 	Thread loadingThread;
@@ -168,93 +168,42 @@ public class TimetableActivity extends Activity {
 	
 	
 	private void getBoard(){
-        try{
-        	
-        	DefaultHttpClient client = new DefaultHttpClient();
-			//String url = "http://192.168.1.101/test/dane.php";
+		try{
+			DefaultHttpClient client = new DefaultHttpClient();
+
 			String s = SID.replaceAll("=", "%3D");
 			s = s.replaceAll(" ", "%20");
 			String time = getIntent().getExtras().getString("Time");
 			String date = getIntent().getExtras().getString("Date");
 			String prod = getIntent().getExtras().getString("Products");
-			String type = dep?"dep":"arr";
-			
-			//Log.i("Sitkol",date);
-			
+			String type = dep?"dep":"arr";		
+
 			String data = "L=vs_java3&productsFilter="+prod+"&inputTripelId="+s+"@&maxJourneys=50&boardType="+type+"&time="+time+"&date="+date+"&start=yes";
-        	String url  = "http://rozklad.sitkol.pl/bin/stboard.exe/pn" ;
-        	
+			String url  = "http://rozklad.sitkol.pl/bin/stboard.exe/pn" ;
+
 			HttpPost request = new HttpPost(url);
 			client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestExpectContinue.class);
-	        client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestUserAgent.class);
-	        request.addHeader("Content-Type", "text/plain");
-	        request.setEntity(new StringEntity(data));
-	        
-	        HttpResponse response = client.execute(request);
-	         
-            // Pull content stream from response
-            HttpEntity entity = response.getEntity();
-            InputStream inputStream = entity.getContent();
-            ByteArrayOutputStream content = new ByteArrayOutputStream();
+			client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestUserAgent.class);
+			request.addHeader("Content-Type", "text/plain");
+			request.setEntity(new StringEntity(data));
 
-            // Read response into a buffered stream
-            int readBytes = 0;
-            while ((readBytes = inputStream.read(sBuffer)) != -1) {
-                content.write(sBuffer, 0, readBytes);
-            }
+			HttpResponse response = client.execute(request);
+			HttpEntity entity = response.getEntity();
+			InputStream inputStream = entity.getContent();
+			ByteArrayOutputStream content = new ByteArrayOutputStream();
 
-            // Return result from buffered stream
-            String xmlstring = new String(content.toByteArray());
-            
-            
-        	
-        	DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        	DocumentBuilder db = factory.newDocumentBuilder();
-        	InputSource inStream = new InputSource();
-        	inStream.setCharacterStream(new StringReader("<a>"+xmlstring+"</a>"));
-        	Document doc = db.parse(inStream);
-        	
-        	NodeList list = doc.getElementsByTagName("Journey");
-            
-            m_items.clear();
-            
-            TimetableItem bi = new TimetableItem();
-            String pdate = "";
-            int j = list.getLength();
-            for(int i = 0; i < j; i++)
-            { 
-            	TrainItem o = bi.new TrainItem();
-            	Node n = list.item(i);
-            	o.station 	= n.getAttributes().getNamedItem("targetLoc").getNodeValue();
-            	o.time 		= n.getAttributes().getNamedItem("fpTime").getNodeValue();
-            	o.date 		= n.getAttributes().getNamedItem("fpDate").getNodeValue();
-            	o.delay		= n.getAttributes().getNamedItem("delay").getNodeValue();
-            	o.number 	= n.getAttributes().getNamedItem("prod").getNodeValue();
-            	
-            	int hix = o.number.indexOf('#');
-            	if(hix > 0)
-            		o.number = o.number.substring(0, hix);
-            	
-            	if(!pdate.equals(o.date)){
-            		DateItem d = bi.new DateItem();
-            		d.date = o.date;
-            		pdate = o.date;
-            		m_items.add(d);
-            	}
-            	
-            	NodeList msgs = n.getChildNodes();
-            	for(int k = 0; k < msgs.getLength(); k++)
-            	{
-            		Node c	= msgs.item(k);
-            		if(c.getNodeName().equals("HIMMessage"))
-            			o.message += c.getAttributes().getNamedItem("header").getNodeValue();
-            	}
-            	m_items.add(o);
-            }
-          } catch (Exception e) { 
-            //Log.e("BACKGROUND_PROC", e.getMessage());
-          }
-          runOnUiThread(returnRes);
+
+			int readBytes = 0;
+			while ((readBytes = inputStream.read(sBuffer)) != -1) {
+				content.write(sBuffer, 0, readBytes);
+			}
+
+
+			xmlstring = "<a>"+new String(content.toByteArray())+"</a>";
+		} catch (Exception e) { 
+
+		}
+		runOnUiThread(returnRes);
     }
 	
 	private void noDataAlert()
@@ -280,13 +229,14 @@ public class TimetableActivity extends Activity {
 
         @Override
         public void run() {
-            if(m_items != null && m_items.size() > 0)
-                m_adapter.notifyDataSetChanged();
-            else if(inFront)
-            	noDataAlert();
-            else
-            	showNDDialog = true;
-            
+        	m_adapter.setXML(xmlstring);
+            if(m_items != null && m_items.size() == 0)
+            {
+            	if(inFront)
+            		noDataAlert();
+            	else
+            		showNDDialog = true;
+            }
             m_ProgressDialog.dismiss();
         }
 	};
@@ -314,7 +264,6 @@ public class TimetableActivity extends Activity {
 			noDataAlert();
 			showNDDialog = false;
 		}
-		
 	}
 	
 	@Override

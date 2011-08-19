@@ -16,10 +16,18 @@
  ******************************************************************************/
 package org.tyszecki.rozkladpkp;
 
+import java.io.StringReader;
 import java.util.ArrayList;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.tyszecki.rozkladpkp.TimetableItem.DateItem;
 import org.tyszecki.rozkladpkp.TimetableItem.TrainItem;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
 import android.content.Context;
 import android.text.Html;
@@ -47,6 +55,56 @@ public class TimetableItemAdapter extends BaseAdapter {
     public void setType(boolean d)
     {
     	dep = d;
+    }
+    
+    public void setXML(String xmlstring)
+    {
+    	try{
+    		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    		DocumentBuilder db = factory.newDocumentBuilder();
+    		InputSource inStream = new InputSource();
+    		inStream.setCharacterStream(new StringReader("<a>"+xmlstring+"</a>"));
+    		Document doc = db.parse(inStream);
+
+    		NodeList list = doc.getElementsByTagName("Journey");
+
+    		items.clear();
+
+    		TimetableItem bi = new TimetableItem();
+    		String pdate = "";
+    		int j = list.getLength();
+    		for(int i = 0; i < j; i++)
+    		{ 
+    			TrainItem o = bi.new TrainItem();
+    			Node n = list.item(i);
+    			o.station 	= n.getAttributes().getNamedItem("targetLoc").getNodeValue();
+    			o.time 		= n.getAttributes().getNamedItem("fpTime").getNodeValue();
+    			o.date 		= n.getAttributes().getNamedItem("fpDate").getNodeValue();
+    			o.delay		= n.getAttributes().getNamedItem("delay").getNodeValue();
+    			o.number 	= n.getAttributes().getNamedItem("prod").getNodeValue();
+
+    			int hix = o.number.indexOf('#');
+    			if(hix > 0)
+    				o.number = o.number.substring(0, hix);
+
+    			if(!pdate.equals(o.date)){
+    				DateItem d = bi.new DateItem();
+    				d.date = o.date;
+    				pdate = o.date;
+    				items.add(d);
+    			}
+
+    			NodeList msgs = n.getChildNodes();
+    			for(int k = 0; k < msgs.getLength(); k++)
+    			{
+    				Node c	= msgs.item(k);
+    				if(c.getNodeName().equals("HIMMessage"))
+    					o.message += c.getAttributes().getNamedItem("header").getNodeValue();
+    			}
+    			items.add(o);
+    		}
+    	}catch (Exception e) {}
+    	notifyDataSetChanged();
     }
     
     public View getView(int position, View convertView, ViewGroup parent) {
