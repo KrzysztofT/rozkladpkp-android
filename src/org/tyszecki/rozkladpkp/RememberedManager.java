@@ -114,19 +114,21 @@ public class RememberedManager {
 		
 		Cursor cur = db.rawQuery("SELECT _id,fav FROM stored WHERE sidFrom=? AND type=?",new String[]{stationSID,departure?"0":"1"});
 		
-		cur.moveToNext();
-		boolean add = cur.getInt(1) != 1;
-		int id = cur.getInt(0);
-		cur.close();
-		
-		if(add)
+		if(cur.moveToNext())
 		{
-			ContentValues val = new ContentValues();
-			val.put("fav", 1);
-			db.update("stored", val, "_id="+Integer.toString(id),null);
+			boolean add = cur.getInt(1) != 1;
+			int id = cur.getInt(0);
+			cur.close();
+			
+			if(add)
+			{
+				ContentValues val = new ContentValues();
+				val.put("fav", 1);
+				db.update("stored", val, "_id="+Integer.toString(id),null);
+			}
+			Toast.makeText(c, add?"Stację dodano do zapamiętanych":"Stacja już jest na liście zapamiętanych", Toast.LENGTH_SHORT).show();
+			db.close();
 		}
-		Toast.makeText(c, add?"Stację dodano do zapamiętanych":"Stacja już jest na liście zapamiętanych", Toast.LENGTH_SHORT).show();
-		db.close();
 	}
 	
 	public static void saveRoute(Context c, String fromSID, String toSID)
@@ -135,18 +137,20 @@ public class RememberedManager {
 		
 		Cursor cur = db.query("stored", new String[]{"_id,fav"}, "sidFrom=? AND sidTo=?", new String[]{fromSID,toSID}, null, null, null);
 		
-		cur.moveToNext();
-		boolean add = cur.getInt(1) != 1;
-		int id = cur.getInt(0);
-		cur.close();
-		
-		if(add)
+		if(cur.moveToNext())
 		{
-			ContentValues val = new ContentValues();
-			val.put("fav", 1);
-			db.update("stored", val, "_id="+Integer.toString(id),null);
+			boolean add = cur.getInt(1) != 1;
+			int id = cur.getInt(0);
+			cur.close();
+
+			if(add)
+			{
+				ContentValues val = new ContentValues();
+				val.put("fav", 1);
+				db.update("stored", val, "_id="+Integer.toString(id),null);
+			}
+			Toast.makeText(c, add?"Trasę dodano do zapamiętanych":"Trasa już jest na liście zapamiętanych", Toast.LENGTH_SHORT).show();
+			db.close();
 		}
-		Toast.makeText(c, add?"Trasę dodano do zapamiętanych":"Trasa już jest na liście zapamiętanych", Toast.LENGTH_SHORT).show();
-		db.close();
 	}
 }

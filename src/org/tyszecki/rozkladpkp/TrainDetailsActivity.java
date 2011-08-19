@@ -115,8 +115,8 @@ public class TrainDetailsActivity extends Activity {
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				adapter.setData(doc,stId,t.arrstation.id);
 				progressDialog.dismiss();
+				adapter.setData(doc,stId,t.arrstation.id);
 			}
 		});
 	}
