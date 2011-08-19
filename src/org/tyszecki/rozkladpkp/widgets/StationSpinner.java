@@ -157,8 +157,6 @@ public class StationSpinner extends Spinner {
 	            	Node n = list.item(i);
 	            	stations[i][0] = n.getAttributes().getNamedItem("n").getNodeValue();
 	            	stations[i][1] = n.getAttributes().getNamedItem("i").getNodeValue();
-	            	
-	            	Log.i("RozkladPKP", stations[i][1]);
 	            }
 
 	            acHandler.post(showUpdate);
@@ -167,14 +165,11 @@ public class StationSpinner extends Spinner {
 	        } 
 	        catch (IOException e) {
 	        	//throw new Exception("Problem communicating with API", e);
-	        	Log.e("Sitkol",e.toString());
 	        	if(pdialog != null && pdialog.isShowing()) pdialog.dismiss();
 	        } catch (ParserConfigurationException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				if(pdialog != null && pdialog.isShowing()) pdialog.dismiss();
 			} catch (SAXException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				if(pdialog != null && pdialog.isShowing()) pdialog.dismiss();
 			}
