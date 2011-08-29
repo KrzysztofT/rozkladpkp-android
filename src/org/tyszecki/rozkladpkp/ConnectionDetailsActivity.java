@@ -19,8 +19,6 @@ package org.tyszecki.rozkladpkp;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.tyszecki.rozkladpkp.ConnectionDetailsItem.PriceItem;
@@ -32,7 +30,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.DialogInterface.OnCancelListener;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -76,7 +73,6 @@ public class ConnectionDetailsActivity extends Activity {
 			            @Override
 			            public void run() {
 			                try {
-			                	DefaultHttpClient client = new DefaultHttpClient();
 			            		Connection c = pln.connections[conidx];
 			                	
 			                	String params;
@@ -96,21 +92,9 @@ public class ConnectionDetailsActivity extends Activity {
 			                	
 			                	Bundle extras = ConnectionDetailsActivity.this.getIntent().getExtras();
 			                	params += "&REQ0JourneyProduct_prod_list_1="+extras.getString("Products");
-			                	
-			                	//ArrayList<SerializableNameValuePair> data = (ArrayList<SerializableNameValuePair>) extras.getSerializable("Attributes");
-			                	
-			                	//for(SerializableNameValuePair p : data)
-			                	//	params += "&"+p.name+"="+p.value;
-			                	
 			                	params = params.replace(" ","%20");
-			                	Log.i("RozkladPKP", params);
-			            		HttpGet request = new HttpGet("http://2.cennikkolej.appspot.com/?"+params);
-			            		
-			                    HttpResponse response = client.execute(request);
-			                     
-			                    // Pull content stream from response
-			                    HttpEntity entity = response.getEntity();
-			                    InputStream inputStream = entity.getContent();
+
+			                    InputStream inputStream = (new DefaultHttpClient()).execute(new HttpGet("http://2.cennikkolej.appspot.com/?"+params)).getEntity().getContent();
 			                    final ByteArrayOutputStream content = new ByteArrayOutputStream();
 			                    
 			                    int readBytes = 0;

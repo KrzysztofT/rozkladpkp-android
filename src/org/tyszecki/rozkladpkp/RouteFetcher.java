@@ -17,65 +17,164 @@
 package org.tyszecki.rozkladpkp;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
+
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
-import android.util.Log;
+import android.content.Context;
+import android.os.AsyncTask;
 
-public class RouteFetcher {
-	public static Document fetchRoute(String train_number, String station_s, String station_d, String date, String time, String type) throws SAXException, IOException, ParserConfigurationException{
+
+
+public class RouteFetcher extends AsyncTask<RouteFetcher.RouteParams, Void, Document> {
+	private static byte[] sBuffer = new byte[512];
+
+	public static class RouteParams{
+		String departure,arrival;
+		String deptime,arrtime;
+		String type = "dep";
+		String train_number;
+		String date;
+		boolean force_download = false;
+	}
+	
+	private boolean isCached = true;
+	
+	protected boolean isCached()
+	{
+		return isCached;
+	}
+	
+	private static String getCached(String trainNumber)
+	{
+		FileInputStream fis;
+		try {
+			fis = RozkladPKPApplication.getAppContext().openFileInput("route_"+trainNumber);
+		} catch (FileNotFoundException e) {
+			return null;
+		}
 		
-		String data = "start=yes&REQTrain_name="+train_number+"&date="+date+"&time="+time+"&sTI=1&dirInput="+station_d+"&L=vs_java3&input="+station_s+"&boardType="+type;
-    	String url  = "http://rozklad.sitkol.pl/bin/stboard.exe/pn";
-    	
-    	Log.i("RozkladPKP",data);
-    	
-    	DefaultHttpClient client = new DefaultHttpClient();
-		HttpPost request = new HttpPost(url);
-		client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestExpectContinue.class);
-        client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestUserAgent.class);
-        request.addHeader("Content-Type", "text/plain");
-        
-        //Log.i("RozkladPKP",data);
-        
-		request.setEntity(new StringEntity(data));
+		ByteArrayOutputStream content = new ByteArrayOutputStream();
+	        
+	    int readBytes = 0;
+	    try {
+			while ((readBytes = fis.read(sBuffer)) != -1)
+				content.write(sBuffer, 0, readBytes);
+		} catch (IOException e) {
+			return null;
+		}
 		
-        HttpResponse response = client.execute(request);
-         
-        // Pull content stream from response
-        HttpEntity entity = response.getEntity();
-        InputStream inputStream = entity.getContent();
-        ByteArrayOutputStream content = new ByteArrayOutputStream();
+		return content.toString();
+	}
+	
+	/*private static void removeCached(String trainNumber)
+	{
+		RozkladPKPApplication.getAppContext().deleteFile("route_"+trainNumber);
+	}*/
+	
+	private static void saveInCache(String trainNumber, String xml)
+	{
+		try {
+			FileOutputStream fos = RozkladPKPApplication.getAppContext().openFileOutput("route_"+trainNumber, Context.MODE_PRIVATE);
+			fos.write(xml.getBytes());
+			fos.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private static boolean checkTable(String xml, String station, String time)
+	{
+		if(time == null || station == null)
+			return true; //Pozwala na zapisywanie stacji z "rozkładów jazdy", gdzie znany jest tylko odjazd.
+		
+		int poss = xml.indexOf(station);
+		int post = xml.indexOf(time);
+		
+		if(poss != -1 && post != -1)
+		{
+			int posa = xml.lastIndexOf('<',poss);
+			int posb = xml.lastIndexOf('<',post);
+			
+			if(posa == posb)
+				return true;
+		}
+		return false;
+	}
+	
+	@Override
+	protected Document doInBackground(RouteParams... params) {
+		
+		if(params.length == 0)
+			return null;
+		
+		RouteParams par = params[0];
+		
+		String cached = null, xmlstring = null;
+		
+		if(!par.force_download)
+			cached = getCached(par.train_number);
+		
+		if(cached != null && checkTable(cached, par.departure, par.deptime) && checkTable(cached, par.arrival, par.arrtime))
+			xmlstring = cached;
+		else
+		{
+			if(!CommonUtils.onlineCheckSilent())
+				return null;
+			
+			isCached = false;
+			publishProgress();
 
-        byte[] sBuffer = new byte[512];
-        // Read response into a buffered stream
-        int readBytes = 0;
-        while ((readBytes = inputStream.read(sBuffer)) != -1) {
-            content.write(sBuffer, 0, readBytes);
-        }
+			String data = "start=yes&REQTrain_name="+par.train_number+"&date="+par.date+"&time="+par.deptime+"&sTI=1&dirInput="+par.arrival+"&L=vs_java3&input="+par.departure+"&boardType="+par.type;
+			String url  = "http://rozklad.sitkol.pl/bin/stboard.exe/pn";
 
-        // Return result from buffered stream
-        String xmlstring = new String(content.toByteArray());
-        xmlstring	= xmlstring.replace("< ", "<");
-        Log.i("RozkladPKP",xmlstring);
-    	DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-    	DocumentBuilder db = factory.newDocumentBuilder();
-    	InputSource inStream = new InputSource();
-    	inStream.setCharacterStream(new StringReader("<a>"+xmlstring+"</a>"));
-    	return db.parse(inStream);
+			try{
+				DefaultHttpClient client = new DefaultHttpClient();
+				HttpPost request = new HttpPost(url);
+				client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestExpectContinue.class);
+				client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestUserAgent.class);
+				request.addHeader("Content-Type", "text/plain");
+				request.setEntity(new StringEntity(data));
+
+
+				InputStream inputStream = client.execute(request).getEntity().getContent();
+				ByteArrayOutputStream content = new ByteArrayOutputStream();
+
+				int readBytes = 0;
+				while ((readBytes = inputStream.read(sBuffer)) != -1) {
+					content.write(sBuffer, 0, readBytes);
+				}
+
+				xmlstring = new String(content.toByteArray());
+				xmlstring	= xmlstring.replace("< ", "<");
+
+				saveInCache(par.train_number, xmlstring);
+			}
+			catch (Exception e) {
+				return null;
+			}
+		}
+		try{
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder db = factory.newDocumentBuilder();
+			InputSource inStream = new InputSource();
+			inStream.setCharacterStream(new StringReader("<a>"+xmlstring+"</a>"));
+			return db.parse(inStream);
+		}catch (Exception e) {
+			return null;
+		}
 	}
 }

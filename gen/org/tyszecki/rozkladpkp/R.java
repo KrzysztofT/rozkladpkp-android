@@ -120,6 +120,7 @@ public final class R {
         public static final int timetable_row=0x7f030012;
         public static final int train_details=0x7f030013;
         public static final int train_details_header=0x7f030014;
+        public static final int warning_item=0x7f030015;
     }
     public static final class menu {
         public static final int connection_list=0x7f070000;

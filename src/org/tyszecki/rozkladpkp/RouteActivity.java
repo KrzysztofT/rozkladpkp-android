@@ -16,77 +16,125 @@
  ******************************************************************************/
 package org.tyszecki.rozkladpkp;
 
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.apache.http.client.ClientProtocolException;
+import org.tyszecki.rozkladpkp.RouteFetcher.RouteParams;
 import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.DialogInterface.OnCancelListener;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.AdapterView.OnItemClickListener;
 
 public class RouteActivity extends Activity {
 	
-	private ProgressDialog progressDialog = null; 
 	private RouteItemAdapter adapter;
-	private Runnable viewTable;
 	
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.route);
         
-        viewTable = new Runnable(){
-            @Override
-            public void run() {
-                try {
-                	getTable();
-				} catch (Exception e) {
-					e.printStackTrace();
-				} 
-            }
-        };
+        final Bundle extras = getIntent().getExtras();
         
-        adapter = new RouteItemAdapter(this);
-        ((ListView)findViewById(R.id.route)).setAdapter(this.adapter);
         
-        final Thread th = new Thread(null, viewTable);
-        th.start();
+		adapter = new RouteItemAdapter(this);
+        ListView lv = ((ListView)findViewById(R.id.route));
+        lv.setAdapter(this.adapter);
         
-        progressDialog = ProgressDialog.show(RouteActivity.this,    
-              "Czekaj...", "Pobieranie rozkładu...", true, true, new OnCancelListener() {
-				
-				@Override
-				public void onCancel(DialogInterface dialog) {
-					th.interrupt();
-					progressDialog.dismiss();
-					RouteActivity.this.finish();
-				}
-			});
-	}
+        
+        getRoute(extras,false);
+        
+        
+        lv.setOnItemClickListener(new OnItemClickListener() {
 
-	protected void getTable() throws ClientProtocolException, IOException, ParserConfigurationException, SAXException {
-		
-		Bundle extras = getIntent().getExtras();
-		final String sID = extras.getString("startID");
-		final String dID = extras.getString("destID");
-		
-    	final Document doc = RouteFetcher.fetchRoute(extras.getString("number"), sID, dID,
-    			extras.getString("date"), extras.getString("time"), extras.getString("Type"));
-    	
-		runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				adapter.setData(doc,Integer.parseInt(sID),Integer.parseInt(dID));
-				progressDialog.dismiss();
+			public void onItemClick(AdapterView<?> arg0, View v, int pos, long id) {
+				RouteItem it = adapter.getItem(pos);
+
+				if(it == null && pos == 0)
+					getRoute(extras, true);
+				else
+				{
+					if(it.station == null)
+						return;
+
+					Intent ni = new Intent(arg0.getContext(), TimetableFormActivity.class);
+					ni.putExtra("Station", it.station);
+
+					String time = null;
+					while(pos >= 0)
+					{
+						if(it.arr != null && it.arr != null)
+						{
+							time = it.arr;
+							break;
+						}
+						if(it.dep != null && it.dep != null)
+						{
+							time = it.dep;
+							break;
+						}
+						--pos;
+						it = adapter.getItem(pos);
+					}
+					if(time != null)
+						ni.putExtra("Time", time);
+
+					startActivity(ni);
+				}
 			}
 		});
 	}
+
+	private void getRoute(Bundle extras, boolean download) {
+		
+		RouteParams params = new RouteParams();
+        params.date = extras.getString("date");
+        params.deptime = extras.getString("time");
+        params.departure = extras.getString("startID");
+        params.arrival = extras.getString("destID");
+        params.train_number = extras.getString("number");
+        params.type = extras.getString("Type");
+        params.force_download = download;
+        
+        (new RouteTask()).execute(params);
+	}
 	
-	
+	private class RouteTask extends RouteFetcher{
+		ProgressDialog progress = null;
+		
+		
+		@Override
+		protected void onProgressUpdate(Void... values) {
+			super.onProgressUpdate(values);
+			
+			progress = ProgressDialog.show(RouteActivity.this,    
+					"Czekaj...", "Pobieranie trasy...", true, true, new OnCancelListener() {
+						@Override
+						public void onCancel(DialogInterface dialog) {
+							cancel(true);
+							if(progress != null)
+								progress.dismiss();
+							RouteActivity.this.finish();
+						}
+					});
+		}
+		
+		@Override
+		protected void onPostExecute(Document result) {
+			super.onPostExecute(result);
+			if(progress != null)
+				progress.dismiss();
+			if(result != null)
+			{
+				Bundle extras = RouteActivity.this.getIntent().getExtras();
+				adapter.setData(result,Integer.parseInt(extras.getString("startID")),Integer.parseInt(extras.getString("destID")),isCached());
+			}
+			else
+				CommonUtils.onlineCheck("Nie można pobrać trasy, brak połączenia internetowego.");
+		}
+	}
 }

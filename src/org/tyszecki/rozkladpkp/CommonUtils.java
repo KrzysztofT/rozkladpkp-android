@@ -56,14 +56,25 @@ public class CommonUtils {
 	
 	public static boolean onlineCheck(String msgError)
 	{
+		return onlineCheck(msgError,false);
+	}
+	
+	public static boolean onlineCheck(String msgError, boolean silent)
+	{
 		ConnectivityManager cm = (ConnectivityManager)  RozkladPKPApplication.getAppContext().getSystemService(Context.CONNECTIVITY_SERVICE);
 	    NetworkInfo netInfo = cm.getActiveNetworkInfo();
 	    if (netInfo != null && netInfo.isConnectedOrConnecting()) {
 	        return true;
 	    }
 
-	    Toast.makeText(RozkladPKPApplication.getAppContext(), msgError, Toast.LENGTH_SHORT).show();
+	    if(!silent)
+	    	Toast.makeText(RozkladPKPApplication.getAppContext(), msgError, Toast.LENGTH_SHORT).show();
 	    return false;
+	}
+	
+	public static boolean onlineCheckSilent()
+	{
+		return onlineCheck(null, true);
 	}
 	
 	/*
