@@ -87,7 +87,7 @@ public class TrainDetailsActivity extends Activity {
         adapter = new RouteItemAdapter(this);
         ((ListView)findViewById(R.id.route)).setAdapter(this.adapter);
         
-        if(CommonUtils.onlineCheck(this, "Nie można pobrać trasy, brak połączenia internetowego."))
+        if(CommonUtils.onlineCheck("Nie można pobrać trasy, brak połączenia internetowego."))
         {
 	        final Thread th = new Thread(null, viewTable);
 	        th.start();

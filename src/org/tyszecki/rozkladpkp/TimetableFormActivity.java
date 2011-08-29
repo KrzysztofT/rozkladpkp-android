@@ -207,7 +207,7 @@ public class TimetableFormActivity extends Activity {
 					}
 					
 					//Wprowadzono coś, dalsze akcje wymagają połączenia internetowego
-					if(!CommonUtils.onlineCheck(getBaseContext()))
+					if(!CommonUtils.onlineCheck())
 						return;
 					String sid = autoComplete.getCurrentSID();
 					
@@ -252,27 +252,7 @@ public class TimetableFormActivity extends Activity {
 	        ((ImageButton)findViewById(R.id.location_button)).setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					CommonUtils.currentLocality(TimetableFormActivity.this, new CommonUtils.LocationResult() {
-						@Override
-						public void gotLocality(final String s) {
-								runOnUiThread(new Runnable() {
-									@Override
-									public void run() {
-										if(s == null)
-											Toast.makeText(getApplicationContext(), res.getText(R.string.toastLocationError), Toast.LENGTH_SHORT).show();
-										else
-										{
-											StationEdit ed = (StationEdit) findViewById(R.id.station_edit);
-											ed.setText(s);
-											final Editable etext = ed.getText();
-											final int position = etext.length();
-											Selection.setSelection(etext, position);
-										}
-									}
-								});
-							}
-						}
-					);					
+					(new GetLocality()).execute();			
 				}
 			});
         }
@@ -280,26 +260,12 @@ public class TimetableFormActivity extends Activity {
 	
 	
 	public boolean onCreateOptionsMenu(Menu menu){
-		
-		//if(clarifyingForm())
-		//	return false;
-		
-		//StationEdit autoComplete = (StationEdit)  findViewById(R.id.station_edit);
 		getMenuInflater().inflate(R.menu.timetable_form, menu);
-		//menu.getItem(0).setTitle(res.getString((autoComplete.autoComplete() ? R.string.menuDisableAC : R.string.menuEnableAC)));
 		return true;
 	}
 	
 	public boolean onOptionsItemSelected (MenuItem item){
 		switch(item.getItemId()){
-		/*case R.id.item01:
-			StationEdit ed = (StationEdit)  findViewById(R.id.station_edit);
-			boolean ac = ed.autoComplete();
-			ed.setAutoComplete(!ac);
-			SharedPreferences.Editor e = pref.edit();
-			e.putBoolean("EnableStationAC", !ac);
-			e.commit();
-			return true;*/
 		case R.id.item_settings:
 			Intent ni = new Intent(getBaseContext(),PreferencesActivity.class);
 			startActivity(ni);
@@ -319,5 +285,32 @@ public class TimetableFormActivity extends Activity {
 	    	return prodb.getDialog();
 	    }
 	    return null;
+	}
+	
+	private class GetLocality extends CommonUtils.GetLocalityTask{
+		ProgressDialog p;
+		
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			p = ProgressDialog.show(TimetableFormActivity.this, res.getString(R.string.progressTitle), res.getString(R.string.progressBodyLocation));
+		}
+		
+		@Override
+		protected void onPostExecute(String result) {
+			super.onPostExecute(result);
+			p.dismiss();
+
+			if(result == null)
+				Toast.makeText(getApplicationContext(), res.getText(R.string.toastLocationError), Toast.LENGTH_SHORT).show();
+			else
+			{
+				StationEdit ed = (StationEdit) findViewById(R.id.station_edit);
+				ed.setText(result);
+				final Editable etext = ed.getText();
+				final int position = etext.length();
+				Selection.setSelection(etext, position);
+			}
+		}
 	}
 }

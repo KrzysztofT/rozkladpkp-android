@@ -357,7 +357,7 @@ public class ConnectionListItemAdapter extends BaseAdapter {
 				++c;
 		}
 		
-		return c;
+		return -1;
 	}
 
 	@Override

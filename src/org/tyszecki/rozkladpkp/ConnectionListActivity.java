@@ -16,10 +16,6 @@
  ******************************************************************************/
 package org.tyszecki.rozkladpkp;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import org.tyszecki.rozkladpkp.ConnectionList.ConnectionListCallback;
@@ -33,7 +29,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.DialogInterface.OnCancelListener;
 import android.os.Bundle;
-import android.os.Environment;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -109,12 +104,18 @@ public class ConnectionListActivity extends Activity {
 					return;
 
 				if(b instanceof TripItem){
+					int cix = adapter.getTripId((TripItem)b);
+
+					//Błąd - nic nie robimy
+					if(cix == -1 || cix >= clist.getPLN().conCnt)
+						return;
+					
 					Intent ni = new Intent(arg0.getContext(),ConnectionDetailsActivity.class);
 
 					ni.putExtra("seqnr", clist.getSeqNr());
 					ni.putExtra("PLNData", clist.getPLN().data);
 					ni.putExtra("ConnectionIndex",((TripItem)b).t.conidx);
-					ni.putExtra("ConnectionId", adapter.getTripId((TripItem)b));
+					ni.putExtra("ConnectionId", cix);
 					ni.putExtra("StartDate",((TripItem)b).t.date);
 					ni.putExtra("Attributes", extras.getSerializable("Attributes"));
 					ni.putExtra("Products", extras.getString("Products"));
@@ -273,7 +274,7 @@ public class ConnectionListActivity extends Activity {
 	
 	protected void getConnections(){
 		
-		if(!CommonUtils.onlineCheck(getBaseContext()))
+		if(!CommonUtils.onlineCheck())
 			return;
 		
 		showLoader();

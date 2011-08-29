@@ -18,17 +18,13 @@ package org.tyszecki.rozkladpkp;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.tyszecki.rozkladpkp.ConnectionDetailsItem.PriceItem;
 import org.tyszecki.rozkladpkp.PLN.Connection;
-import org.tyszecki.rozkladpkp.PLN.ConnectionChange;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -37,12 +33,9 @@ import android.content.Intent;
 import android.content.DialogInterface.OnCancelListener;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 
 public class ConnectionDetailsActivity extends Activity {
@@ -75,6 +68,9 @@ public class ConnectionDetailsActivity extends Activity {
 				
 				if(adapter.getItem(pos) instanceof PriceItem)
 				{
+					if(!CommonUtils.onlineCheck())
+						return;
+					
 					showPriceProgress();
 					priceThread = new Thread(new Runnable(){
 			            @Override

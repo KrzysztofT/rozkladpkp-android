@@ -30,17 +30,13 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnKeyListener;
 import android.content.res.Resources;
-import android.opengl.Visibility;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.Selection;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -72,14 +68,7 @@ public class ConnectionsFormActivity extends Activity {
 			return e.getString(key);
 		return null;
 	}
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-	    if (keyCode == KeyEvent.KEYCODE_SEARCH) {
-	        return true;
-	    } else {
-	        return false;
-	    }
-	}
+	
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
@@ -284,7 +273,7 @@ public class ConnectionsFormActivity extends Activity {
 					}
 					
 					//Do dalszych operacji potrzebny internet
-					if(!CommonUtils.onlineCheck(getBaseContext()))
+					if(!CommonUtils.onlineCheck())
 						return;
 					
 					
@@ -378,27 +367,7 @@ public class ConnectionsFormActivity extends Activity {
 	        ((ImageButton) findViewById(R.id.location_button)).setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					CommonUtils.currentLocality(ConnectionsFormActivity.this, new CommonUtils.LocationResult() {
-						@Override
-						public void gotLocality(final String s) {
-								runOnUiThread(new Runnable() {
-									@Override
-									public void run() {
-										if(s == null)
-											Toast.makeText(getApplicationContext(), res.getText(R.string.toastLocationError), Toast.LENGTH_SHORT).show();
-										else
-										{
-											StationEdit ed = (StationEdit) findViewById(R.id.departure_edit);
-											ed.setText(s);
-											final Editable etext = ed.getText();
-											final int position = etext.length();
-											Selection.setSelection(etext, position);
-										}
-									}
-								});
-							}
-						}
-					);		
+					(new GetLocality()).execute();
 				}
 			});
         }
@@ -446,5 +415,32 @@ public class ConnectionsFormActivity extends Activity {
 	    	return attrb.getDialog();
 	    }
 	    return null;
+	}
+	
+	private class GetLocality extends CommonUtils.GetLocalityTask{
+		ProgressDialog p;
+		
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			p = ProgressDialog.show(ConnectionsFormActivity.this, res.getString(R.string.progressTitle), res.getString(R.string.progressBodyLocation));
+		}
+		
+		@Override
+		protected void onPostExecute(String result) {
+			super.onPostExecute(result);
+			p.dismiss();
+
+			if(result == null)
+				Toast.makeText(getApplicationContext(), res.getText(R.string.toastLocationError), Toast.LENGTH_SHORT).show();
+			else
+			{
+				StationEdit ed = (StationEdit) findViewById(R.id.departure_edit);
+				ed.setText(result);
+				final Editable etext = ed.getText();
+				final int position = etext.length();
+				Selection.setSelection(etext, position);
+			}
+		}
 	}
 }

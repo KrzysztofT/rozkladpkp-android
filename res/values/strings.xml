@@ -24,7 +24,7 @@
 	<string name="toastLocationError">Nie można wskazać Twojej lokalizacji. Sprawdź czy masz zaznaczoną opcję \"Lokalizacja/Skorzystaj z sieci bezprzewodowych" z ustawień systemowych i ponów próbę.</string>
 	
 	<string name="toastSameStationsError">Stacja początkowa i docelowa muszą być różne.</string>
-	<string name="toastArrivalEmpty">Wprowadź nazwę stacji decelowej.</string>
+	<string name="toastArrivalEmpty">Wprowadź nazwę stacji docelowej.</string>
 	<string name="toastDepartureEmpty">Wprowadź nazwę stacji początkowej.</string>
 	<string name="toastViaEmpty">Wprowadź nazwę stacji przesiadkowej.</string>
 	<string name="toastStationEmpty">Wprowadź nazwę stacji.</string>

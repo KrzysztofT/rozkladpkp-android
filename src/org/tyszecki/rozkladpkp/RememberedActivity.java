@@ -61,7 +61,7 @@ public class RememberedActivity extends Activity {
 				{
 					TimetableItem t = (TimetableItem)b;
 					
-					if(!CommonUtils.onlineCheck(RememberedActivity.this))
+					if(!CommonUtils.onlineCheck())
 						return;
 					
 					ni = new Intent(arg0.getContext(), showForm ? TimetableFormActivity.class : TimetableActivity.class);
@@ -78,7 +78,7 @@ public class RememberedActivity extends Activity {
 					
 					boolean showSaved = (t.cacheValid != null && t.cacheValid.length() > 0);
 					
-					if(!showSaved && !CommonUtils.onlineCheck(RememberedActivity.this))
+					if(!showSaved && !CommonUtils.onlineCheck())
 						return;
 						
 					ni = new Intent(arg0.getContext(),(showForm && !showSaved) ? ConnectionsFormActivity.class : ConnectionListActivity.class);

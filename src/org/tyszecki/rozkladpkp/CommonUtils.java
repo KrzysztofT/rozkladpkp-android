@@ -17,7 +17,6 @@
 package org.tyszecki.rozkladpkp;
 
 import java.io.IOException;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,10 +30,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.res.Resources;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Address;
@@ -43,29 +40,29 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.view.KeyEvent;
 import android.widget.Toast;
-import android.content.DialogInterface;
 
 public class CommonUtils {
 	
 	/*
 	 * Sprawdza czy aplikacja ma dostęp do internetu, pokazuje Toast z błędem, jeśli nie ma.
 	 */
-	public static boolean onlineCheck(Context c)
+	public static boolean onlineCheck()
 	{
-		return onlineCheck(c, "Nie można wykonać tej operacji - brak połączenia internetowego.");
+		return onlineCheck("Nie można wykonać tej operacji - brak połączenia internetowego.");
 	}
 	
-	public static boolean onlineCheck(Context c, String msgError)
+	public static boolean onlineCheck(String msgError)
 	{
-		ConnectivityManager cm = (ConnectivityManager)  c.getSystemService(Context.CONNECTIVITY_SERVICE);
+		ConnectivityManager cm = (ConnectivityManager)  RozkladPKPApplication.getAppContext().getSystemService(Context.CONNECTIVITY_SERVICE);
 	    NetworkInfo netInfo = cm.getActiveNetworkInfo();
 	    if (netInfo != null && netInfo.isConnectedOrConnecting()) {
 	        return true;
 	    }
 
-	    Toast.makeText(c.getApplicationContext(), msgError, Toast.LENGTH_SHORT).show();
+	    Toast.makeText(RozkladPKPApplication.getAppContext(), msgError, Toast.LENGTH_SHORT).show();
 	    return false;
 	}
 	
@@ -132,43 +129,25 @@ public class CommonUtils {
 	}
 	
 	/*
-	 * Zwraca miejscowość, na podstawie pamiętanej przez urządzenie lokalizacji,
-	 * podczas operacji, pokazuje wiadomość o postępie.
-	 * Przekazywanie aktywności może nie jest najelegantsze, ale w obecnym wypadku,
-	 * jest to sensowne rozwiązanie.
+	 * Zwraca miejscowość, na podstawie pamiętanej przez urządzenie lokalizacji, 
+	 * do przeciążenia.
 	 */
-	public static void currentLocality(final Activity cx, final LocationResult callback)
+	public static class GetLocalityTask extends AsyncTask<Void, Void, String>
 	{
-		Resources res = cx.getResources();
-		final ProgressDialog p = ProgressDialog.show(cx, res.getString(R.string.progressTitle), res.getString(R.string.progressBodyLocation));
-		new Thread( new Runnable() {
+		@Override
+		protected String doInBackground(Void... params) {
+			LocationManager lm = (LocationManager) RozkladPKPApplication.getAppContext().getSystemService(Context.LOCATION_SERVICE);
+			Location l = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+			Geocoder c = new Geocoder(RozkladPKPApplication.getAppContext());
 			
-			@Override
-			public void run() {
-				LocationManager lm = (LocationManager) cx.getSystemService(Context.LOCATION_SERVICE);
-				Location l = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-				Geocoder c = new Geocoder(cx);
-				try {
-					List<Address> addresses = c.getFromLocation(l.getLatitude(), l.getLongitude(), 1);
-					callback.gotLocality(addresses.get(0).getLocality());
-				} catch (Exception e) {
-					callback.gotLocality(null);
-				} 
-				//TODO: Czy to wywołanie może w ogóle zawieść? 
-				cx.runOnUiThread(new Runnable() {
-					
-					@Override
-					public void run() {
-							p.dismiss();//TODO: Crash report na to był.
-					}
-				});
-			}
-		}).start();
+			try {
+				List<Address> addresses = c.getFromLocation(l.getLatitude(), l.getLongitude(), 1);
+				return addresses.get(0).getLocality();
+			} catch (Exception e) {
+				return null;
+			} 
+		}
 	}
-	
-	public static abstract class LocationResult{
-        public abstract void gotLocality(String s);
-    }
 	
 	public static abstract class StationIDfromNameProgress{
 		public abstract void downloadStarted();
