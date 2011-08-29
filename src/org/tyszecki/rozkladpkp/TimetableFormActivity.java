@@ -127,6 +127,7 @@ public class TimetableFormActivity extends Activity {
 	        			    	alertDialog.setTitle("Błąd wyszukiwania!");
 	        			    	alertDialog.setMessage("Nie można odnaleźć wskazanej stacji.");
 	        			    	alertDialog.setCancelable(false);
+	        			    	alertDialog.setOnKeyListener(CommonUtils.getOnlyDPadListener());
 	        			    	
 	        			    	alertDialog.setButton("Powrót", new DialogInterface.OnClickListener() {
 	        						public void onClick(DialogInterface arg0, int arg1) {

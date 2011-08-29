@@ -216,6 +216,7 @@ public class TimetableActivity extends Activity {
     	else
     		alertDialog.setMessage("W wybranym terminie nie przyjeżdżają do stacji żadne pociągi.");
     	alertDialog.setCancelable(false);
+    	alertDialog.setOnKeyListener(CommonUtils.getOnlyDPadListener());
     	
     	alertDialog.setButton("Powrót", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface arg0, int arg1) {

@@ -17,6 +17,7 @@
 package org.tyszecki.rozkladpkp;
 
 import java.io.IOException;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +43,9 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.view.KeyEvent;
 import android.widget.Toast;
+import android.content.DialogInterface;
 
 public class CommonUtils {
 	
@@ -257,35 +260,61 @@ public class CommonUtils {
 		
 		return b.toString();
 	}
-	 private final static Map<Character,Character> chmap = new HashMap<Character,Character>(){
-	 		private static final long serialVersionUID = 1L;
-	 		{
-	 			  put('ą','a');
-	 			  put('ć','c');
-	 			  put('ę','e');
-	 			  put('ł','l');
-	 			  put('ń','n');
-	 			  put('ó','o');
-	 			  put('ś','s');
-	 			  put('ż','z');
-	 			  put('ź','z');
-	 		  }
-	 		};
-	 	
-	     private static char strip(char in)
-	     {
-	    	 in = Character.toLowerCase(in);
-	    	 if(chmap.containsKey(in))
-	    		 in = chmap.get(in);
-	    	 return in;
-	     }
-	     
-	     public static String depol(String t)
-	     {
-	    	 String r = "";
-	    	 for(int i = 0; i < t.length(); ++i)
-	    		 r += strip(t.charAt(i));
-	    	 
-	    	 return r;
-	     }
+	
+	/*
+	 * Metoda używana w AlertDialogach, zapobiegająca anulowaniu "nieanulowalnego" okna poprzez wciśniecię przycisku wyszukiwania.
+	 */
+
+	private static DialogInterface.OnKeyListener onlyDPadListener;
+	public static DialogInterface.OnKeyListener getOnlyDPadListener()
+	{
+		if(onlyDPadListener == null)
+			onlyDPadListener =  new DialogInterface.OnKeyListener() {
+				@Override
+				public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+					if (keyCode < KeyEvent.KEYCODE_DPAD_UP || keyCode > KeyEvent.KEYCODE_DPAD_CENTER) {
+						return true;
+					}
+					return false;
+				}
+			};
+
+		return onlyDPadListener;
+	}
+
+
+	private final static Map<Character,Character> chmap = new HashMap<Character,Character>(){
+		private static final long serialVersionUID = 1L;
+		{
+			put('ą','a');
+			put('ć','c');
+			put('ę','e');
+			put('ł','l');
+			put('ń','n');
+			put('ó','o');
+			put('ś','s');
+			put('ż','z');
+			put('ź','z');
+		}
+	};
+
+	private static char strip(char in)
+	{
+		in = Character.toLowerCase(in);
+		if(chmap.containsKey(in))
+			in = chmap.get(in);
+		return in;
+	}
+
+	public static String depol(String t)
+	{
+		String r = "";
+		for(int i = 0; i < t.length(); ++i)
+			r += strip(t.charAt(i));
+
+		return r;
+	}
 }
+
+	
+	

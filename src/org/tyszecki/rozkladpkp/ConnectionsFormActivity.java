@@ -33,12 +33,14 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnKeyListener;
 import android.content.res.Resources;
 import android.opengl.Visibility;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.Selection;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -70,7 +72,14 @@ public class ConnectionsFormActivity extends Activity {
 			return e.getString(key);
 		return null;
 	}
-
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+	    if (keyCode == KeyEvent.KEYCODE_SEARCH) {
+	        return true;
+	    } else {
+	        return false;
+	    }
+	}
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
@@ -196,7 +205,9 @@ public class ConnectionsFormActivity extends Activity {
         					runOnUiThread(new Runnable() {
 								public void run() {
 									AlertDialog alertDialog;
-		        			    	alertDialog = new AlertDialog.Builder(ConnectionsFormActivity.this).create();
+									alertDialog = new AlertDialog.Builder(ConnectionsFormActivity.this).create();
+									alertDialog.setOnKeyListener(CommonUtils.getOnlyDPadListener());
+		        			    	
 		        			    	alertDialog.setTitle("Błąd wyszukiwania!");
 		        			    	alertDialog.setMessage("Nie można odnaleźć wskazanej stacji.");
 		        			    	alertDialog.setCancelable(false);

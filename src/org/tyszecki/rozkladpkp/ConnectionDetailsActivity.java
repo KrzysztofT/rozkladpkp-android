@@ -32,7 +32,9 @@ import org.tyszecki.rozkladpkp.PLN.ConnectionChange;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.DialogInterface.OnCancelListener;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -49,6 +51,8 @@ public class ConnectionDetailsActivity extends Activity {
 	//private String startDate;
 	private int conidx;
 	private static byte[] sBuffer = new byte[512];
+	ProgressDialog priceProgress;
+	Thread priceThread;
 	
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,9 +75,8 @@ public class ConnectionDetailsActivity extends Activity {
 				
 				if(adapter.getItem(pos) instanceof PriceItem)
 				{
-					final ProgressDialog pdial = ProgressDialog.show(ConnectionDetailsActivity.this, "Czekaj...", "Pobieranie informacji o cenie...");
-					
-					new Thread(new Runnable(){
+					showPriceProgress();
+					priceThread = new Thread(new Runnable(){
 			            @Override
 			            public void run() {
 			                try {
@@ -90,7 +93,7 @@ public class ConnectionDetailsActivity extends Activity {
 			                	int j = c.getTrainCount();
 			                	for(int i = 0; i < j; ++i)
 			                	{
-			                		params += c.getTrain(i).number;
+			                		params += c.getTrain(i).number.trim();
 			                		if(i < j-1)
 			                			params += ':';
 			                	}
@@ -124,7 +127,7 @@ public class ConnectionDetailsActivity extends Activity {
 			                    runOnUiThread(new Runnable() {
 									@Override
 									public void run() {		
-										pdial.dismiss();
+										hidePriceProgress();
 										if(spl.length == 1)
 											adapter.setPrice("-1", null, null);
 										else
@@ -136,7 +139,8 @@ public class ConnectionDetailsActivity extends Activity {
 								e.printStackTrace();
 							}
 			            }
-					}).start();
+					});
+					priceThread.start();
 				}
 				else
 				{
@@ -151,5 +155,25 @@ public class ConnectionDetailsActivity extends Activity {
 			}
 		});
         
+	}
+	void showPriceProgress()
+	{
+		priceProgress = ProgressDialog.show(ConnectionDetailsActivity.this, "Czekaj...", "Pobieranie informacji o cenie...",true,true,new OnCancelListener() {
+			
+			@Override
+			public void onCancel(DialogInterface dialog) {
+				if(priceThread != null && priceThread.isAlive())
+				{
+					priceThread.interrupt();
+					dialog.dismiss();
+				}
+			}
+		});
+	}
+	
+	void hidePriceProgress()
+	{
+		if(priceProgress != null)
+			priceProgress.dismiss();
 	}
 }

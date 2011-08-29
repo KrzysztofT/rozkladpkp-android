@@ -248,6 +248,8 @@ public class ConnectionDetailsItemAdapter extends BaseAdapter {
     }  
 	@Override
     public boolean isEnabled(int position) {  
-        return true;//(getItemViewType(position) != PRICE);  
+		if(position == items.size() -1 && km != null)
+			return false;
+        return true;  
     }  
 }

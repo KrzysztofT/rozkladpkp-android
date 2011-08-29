@@ -95,7 +95,7 @@ public class RememberedItemAdapter extends BaseAdapter {
 		items.add(h);
 		
 		//Zwraca nazwy i SIDy ostatnio wyszukiwanych
-		cur = db.rawQuery("SELECT type,sidFrom,sidTo,fromName,toName,_id,cacheValid FROM storedview WHERE fav IS NULL", null);
+		cur = db.rawQuery("SELECT type,sidFrom,sidTo,fromName,toName,_id,cacheValid FROM storedview WHERE fav IS NULL ORDER by _id DESC", null);
 		while(cur.moveToNext())
 		{
 			//2 = trasa, 1 = przyjazdy, 0 = odjazdy

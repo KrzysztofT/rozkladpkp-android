@@ -218,9 +218,13 @@ public class ConnectionListActivity extends Activity {
 	}
 	public void updateDisplayedPLN()
 	{
+		hideLoader();
+		
+		if(clist == null || clist.getPLN() == null)
+			return;
+		
 		if(clist.getSeqNr() == 0 && clist.getPLN().conCnt == 0)
 		{
-			hideLoader();
 			if(inFront)
 				noConnectionsAlert();
 			else
@@ -228,13 +232,11 @@ public class ConnectionListActivity extends Activity {
 		}
 		else if(clist.getSeqNr() > 0 && clist.getPLN().conCnt == 0)
 		{
-			hideLoader();
 			if(inFront)
 				noMoreAlert();
 		}
 		else
 		{
-			hideLoader();
 			adapter.setPLN(clist.getPLN(), !hasFullTable, clist.getPLN().hasDelayInfo());
 
 			//Zapisanie wyników
@@ -257,6 +259,7 @@ public class ConnectionListActivity extends Activity {
     	alertDialog = new AlertDialog.Builder(this).create();
     	alertDialog.setTitle("Brak połączeń!");
     	alertDialog.setMessage("Nie istnieje połączenie między wybranymi stacjami które spełnia obecne kryteria wyszukiwania.");
+    	alertDialog.setOnKeyListener(CommonUtils.getOnlyDPadListener());
     	alertDialog.setCancelable(false);
     	
     	alertDialog.setButton("Powrót", new DialogInterface.OnClickListener() {
@@ -309,7 +312,7 @@ public class ConnectionListActivity extends Activity {
 		Bundle extras = getIntent().getExtras();
 		Intent ni = null;
 		switch(item.getItemId()){
-		case R.id.savepln:
+		/*case R.id.savepln:
 			File f = new File(Environment.getExternalStorageDirectory(),"PLN");
 			FileOutputStream w = null;
 			try {
@@ -322,7 +325,7 @@ public class ConnectionListActivity extends Activity {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			return true;
+			return true;*/
 		case R.id.item_favourite:
 			RememberedManager.addtoHistory(ConnectionListActivity.this, CommonUtils.StationIDfromSID(extras.getString("SID")), CommonUtils.StationIDfromSID(extras.getString("ZID")),"");
 			RememberedManager.saveRoute(ConnectionListActivity.this, CommonUtils.StationIDfromSID(extras.getString("SID")), CommonUtils.StationIDfromSID(extras.getString("ZID")));

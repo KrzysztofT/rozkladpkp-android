@@ -70,12 +70,12 @@ public final class R {
         public static final int duration_icon=0x7f080006;
         public static final int header=0x7f08002b;
         public static final int icon=0x7f080020;
-        public static final int item_continue_journey=0x7f08002f;
-        public static final int item_delete=0x7f080032;
-        public static final int item_favourite=0x7f08002d;
-        public static final int item_return_journey=0x7f08002e;
-        public static final int item_settings=0x7f080030;
-        public static final int item_via=0x7f080031;
+        public static final int item_continue_journey=0x7f08002e;
+        public static final int item_delete=0x7f080031;
+        public static final int item_favourite=0x7f08002c;
+        public static final int item_return_journey=0x7f08002d;
+        public static final int item_settings=0x7f08002f;
+        public static final int item_via=0x7f080030;
         public static final int location_button=0x7f08000d;
         public static final int ok_button=0x7f080014;
         public static final int price=0x7f080002;
@@ -83,7 +83,6 @@ public final class R {
         public static final int remembered_list=0x7f08001c;
         public static final int route=0x7f08001f;
         public static final int saved_icon=0x7f08001e;
-        public static final int savepln=0x7f08002c;
         public static final int scrollitem_text=0x7f080024;
         public static final int station=0x7f080023;
         public static final int station_edit=0x7f080026;

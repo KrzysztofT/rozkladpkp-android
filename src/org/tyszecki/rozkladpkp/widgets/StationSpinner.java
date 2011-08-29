@@ -91,7 +91,6 @@ public class StationSpinner extends Spinner {
 	
 	public String getCurrentSID()
 	{
-		//FIXME: Komuś tutaj scrashowało :)
 		return stations[getSelectedItemPosition()][1];
 	}
 	
