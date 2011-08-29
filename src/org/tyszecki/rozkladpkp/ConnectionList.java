@@ -87,10 +87,11 @@ public class ConnectionList {
 		return ret;
 	}
 	
-	public static ConnectionList fromByteArray(ConnectionListCallback callback, byte[] array, int seqnr)
+	public static ConnectionList fromByteArray(ConnectionListCallback callback, ArrayList<SerializableNameValuePair> commonFields, byte[] array, int seqnr)
 	{
 		ConnectionList ret = new ConnectionList(callback);
 		
+		ret.common = commonFields;
 		ret.seqnr = seqnr;
 		ret.pln = new PLN(array);
 		

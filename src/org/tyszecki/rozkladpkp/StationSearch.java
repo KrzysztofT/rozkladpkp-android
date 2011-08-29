@@ -36,6 +36,10 @@ public class StationSearch {
 	}
 	
 	public InputStream search(String station) throws IllegalStateException, IOException {
+		
+		//Dla tych którzy wpadną na pomysł wpisania cudzysłowów itp. do nazwy stacji
+		station = station.replaceAll("[^a-zA-Z0-9]", "");
+		
 		String url = "http://h2g.sitkol.pl/bin/query.exe/dn";
 		String data = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?><ReqC ver=\"1.1\" prod=\"String\" lang=\"DE\"><MLcReq><MLc n=\""+station+"\" t=\"ST\" /></MLcReq></ReqC>";
         HttpPost request = new HttpPost(url);

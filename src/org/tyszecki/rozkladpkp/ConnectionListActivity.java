@@ -153,7 +153,7 @@ public class ConnectionListActivity extends Activity {
 		}
 		else if(savedInstanceState != null && savedInstanceState.containsKey("PLNData")){
 
-			clist = ConnectionList.fromByteArray(clistCallback, savedInstanceState.getByteArray("PLNData"), savedInstanceState.getInt("SeqNr"));
+			clist = ConnectionList.fromByteArray(clistCallback, commonFieldsList, savedInstanceState.getByteArray("PLNData"), savedInstanceState.getInt("SeqNr"));
 			hasFullTable = savedInstanceState.getBoolean("hasFullTable");
 			timetableUrl = savedInstanceState.getString("timetableURL");
 		}
