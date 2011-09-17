@@ -25,6 +25,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.DialogInterface.OnCancelListener;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -33,6 +34,7 @@ import android.widget.AdapterView.OnItemClickListener;
 public class RouteActivity extends Activity {
 	
 	private RouteItemAdapter adapter;
+	private RouteTask task = null;
 	
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,9 +47,7 @@ public class RouteActivity extends Activity {
         ListView lv = ((ListView)findViewById(R.id.route));
         lv.setAdapter(this.adapter);
         
-        
         getRoute(extras,false);
-        
         
         lv.setOnItemClickListener(new OnItemClickListener() {
 
@@ -100,7 +100,8 @@ public class RouteActivity extends Activity {
         params.type = extras.getString("Type");
         params.force_download = download;
         
-        (new RouteTask()).execute(params);
+        task = new RouteTask();
+        task.execute(params);
 	}
 	
 	private class RouteTask extends RouteFetcher{
@@ -110,6 +111,8 @@ public class RouteActivity extends Activity {
 		@Override
 		protected void onProgressUpdate(Void... values) {
 			super.onProgressUpdate(values);
+			if(isCancelled())
+				return;
 			
 			progress = ProgressDialog.show(RouteActivity.this,    
 					"Czekaj...", "Pobieranie trasy...", true, true, new OnCancelListener() {
@@ -126,6 +129,7 @@ public class RouteActivity extends Activity {
 		@Override
 		protected void onPostExecute(Document result) {
 			super.onPostExecute(result);
+			Log.i("RozkladPKP","Post execute...");
 			if(progress != null)
 				progress.dismiss();
 			if(result != null)
@@ -136,5 +140,12 @@ public class RouteActivity extends Activity {
 			else
 				CommonUtils.onlineCheck("Nie można pobrać trasy, brak połączenia internetowego.");
 		}
+	}
+	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		if(task != null)
+			task.cancel(true);
 	}
 }

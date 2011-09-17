@@ -137,7 +137,6 @@ public class ConnectionList {
 		data.add(new SerializableNameValuePair("androidversion", "1.1.4"));
 		data.add(new SerializableNameValuePair("h2g-direct", "1"));
 	    	
-		int tries = 0;
 		attempts = MAX_ATTEMPTS;
 		download(data);		
 	}

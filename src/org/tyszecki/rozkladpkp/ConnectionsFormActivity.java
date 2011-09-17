@@ -19,6 +19,7 @@ package org.tyszecki.rozkladpkp;
 import java.util.ArrayList;
 
 import org.tyszecki.rozkladpkp.widgets.AttributesButton;
+import org.tyszecki.rozkladpkp.widgets.CarriersButton;
 import org.tyszecki.rozkladpkp.widgets.DateButton;
 import org.tyszecki.rozkladpkp.widgets.ProductsButton;
 import org.tyszecki.rozkladpkp.widgets.StationEdit;
@@ -37,6 +38,7 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.Selection;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -51,6 +53,7 @@ public class ConnectionsFormActivity extends Activity {
 	private DateButton dateb;
 	private ProductsButton prodb;
 	private AttributesButton attrb;
+	private CarriersButton carrb;
 	private SharedPreferences pref;
 	
 	private StationEdit depEdit,arrEdit,viaEdit;
@@ -60,6 +63,7 @@ public class ConnectionsFormActivity extends Activity {
 	private int loading;
 	
 	private ProgressDialog progressDialog;
+	private GetLocality task;
 	
 	private String safeExtras(String key)
 	{
@@ -146,6 +150,21 @@ public class ConnectionsFormActivity extends Activity {
 				
 			}
 		});
+        
+        carrb = (CarriersButton) findViewById(R.id.carriers_button);
+        carrb.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				showDialog(4);
+			}
+		});
+        
+        Bundle extra = getIntent().getExtras();
+        if(extra != null && extra.containsKey("Carriers"))
+        {
+        	carrb.setVisibility(View.VISIBLE);
+        	carrb.setParameters((ArrayList<SerializableNameValuePair>) extra.getSerializable("Carriers"));
+        }
  
         if(!clarify)
         {
@@ -213,7 +232,7 @@ public class ConnectionsFormActivity extends Activity {
         			}
         		}
         	};
-        	Bundle extra = getIntent().getExtras();
+        	
         	
         	depSelect = (StationSpinner) findViewById(R.id.departure_select);
         	arrSelect = (StationSpinner) findViewById(R.id.arrival_select);
@@ -356,6 +375,10 @@ public class ConnectionsFormActivity extends Activity {
 				ni.putExtra("Date", dateb.getDate());
 				ni.putExtra("Products", prodb.getProductString());
 				ni.putExtra("Attributes", attrb.getParameters());
+				
+				if(carrb.isShown())
+					ni.putExtra("Carriers", carrb.getParameters());
+				
 				pref.edit().putString("Products", prodb.getProductString()).putInt("Attributes", attrb.settingsCode()).commit();
 				
 				startActivity(ni);
@@ -367,7 +390,8 @@ public class ConnectionsFormActivity extends Activity {
 	        ((ImageButton) findViewById(R.id.location_button)).setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					(new GetLocality()).execute();
+					task = new GetLocality();
+					task.execute();
 				}
 			});
         }
@@ -388,6 +412,14 @@ public class ConnectionsFormActivity extends Activity {
 		else
 			menu.findItem(R.id.item_via).setTitle(R.string.menuAddVia);
 		
+		if(carrb == null)
+			menu.findItem(R.id.item_carriers).setVisible(false);
+		else if(carrb.isShown())
+			menu.findItem(R.id.item_carriers).setTitle(R.string.menuLessOptions);
+		else
+			menu.findItem(R.id.item_carriers).setTitle(R.string.menuMoreOptions);
+		
+		
 		return super.onPrepareOptionsMenu(menu);
 	}
 	
@@ -399,6 +431,8 @@ public class ConnectionsFormActivity extends Activity {
 			return true;
 		case R.id.item_via:
 			viaEdit.setVisibility(viaEdit.isShown() ? View.GONE : View.VISIBLE);
+		case R.id.item_carriers:
+			carrb.setVisibility(carrb.isShown() ? View.GONE : View.VISIBLE);
 		}
 		return false;
 	}
@@ -413,8 +447,23 @@ public class ConnectionsFormActivity extends Activity {
 	    	return prodb.getDialog();
 	    case 3:
 	    	return attrb.getDialog();
+	    case 4:
+	    	return carrb.getDialog();
 	    }
 	    return null;
+	}
+	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		Log.d("RozkladPKP", "Pause");
+		if(task != null)
+		{
+			Log.e("RozkladPKP","Anulowanie...");
+			task.cancel(true);
+		}
+		else
+			Log.wtf("RozkladPKP","NULL...");
 	}
 	
 	private class GetLocality extends CommonUtils.GetLocalityTask{
@@ -423,12 +472,14 @@ public class ConnectionsFormActivity extends Activity {
 		@Override
 		protected void onPreExecute() {
 			super.onPreExecute();
+			//TODO: Cancel listener
 			p = ProgressDialog.show(ConnectionsFormActivity.this, res.getString(R.string.progressTitle), res.getString(R.string.progressBodyLocation));
 		}
 		
 		@Override
 		protected void onPostExecute(String result) {
 			super.onPostExecute(result);
+			Log.i("RozkladPKP", "Post");
 			p.dismiss();
 
 			if(result == null)

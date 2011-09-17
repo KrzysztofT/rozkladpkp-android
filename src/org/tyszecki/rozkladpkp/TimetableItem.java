@@ -18,13 +18,31 @@ package org.tyszecki.rozkladpkp;
 
 public class TimetableItem {
 	
-	public class DateItem extends TimetableItem {
+	public static class DateItem extends TimetableItem {
 		String date;
 	}
 	
-	public class TrainItem extends TimetableItem {
+	public static class TrainItem extends TimetableItem {
 		public String time,number,station,delay,type;
 		public String date,message="";
 	}
 
+	public static class ScrollItem extends TimetableItem {
+		public static ScrollItem progressItem()
+		{
+			ScrollItem si = new ScrollItem();
+			si.inProgress = true;
+			
+			return si;
+		}
+		public static ScrollItem scrollItem(boolean up)
+		{
+			ScrollItem si = new ScrollItem();
+			si.up = up;
+			
+			return si;
+		}
+		public boolean up, inProgress;
+	}
+	public static class WarningItem extends TimetableItem{}
 }

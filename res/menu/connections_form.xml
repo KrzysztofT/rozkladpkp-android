@@ -17,4 +17,5 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 <item android:id="@+id/item_settings" android:title="Ustawienia"></item>
 <item android:id="@+id/item_via" android:title="@string/menuAddVia"></item>
+<item android:id="@+id/item_carriers"></item>
 </menu>

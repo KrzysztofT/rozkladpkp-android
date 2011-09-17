@@ -64,6 +64,12 @@
         	android:layout_width="fill_parent"
         	android:layout_height="wrap_content"
 			/>
+		<org.tyszecki.rozkladpkp.widgets.CarriersButton
+        	android:id="@+id/carriers_button"
+        	android:layout_width="fill_parent"
+        	android:layout_height="wrap_content"
+        	android:visibility="gone"
+			/>
         <Button
         	android:id="@+id/ok_button"
         	android:layout_width="fill_parent"

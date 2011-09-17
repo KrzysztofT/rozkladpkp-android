@@ -42,6 +42,9 @@
 <string name="menuAddVia">Dodaj przesiadkę</string>
 <string name="menuRemoveVia">Usuń Przesiadkę</string>
 
+<string name="menuMoreOptions">Więcej opcji</string>
+<string name="menuLessOptions">Mniej opcji</string>
+
 <string name="menuEnableAC">Włącz autouzupełnianie</string>
 <string name="menuDisableAC">Wyłącz autouzupełnianie</string>
 <string-array name="settingsTabsList">

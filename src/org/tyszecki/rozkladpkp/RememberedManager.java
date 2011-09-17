@@ -55,7 +55,7 @@ public class RememberedManager {
 	
 	//Przy dodawaniu do hstorii, należy sprawdzić czy już nie ma takiej pozycji.
 	//Jeśli jest, zwiększamy jej ID na największe w tabeli, dzięki czemu powędruje na górę listy
-	public static void addtoHistory(Context c, String stationSID, boolean departure)
+	public static void addtoHistory(Context c, String stationSID, boolean departure, String cValid)
 	{
 		SQLiteDatabase db = DatabaseHelper.getDbRW(c);
 		
@@ -68,13 +68,14 @@ public class RememberedManager {
 		cur.close();
 		
 		if(id != null)
-			db.execSQL("UPDATE stored SET _id=(SELECT _id+1 FROM stored ORDER BY _id DESC LIMIT 1) WHERE _id="+id);
+			db.execSQL("UPDATE stored SET _id=(SELECT _id+1 FROM stored ORDER BY _id DESC LIMIT 1)"+((cValid != null)?", cacheValid='"+cValid+"'":"")+" WHERE _id="+id);
 		
 		else
 		{
 			ContentValues val = new ContentValues();
 			val.put("sidFrom", stationSID);
 			val.put("type", departure?0:1);
+			val.put("cacheValid", cValid);
 			
 			db.insert("stored", null, val);
 			cleanupHistory(db,c);	

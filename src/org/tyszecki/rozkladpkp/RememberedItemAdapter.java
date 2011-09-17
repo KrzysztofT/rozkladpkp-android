@@ -124,7 +124,7 @@ public class RememberedItemAdapter extends BaseAdapter {
 				if(t.name == null)
 					continue;
 				t.id = cur.getInt(5);
-				
+				t.cacheValid = cur.getString(6);
 				items.add(t);
 			}
 			
@@ -177,15 +177,13 @@ public class RememberedItemAdapter extends BaseAdapter {
         	{
         		RouteItem r = (RouteItem)b;
         		text.setText(r.fromName + " → " + r.toName);
+        		
         		boolean showSaved = r.cacheValid != null && r.cacheValid.length() > 0;
         		
         		if(showSaved)
         		{
         			try{
         			itime.parse(r.cacheValid);
-        			
-        			//Log.i("RozkladPKP","ITEM: "+itime.toString());
-        			//Log.i("RozkladPKP","NOW: "+now.toString());
         			
         			if(Time.compare(itime, now) < 0)
         			{
@@ -207,7 +205,32 @@ public class RememberedItemAdapter extends BaseAdapter {
         	{
         		TimetableItem t = (TimetableItem)b;
         		text.setText(((t.type == TimetableType.Departure) ? "Odjazdy z " : "Przyjazdy do ") + t.name);
-        		v.findViewById(R.id.saved_icon).setVisibility(View.INVISIBLE);
+        		
+        		boolean showSaved = t.cacheValid != null && t.cacheValid.length() > 0;
+        		
+        		if(showSaved)
+        		{
+        			try{
+        			itime.parse(t.cacheValid);
+        			
+        			
+        			//Log.i("RozkladPKP","NOW: "+now.toString());
+        			
+        			if(Time.compare(itime, now) < 0)
+        			{
+        				c.deleteFile(CommonUtils.ResultsHash(Integer.toString(t.SID), null, null));
+        				showSaved = false;
+        				t.cacheValid = null;
+        				
+        				SQLiteDatabase db = DatabaseHelper.getDbRW(c);
+        				db.execSQL("UPDATE stored SET cacheValid='' WHERE _id="+Integer.toString(t.id));
+        				db.close();
+        			}
+        			}catch(Exception e)
+        			{}
+        		}
+        		
+        		v.findViewById(R.id.saved_icon).setVisibility(showSaved ? View.VISIBLE : View.INVISIBLE);
         	}
         }
         

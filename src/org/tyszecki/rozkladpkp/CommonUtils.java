@@ -41,6 +41,7 @@ import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.text.format.Time;
 import android.view.KeyEvent;
 import android.widget.Toast;
 
@@ -303,6 +304,26 @@ public class CommonUtils {
 			r += strip(t.charAt(i));
 
 		return r;
+	}
+	
+	public static Time timeFromString(Time ret, String date, String time)
+	{
+		String[] t = date.split("\\."); 
+		if(t.length >= 3)
+		{	
+			ret.monthDay = Integer.parseInt(t[0]);
+			ret.month = Integer.parseInt(t[1])-1;
+			ret.year = Integer.parseInt(t[2]);
+			if(ret.year < 1000)
+				ret.year += 2000;
+		}
+		t = time.split(":"); 
+		if(t.length >= 2)
+		{
+			ret.minute = Integer.parseInt(t[1]);
+			ret.hour = Integer.parseInt(t[0]);
+		}
+		return ret;
 	}
 }
 

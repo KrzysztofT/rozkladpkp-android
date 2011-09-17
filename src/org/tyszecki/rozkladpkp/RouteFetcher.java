@@ -121,6 +121,9 @@ public class RouteFetcher extends AsyncTask<RouteFetcher.RouteParams, Void, Docu
 		if(params.length == 0)
 			return null;
 		
+		
+		
+		
 		RouteParams par = params[0];
 		
 		String cached = null, xmlstring = null;
@@ -137,7 +140,7 @@ public class RouteFetcher extends AsyncTask<RouteFetcher.RouteParams, Void, Docu
 			
 			isCached = false;
 			publishProgress();
-
+			
 			String data = "start=yes&REQTrain_name="+par.train_number+"&date="+par.date+"&time="+par.deptime+"&sTI=1&dirInput="+par.arrival+"&L=vs_java3&input="+par.departure+"&boardType="+par.type;
 			String url  = "http://rozklad.sitkol.pl/bin/stboard.exe/pn";
 

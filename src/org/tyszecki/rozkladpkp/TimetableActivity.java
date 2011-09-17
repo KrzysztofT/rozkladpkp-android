@@ -16,34 +16,19 @@
  ******************************************************************************/
 package org.tyszecki.rozkladpkp;
 
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.util.ArrayList;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.tyszecki.rozkladpkp.CommonUtils.StationIDfromNameProgress;
-import org.tyszecki.rozkladpkp.TimetableItem.DateItem;
+import org.tyszecki.rozkladpkp.TimetableItem.ScrollItem;
 import org.tyszecki.rozkladpkp.TimetableItem.TrainItem;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
+import org.tyszecki.rozkladpkp.TimetableItem.WarningItem;
 import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.DialogInterface.OnCancelListener;
 import android.os.Bundle;
+import android.text.format.Time;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -53,12 +38,9 @@ import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 
 public class TimetableActivity extends Activity {
-	
-	
-	private ArrayList<TimetableItem> m_items = null;
+
 	private TimetableItemAdapter m_adapter;
-	private Runnable viewBoard;
-	private static byte[] sBuffer = new byte[512];
+
 	private String SID;
 	private boolean dep, inFront = true, showNDDialog = false;
 	NodeList destList = null;
@@ -66,47 +48,37 @@ public class TimetableActivity extends Activity {
 	String startID = null,destID = null, xmlstring;
 	
 	TrainItem titem;
-	Thread loadingThread;
-	private ProgressDialog m_ProgressDialog;
 	
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.timetable);
+        Bundle extras = getIntent().getExtras();
         
-        SID = getIntent().getExtras().getString("SID");
+        SID = extras.getString("SID");
+        dep = extras.getString("Type").equals("dep");
         
-        //Log.i("RozkladPKP",SID);
-        dep = getIntent().getExtras().getString("Type").equals("dep");
+        String stationID =  CommonUtils.StationIDfromSID(SID);
         
-        RememberedManager.addtoHistory(this, CommonUtils.StationIDfromSID(SID), dep);
+        RememberedManager.addtoHistory(this, stationID, dep, null);
         
-        setTitle((dep?"Odjazdy z ":"Przyjazdy do ")+getIntent().getExtras().getString("Station"));
+        setTitle((dep?"Odjazdy z ":"Przyjazdy do ")+extras.getString("Station"));
         
-        m_items = new ArrayList<TimetableItem>();
-        
-        m_adapter = new TimetableItemAdapter(this, m_items);
-        m_adapter.setType(dep);
+     
+        if(extras.containsKey("Filename"))
+        	m_adapter = new TimetableItemAdapter(stationID, extras.getString("Products"), 
+            		CommonUtils.timeFromString(new Time(), extras.getString("Date"), extras.getString("Time")), !dep, this, extras.getString("Filename"));
+        	
+        else
+        {
+	        m_adapter = new TimetableItemAdapter(stationID, extras.getString("Products"), 
+	        		CommonUtils.timeFromString(new Time(), extras.getString("Date"), extras.getString("Time")), !dep, this);
+	        m_adapter.fetch();
+        }
+        		
         
         ListView lv = (ListView)findViewById(R.id.timetable);
         lv.setAdapter(this.m_adapter);
         
-        viewBoard = new Runnable(){
-            @Override
-            public void run() {
-                getBoard();
-            }
-        };
-        
-        loadingThread =  new Thread(null, viewBoard, "MagentoBackground");
-        loadingThread.start();
-        m_ProgressDialog = ProgressDialog.show(TimetableActivity.this,    
-              "Czekaj...", "Pobieranie rozkładu...", true, true, new OnCancelListener() {
-				@Override
-				public void onCancel(DialogInterface dialog) {
-					loadingThread.interrupt();
-					TimetableActivity.this.finish();
-				}
-			});
         
         //Włączanie informacji o pociągu - potrzebnego do tego są identyfikatory stacji.
         //Ponieważ nie rozpracowałem jeszcze formatu PLN, używana jest wyszukiwarka.
@@ -115,96 +87,72 @@ public class TimetableActivity extends Activity {
 			public void onItemClick(final AdapterView<?> arg0, View arg1, int pos,
 					long id) {
 				
-				item = m_items.get(pos);
+				item = m_adapter.getItem(pos);
 				if(item instanceof TimetableItem.DateItem)
 					return;
 				
-				titem = (TrainItem)item;
+				else if(item instanceof ScrollItem)
+					m_adapter.fetchMore(!((ScrollItem)item).up);
 				
-				startID = CommonUtils.StationIDfromSID(SID);
-				try {
-					CommonUtils.StationIDfromName(titem.station, new StationIDfromNameProgress() {
-						
-						ProgressDialog dialog = null;
-						
-						@Override
-						public void finished(final String ID) {
+				else if(item instanceof WarningItem)
+				{
+					Intent ni = new Intent(TimetableActivity.this, TimetableFormActivity.class);
+					ni.putExtra("Station",getIntent().getExtras().getString("Station"));
+					startActivity(ni);
+				}
+				
+				else
+				{
+					titem = (TrainItem)item;
+					
+					startID = CommonUtils.StationIDfromSID(SID);
+					try {
+						CommonUtils.StationIDfromName(titem.station, new StationIDfromNameProgress() {
 							
-							runOnUiThread(new Runnable(){
-								@Override
-								public void run() {
-									if(dialog != null)
-										dialog.dismiss();
-									if(ID != null)
-									{
-										Intent ni = new Intent(arg0.getContext(),RouteActivity.class);
-										ni.putExtra("startID",startID);
-										ni.putExtra("destID",ID);
-										ni.putExtra("number",titem.number);
-										ni.putExtra("date", titem.date);
-										ni.putExtra("time", titem.time);
-										ni.putExtra("Type", dep?"dep":"arr");
-										
-										startActivity(ni);
+							ProgressDialog dialog = null;
+							
+							@Override
+							public void finished(final String ID) {
+								
+								runOnUiThread(new Runnable(){
+									@Override
+									public void run() {
+										if(dialog != null)
+											dialog.dismiss();
+										if(ID != null)
+										{
+											Intent ni = new Intent(arg0.getContext(),RouteActivity.class);
+											ni.putExtra("startID",startID);
+											ni.putExtra("destID",ID);
+											ni.putExtra("number",titem.number);
+											ni.putExtra("date", titem.date);
+											ni.putExtra("time", titem.time);
+											ni.putExtra("Type", dep?"dep":"arr");
+											
+											startActivity(ni);
+										}
+										else
+										{
+											//Blad
+											Log.e("RozkladPKP","Nie mozna pobrac identyfikatora stacji");
+										}
 									}
-									else
-									{
-										//Blad
-										Log.e("RozkladPKP","Nie mozna pobrac identyfikatora stacji");
-									}
-								}
-							});
-						}
-						
-						@Override
-						public void downloadStarted() {
-							dialog = ProgressDialog.show(TimetableActivity.this,"Czekaj...", "Wyszukiwanie stacji...", true);
-						}
-					});
-				} catch (Exception e) {}
+								});
+							}
+							
+							@Override
+							public void downloadStarted() {
+								dialog = ProgressDialog.show(TimetableActivity.this,"Czekaj...", "Wyszukiwanie stacji...", true);
+							}
+						});
+					} catch (Exception e) {}
+				}
 			}
 		});
 	}
 	
 	
-	private void getBoard(){
-		try{
-			DefaultHttpClient client = new DefaultHttpClient();
-
-			String s = SID.replaceAll("=", "%3D");
-			s = s.replaceAll(" ", "%20");
-			String time = getIntent().getExtras().getString("Time");
-			String date = getIntent().getExtras().getString("Date");
-			String prod = getIntent().getExtras().getString("Products");
-			String type = dep?"dep":"arr";		
-
-			String data = "L=vs_java3&productsFilter="+prod+"&inputTripelId="+s+"@&maxJourneys=50&boardType="+type+"&time="+time+"&date="+date+"&start=yes";
-			String url  = "http://rozklad.sitkol.pl/bin/stboard.exe/pn" ;
-
-			HttpPost request = new HttpPost(url);
-			client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestExpectContinue.class);
-			client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestUserAgent.class);
-			request.addHeader("Content-Type", "text/plain");
-			request.setEntity(new StringEntity(data));
-
-			HttpResponse response = client.execute(request);
-			HttpEntity entity = response.getEntity();
-			InputStream inputStream = entity.getContent();
-			ByteArrayOutputStream content = new ByteArrayOutputStream();
-
-
-			int readBytes = 0;
-			while ((readBytes = inputStream.read(sBuffer)) != -1) {
-				content.write(sBuffer, 0, readBytes);
-			}
-
-
-			xmlstring = "<a>"+new String(content.toByteArray())+"</a>";
-		} catch (Exception e) { 
-
-		}
-		runOnUiThread(returnRes);
-    }
+	
 	
 	private void noDataAlert()
 	{
@@ -225,22 +173,6 @@ public class TimetableActivity extends Activity {
 		});
     	alertDialog.show();
 	}
-	
-	private Runnable returnRes = new Runnable() {
-
-        @Override
-        public void run() {
-        	m_adapter.setXML(xmlstring);
-            if(m_items != null && m_items.size() == 0)
-            {
-            	if(inFront)
-            		noDataAlert();
-            	else
-            		showNDDialog = true;
-            }
-            m_ProgressDialog.dismiss();
-        }
-	};
 	
 	public boolean onCreateOptionsMenu(Menu menu){
 		getMenuInflater().inflate(R.menu.timetable, menu);

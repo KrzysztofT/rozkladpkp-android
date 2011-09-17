@@ -22,7 +22,6 @@ public class RememberedService extends IntentService {
 	protected void onHandleIntent(Intent in) {
 		Bundle ex = in.getExtras();
 		
-		Log.i("RozkladPKP","IntentService startuje");
 		//Do poprawienia jest ogólnie większość rzeczy związana z zapamiętywaniem czasu w PLN.
 		//FIXME: Tutaj zakładamy, że hafas zwraca wyniki w strefie czasowej użytkownika, co nie jest prawdą.
 		//Z drugiej strony, nie wiadomo w jakiej strefie te wyniki są zwracane.
@@ -30,7 +29,10 @@ public class RememberedService extends IntentService {
 		String t = null;
 		
 		String Sid = ex.getString("SID");
-		String Zid = ex.getString("ZID");
+		String Zid = null;
+		
+		if(ex.containsKey("ZID"))
+			Zid = ex.getString("ZID");
 		
 		
 		if(ex.containsKey("pln"))
@@ -65,8 +67,26 @@ public class RememberedService extends IntentService {
 			catch(Exception e){
 				return;
 			}
+			
+			RememberedManager.addtoHistory(this, Sid, Zid, t);
 		}
-		RememberedManager.addtoHistory(this, Sid, Zid, t);
+		else if(ex.containsKey("timetable"))
+		{
+			t = ex.getString("time");
+			
+			String s = CommonUtils.ResultsHash(Sid, null, ex.getBoolean("departure"));
+			
+			try {
+				FileOutputStream fos = openFileOutput(s, Context.MODE_PRIVATE);
+				fos.write(ex.getByteArray("timetable"));
+				fos.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			RememberedManager.addtoHistory(this, Sid, ex.getBoolean("departure"), t);
+		}
+		
+		
 	}
 
 }

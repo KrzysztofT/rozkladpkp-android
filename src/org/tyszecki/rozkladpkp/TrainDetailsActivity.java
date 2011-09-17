@@ -40,6 +40,7 @@ public class TrainDetailsActivity extends Activity {
 	private RouteItemAdapter adapter;
 	
 	Train t;
+	RouteTask task;
 	
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -135,7 +136,8 @@ public class TrainDetailsActivity extends Activity {
         params.train_number = t.number;
         
         
-        (new RouteTask()).execute(params);
+        task = new RouteTask();
+        task.execute(params);
 	}
 	
 	private class RouteTask extends RouteFetcher{
@@ -166,5 +168,12 @@ public class TrainDetailsActivity extends Activity {
 			else
 				CommonUtils.onlineCheck("Nie można pobrać trasy, brak połączenia internetowego.");
 		}
+	}
+	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		if(task != null)
+			task.cancel(true);
 	}
 }

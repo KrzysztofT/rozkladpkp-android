@@ -175,6 +175,9 @@ public class ConnectionListActivity extends Activity {
         if(extras.containsKey("VID1"))
         	commonFieldsList.add(new SerializableNameValuePair("VID1", extras.getString("VID1")));
         
+        if(extras.containsKey("Carriers"))
+        	commonFieldsList.addAll((ArrayList<SerializableNameValuePair>)extras.getSerializable("Carriers"));
+        
         commonFieldsList.add(new SerializableNameValuePair("ZID", extras.getString("ZID")));
         commonFieldsList.add(new SerializableNameValuePair("REQ0JourneyProduct_prod_list_1",extras.getString("Products")));
         commonFieldsList.add(new SerializableNameValuePair("start", "1"));

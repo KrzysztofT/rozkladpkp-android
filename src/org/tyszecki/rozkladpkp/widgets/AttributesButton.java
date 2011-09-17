@@ -126,12 +126,6 @@ public class AttributesButton extends Button {
 		updateText();
 	}
 	
-	public void deselectAll()
-	{
-		for(int i = 0; i < ATTR_CNT; ++i)
-			p[i] = false;
-		updateText();
-	}
 	
 	public ArrayList<SerializableNameValuePair> getParameters()
 	{

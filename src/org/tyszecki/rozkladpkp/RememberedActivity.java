@@ -61,10 +61,15 @@ public class RememberedActivity extends Activity {
 				{
 					TimetableItem t = (TimetableItem)b;
 					
-					if(!CommonUtils.onlineCheck())
+					boolean showSaved = (t.cacheValid != null && t.cacheValid.length() > 0);
+					
+					if(!showSaved && !CommonUtils.onlineCheck())
 						return;
 					
 					ni = new Intent(arg0.getContext(), showForm ? TimetableFormActivity.class : TimetableActivity.class);
+					
+					if(showSaved)
+						ni.putExtra("Filename", CommonUtils.ResultsHash(Integer.toString(t.SID), null, t.type == TimetableType.Departure));
 					
 					ni.putExtra("Station", t.name);
 					ni.putExtra("SID",CommonUtils.SIDfromStationID(t.SID, t.name));
