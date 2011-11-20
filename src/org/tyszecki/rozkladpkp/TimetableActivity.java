@@ -27,6 +27,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.format.Time;
 import android.util.Log;
@@ -183,6 +184,9 @@ public class TimetableActivity extends Activity {
 		switch(item.getItemId()){
 		case R.id.item_favourite:
 			RememberedManager.saveStation(this, CommonUtils.StationIDfromSID(SID), dep);
+			return true;
+		case R.id.item_taxity:
+			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.taxity")));
 			return true;
 		}
 		return false;

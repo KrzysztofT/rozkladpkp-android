@@ -25,7 +25,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.DialogInterface.OnCancelListener;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -129,7 +128,6 @@ public class RouteActivity extends Activity {
 		@Override
 		protected void onPostExecute(Document result) {
 			super.onPostExecute(result);
-			Log.i("RozkladPKP","Post execute...");
 			if(progress != null)
 				progress.dismiss();
 			if(result != null)

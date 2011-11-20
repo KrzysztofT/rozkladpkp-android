@@ -17,7 +17,7 @@
 -->
 <TableLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
-	android:stretchColumns="8"
+	android:stretchColumns="9"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content">
     <TableRow
@@ -55,6 +55,11 @@
             android:id="@+id/changes"
             android:layout_marginLeft="3dip"
             android:layout_marginRight="13dip"/>
+        <ImageView 
+	        android:id="@+id/info_icon"   
+	        android:src="@drawable/info"
+	        android:layout_marginRight="5dip"
+	        android:visibility="gone"/>
         <LinearLayout
 			android:id="@+id/type_icons"
 			android:gravity="right"

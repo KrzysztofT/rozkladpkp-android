@@ -23,6 +23,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.tyszecki.rozkladpkp.ConnectionDetailsItem.PriceItem;
 import org.tyszecki.rozkladpkp.PLN.Connection;
+import org.tyszecki.rozkladpkp.TimetableItem.TrainItem;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -30,6 +31,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.DialogInterface.OnCancelListener;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -122,7 +125,7 @@ public class ConnectionDetailsActivity extends Activity {
 					});
 					priceThread.start();
 				}
-				else
+				else if(adapter.getItem(pos) instanceof ConnectionDetailsItem.TrainItem)
 				{
 					Intent ni = new Intent(arg0.getContext(),TrainDetailsActivity.class);
 					
@@ -156,4 +159,22 @@ public class ConnectionDetailsActivity extends Activity {
 		if(priceProgress != null)
 			priceProgress.dismiss();
 	}
+	
+	/*public boolean onCreateOptionsMenu(Menu menu){
+		getMenuInflater().inflate(R.menu.connection_details, menu);
+		return true;
+	}
+	
+	public boolean onOptionsItemSelected (MenuItem item){
+		Bundle extras = getIntent().getExtras();
+		Intent ni = null;
+		switch(item.getItemId()){
+		case R.id.share:
+			Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+			sharingIntent.setType("text/plain");
+			sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, adapter.getContentForSharing());
+			startActivity(Intent.createChooser(sharingIntent, "Udostępnij przez..."));
+			return true;
+		}
+	}*/
 }

@@ -26,6 +26,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.format.Time;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -153,6 +154,8 @@ public class RememberedActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+		adapter.setAutoDelete(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("autoDeleteTables", true));
+		
 		adapter.reloadData();
 		
 		showForm = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("showFormFromRemembered", false);

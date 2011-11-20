@@ -17,7 +17,10 @@
 package org.tyszecki.rozkladpkp;
 
 import android.os.Bundle;
+import android.preference.EditTextPreference;
 import android.preference.PreferenceActivity;
+import android.text.method.DigitsKeyListener;
+import android.widget.EditText;
 
 public class PreferencesActivity extends PreferenceActivity {
 	
@@ -26,6 +29,9 @@ public class PreferencesActivity extends PreferenceActivity {
 	    
 	    // Load the preferences from an XML resource
 	    addPreferencesFromResource(R.xml.preferences);
+	    
+	    EditText myEditText = (EditText) ((EditTextPreference)findPreference("discountValue")).getEditText();
+	    myEditText.setKeyListener(DigitsKeyListener.getInstance(false,true));
 	}
 	
 }

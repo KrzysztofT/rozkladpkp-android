@@ -14,16 +14,31 @@
  *     You should have received a copy of the GNU General Public License 
  *     along with RozkladPKP.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.tyszecki.rozkladpkp;
+package org.tyszecki.rozkladpkp.widgets;
 
-import org.tyszecki.rozkladpkp.PLN.Train;
+import android.content.Context;
+import android.util.AttributeSet;
 
-public class ConnectionDetailsItem {
-	public static class TrainItem extends ConnectionDetailsItem{
-		Train t;
+public class PropertiesButton extends AttributesButton {
+	
+	public PropertiesButton(Context context, AttributeSet attrs) {
+		super(context, attrs);
+		items.add(new Attribute("Tylko bezpośrednie", "REQ0JourneyProduct_opt0", "1", false));
+		items.add(new Attribute("Wagon sypialny","SW"));
+		items.add(new Attribute("Wagon z miejscami do leżenia","LW"));
+		items.add(new Attribute("Przewóz rowerów", "bikeEverywhere", "1", false));
+		items.add(new Attribute("Przedział dla niepełnosprawnych","97"));	
 	}
-	public static class PriceItem extends ConnectionDetailsItem{
-	}
-	public static class InfoItem extends ConnectionDetailsItem{
+	
+	protected void updateText() {
+		
+		for(int i = 0; i < items.size(); ++i)
+			if(items.get(i).checked)
+			{
+				super.updateText();
+				return;
+			}
+		
+		setText("Wszystkie połączenia");
 	}
 }

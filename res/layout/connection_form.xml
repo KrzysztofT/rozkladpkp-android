@@ -74,7 +74,7 @@
         	android:layout_width="fill_parent"
         	android:layout_height="wrap_content"
 			/>
-		<org.tyszecki.rozkladpkp.widgets.AttributesButton
+		<org.tyszecki.rozkladpkp.widgets.PropertiesButton
         	android:id="@+id/attributes_button"
         	android:layout_width="fill_parent"
         	android:layout_height="wrap_content"

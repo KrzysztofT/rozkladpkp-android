@@ -15,7 +15,7 @@
       along with RozkladPKP.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-<item android:id="@+id/item_settings" android:title="Ustawienia"></item>
-<item android:id="@+id/item_via" android:title="@string/menuAddVia"></item>
-<item android:id="@+id/item_carriers"></item>
+<item android:id="@+id/item_settings" android:title="Ustawienia" android:icon="@drawable/ic_menu_preferences"></item>
+<item android:id="@+id/item_via" android:title="@string/menuAddVia" android:icon="@drawable/ic_menu_directions"></item>
+<item android:id="@+id/item_carriers" android:icon="@drawable/ic_menu_more"></item>
 </menu>

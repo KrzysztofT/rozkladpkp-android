@@ -65,6 +65,8 @@ public class ExternalDelayFetcher {
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
+					
+					
 
 					ByteArrayOutputStream content = new ByteArrayOutputStream();
 
@@ -101,7 +103,6 @@ public class ExternalDelayFetcher {
 				}
 
 				protected void onPostExecute(Void result) {
-					Log.i("RozkladPKP","Calling callback");
 					callback.ready(delays, false);
 				}
 			}

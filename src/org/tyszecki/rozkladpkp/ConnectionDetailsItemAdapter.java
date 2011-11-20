@@ -17,18 +17,20 @@
 package org.tyszecki.rozkladpkp;
 import java.util.ArrayList;
 
+import org.tyszecki.rozkladpkp.ConnectionDetailsItem.InfoItem;
 import org.tyszecki.rozkladpkp.ConnectionDetailsItem.PriceItem;
 import org.tyszecki.rozkladpkp.ConnectionDetailsItem.TrainItem;
 import org.tyszecki.rozkladpkp.PLN.Connection;
+import org.tyszecki.rozkladpkp.PLN.Message;
 import org.tyszecki.rozkladpkp.PLN.Train;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.preference.PreferenceManager;
 import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
-import android.text.style.UnderlineSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,6 +42,7 @@ public class ConnectionDetailsItemAdapter extends BaseAdapter {
 
 	final int PRICE = 0;
 	final int NORMAL = 1;
+	final int INFO = 2;
 	
 	private ArrayList<ConnectionDetailsItem> items;
 	Context c;
@@ -84,6 +87,7 @@ public class ConnectionDetailsItemAdapter extends BaseAdapter {
     		ti.t = t;
     		items.add(ti);
     	}
+    	items.add(new InfoItem());
     	items.add(new PriceItem());
     	
     	notifyDataSetChanged();
@@ -107,9 +111,11 @@ public class ConnectionDetailsItemAdapter extends BaseAdapter {
             	v = vi.inflate(R.layout.connection_details_row, null);
             else if(con instanceof PriceItem)
             	v = vi.inflate(R.layout.connection_details_price_row, null);
+            else if(con instanceof InfoItem)
+            	v = vi.inflate(R.layout.warning_item, null);
         }
         
-        if (con instanceof TrainItem) {
+        if (con instanceof ConnectionDetailsItem.TrainItem) {
         	Train t = ((TrainItem)con).t;
         	
         	
@@ -191,8 +197,6 @@ public class ConnectionDetailsItemAdapter extends BaseAdapter {
         }
         else if (con instanceof PriceItem)
         {
-        	PriceItem i = (PriceItem)con;
-        	
         	TextView head = (TextView) v.findViewById(R.id.price);
         	
         	if(km == null)
@@ -200,8 +204,67 @@ public class ConnectionDetailsItemAdapter extends BaseAdapter {
         	else if(km.equals("-1"))
         		head.setText("Błąd pobierania ceny");
         	else
-        		head.setText(Html.fromHtml("Odległość: <b>"+km+"</b>km<br> Klasa 1: <b>"+k1+"</b>zł<br> Klasa 2: <b>"+k2+"</b>zł<br>Cena nie uwzględnia zniżek i promocji."));
+        	{
+        		String discount = PreferenceManager.getDefaultSharedPreferences(RozkladPKPApplication.getAppContext()).getString("discountValue", "0");
+        		
+        		boolean showDiscount = true;
+        		int dval = 0;
+        		try{dval = Integer.parseInt(discount);}
+        		catch (Exception e) {
+					showDiscount = false;
+				}
+        		
+        		if(dval <= 0 || dval >= 100)
+        			showDiscount = false;
+        		
+        		String msg = "Odległość: <b>"+km+"</b>km<br> Klasa 1: <b>"+k1+"</b>zł<br> Klasa 2: <b>"+k2+"</b>zł<br>";
+        		String footer = showDiscount ? "Cena nie uwzględnia dodatkowych zniżek i promocji. Cena podana po zniżce ma jedynie charakter orientacyjny." : "Cena nie uwzględnia zniżek i promocji.";
+        		
+        		if(showDiscount)
+        		{
+        			dval = 100-dval;
+        			msg += "<br>Cena ze zniżką "+discount+"%:<br>";
+        			
+        			String zk1 = "---";
+        			String zk2 = "---";
+        			try{
+        				float pr = Float.parseFloat(k1.replace(',', '.'));
+        				int ipr = (int) (pr*100);
+        				ipr *= dval;
+        				ipr /= 100;
+        				zk1 = Integer.toString(ipr/100)+","+String.format("%02d", ipr%100);
+        			}catch (Exception e) {}
+        			try{
+        				float pr = Float.parseFloat(k2.replace(',', '.'));
+        				int ipr = (int) (pr*100);
+        				ipr *= dval;
+        				ipr /= 100;
+        				zk2 = Integer.toString(ipr/100)+","+String.format("%02d", ipr%100);
+        			}catch (Exception e) {}
+        			
+        			msg += "Klasa 1: <b>"+zk1+"</b>zł<br> Klasa 2: <b>"+zk2+"</b>zł<br><br>";
+        		}
+        		
+        		head.setText(Html.fromHtml(msg+footer));
+        	}
         }
+        else if(con instanceof InfoItem)
+        {
+        	PLN.Connection conn = pln.connections[conidx];
+        	
+        	String msg  = conn.availability.getMessage();
+        	if(msg == null)
+        		msg = "Brak informacji o kursowaniu.";
+        	else
+        		msg = "Kursuje "+msg;
+        	
+        	if(conn.hasMessages())
+        		for(Message i : conn.getMessages())
+        			msg +="\n\n" + i.full;
+        
+        	((TextView)v.findViewById(R.id.text)).setText(msg);
+        }
+        
         
         return v;
 	}
@@ -225,12 +288,13 @@ public class ConnectionDetailsItemAdapter extends BaseAdapter {
 	public int getItemViewType(int arg0) {
 		if(items.get(arg0) instanceof ConnectionDetailsItem.TrainItem)
 			return NORMAL;
-		else return PRICE;
+		else if(items.get(arg0) instanceof ConnectionDetailsItem.PriceItem) return PRICE;
+			return INFO;
 	}
 
 	@Override
 	public int getViewTypeCount() {
-		return 2;
+		return 3;
 	}
 
 	@Override
@@ -248,7 +312,7 @@ public class ConnectionDetailsItemAdapter extends BaseAdapter {
     }  
 	@Override
     public boolean isEnabled(int position) {  
-		if(position == items.size() -1 && km != null)
+		if(position == items.size() -2 || (position == items.size() -1 && km != null))
 			return false;
         return true;  
     }  

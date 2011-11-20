@@ -193,14 +193,18 @@ public class TimetableItemAdapter  extends BaseAdapter {
 			
 
 			//Zapisywanie w pamięci
-			Intent in = new Intent(RozkladPKPApplication.getAppContext(), RememberedService.class);
-
-			in.putExtra("timetable", result.getBytes());
-			in.putExtra("SID", stationID);
-			in.putExtra("departure", !arrival);
-			in.putExtra("time", getBottomTime().format2445());
 			
-			RozkladPKPApplication.getAppContext().startService(in);
+			try{
+				Intent in = new Intent(RozkladPKPApplication.getAppContext(), RememberedService.class);
+	
+				in.putExtra("timetable", result.getBytes());
+				in.putExtra("SID", stationID);
+				in.putExtra("departure", !arrival);
+				in.putExtra("time", getBottomTime().format2445());
+				
+				RozkladPKPApplication.getAppContext().startService(in);
+			}
+			catch(Exception e){}
 		}
 	}
 	

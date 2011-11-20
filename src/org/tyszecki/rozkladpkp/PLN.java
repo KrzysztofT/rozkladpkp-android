@@ -17,11 +17,13 @@
 package org.tyszecki.rozkladpkp;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-
-import android.util.Log;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 public class PLN {
 	
@@ -43,6 +45,7 @@ public class PLN {
 	
 	private StringManager strings;
 	private AttributeManager attributes;
+	private MessageManager messages;
 	
 	public Connection[] connections;
 	private Station[] stations;
@@ -81,6 +84,35 @@ public class PLN {
 				return cache.get(offset);
 			
 			String[] t = readAttributeList(offset);
+			cache.put(offset, t);
+			return t;
+		}
+	}
+	
+	class MessageManager{
+		private HashMap<Integer,Message[]> cache = new HashMap<Integer, Message[]>();
+		private SortedSet<Integer> offsets = new TreeSet<Integer>();
+		
+		void addOffset(int offset)
+		{
+			offsets.add(offset);
+		}
+		
+		Message[] get(int offset)
+		{			
+			if(cache.containsKey(offset))
+				return cache.get(offset);
+			
+			int n = data.length; 
+			//Następny offset
+			try{offsets.tailSet(offset+1).first();}catch (Exception e) {}
+			
+			int cnt = (n-offset)/18;
+			Message[] t = new Message[cnt];
+			
+			for(int i = 0; i < cnt; ++i)
+				t[i] = readMessage(offset+i*18);
+			
 			cache.put(offset, t);
 			return t;
 		}
@@ -199,7 +231,7 @@ public class PLN {
 			return dOffset;
 		}
 		
-		private String getMessage()
+		public String getMessage()
 		{
 			if(msg == null)
 				msg = strings.get(msgOffset);
@@ -274,7 +306,8 @@ public class PLN {
 	}
 	
 	public class Message {
-		Station start,end;
+		String start;
+		String end;
 		String brief,full;
 	}
 	
@@ -290,12 +323,11 @@ public class PLN {
 	public class Connection {
 		public int changes,trOffset;
 		
-		private int timeOffset, trainsOffset, trainCount, changeOffset = -1;
+		private int timeOffset, trainsOffset, trainCount, msgOffset = -1, changeOffset = -1;
 		
 		private Time journeyTime = null;
 		private Train[] trains = null;
 		
-		Message[] messages;
 		Availability availability;
 		private ConnectionChange change;
 		
@@ -337,6 +369,19 @@ public class PLN {
 			if(changeOffset != -1)
 				change = readConnectionChanges(changeOffset);
 			return change;
+		}
+		
+		public boolean hasMessages()
+		{
+			return (msgOffset > 0);
+		}
+		
+		public Message[] getMessages()
+		{
+			if(hasMessages())
+				return messages.get(msgOffset);
+			else
+				return null;
 		}
 	}
 	
@@ -425,6 +470,7 @@ public class PLN {
 				
 				pos++;
 				tripsLeft--;
+				time.hour = time.minute = time.second = 0;
 				return new Trip(connections[cix], cix, time.format("%d.%m.%Y"));
 			}
 			else
@@ -454,6 +500,7 @@ public class PLN {
 		data = byte_data;
 		strings = new StringManager();
 		attributes = new AttributeManager();
+		messages = new MessageManager();
 		
 		stationsStart	= readShort(0x36);
 		attributesStart	= readShort(0x3a);
@@ -467,6 +514,7 @@ public class PLN {
 		readAvailabilities();
 		readConnections();
 	}
+
 
 	public TripIterator tripIterator(){
 		return new TripIterator();
@@ -689,20 +737,14 @@ public class PLN {
 
 		return tab;
 	}
-	
-	private void readMessages() {
-		int pos = readShort(attributesEnd+0x16);
-		//TODO: investigate how these messages are connected with trains
-		//No messages
-		if(pos == 0)
-			return;
-	}
 
 	private void readConnections() {
 		
 		connections = new Connection[conCnt];
 		
 		int chinfo = readShort(attributesEnd+0xe);
+		int msginfo = readShort(attributesEnd+0x16);
+		
 		boolean hasChanges = (chinfo != 0);
 		if(hasChanges)
 			chinfo += conCnt*2+4;
@@ -714,6 +756,17 @@ public class PLN {
 			{
 				connections[i].changeOffset = chinfo;
 				chinfo += (connections[i].trainCount+1)*8;
+			}
+			
+			if(msginfo > 0)
+			{
+				int msg =  readShort(msginfo+2*(i+1));
+				if(msg > 0)
+				{	
+					msg += msginfo;
+					connections[i].msgOffset = msg;
+					messages.addOffset(msg);
+				}
 			}
 		}
 	}
@@ -737,6 +790,23 @@ public class PLN {
 		tc.realarrplatform = (rap == 0) ? null : strings.get(rap);
 		
 		return tc;
+	}
+	
+
+	public Message readMessage(int offset) {
+		
+		Message r = new Message();
+		
+		int t = readShort(offset+8);
+		r.end = (t == 0) ? null : strings.get(t);
+		
+		t = readShort(offset+6);
+		r.start = (t == 0) ? null : strings.get(t);
+		
+		r.brief = strings.get(readShort(offset+12));
+		r.full = strings.get(readShort(offset+14));
+		
+		return r;
 	}
 
 	private ConnectionChange readConnectionChanges(int offset) {
@@ -789,6 +859,8 @@ public class PLN {
 		}	
 		return false;
 	}
+	
+	
 	
 	public void addExternalDelayInfo(HashMap<String,Integer> delays)
 	{

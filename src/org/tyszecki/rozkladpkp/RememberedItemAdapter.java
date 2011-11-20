@@ -39,6 +39,7 @@ public class RememberedItemAdapter extends BaseAdapter {
 
 	private ArrayList<RememberedItem> items;
 	private Context c;
+	private boolean autoDelete;
 	
 	final int HEADER = 0;
 	final int NORMAL = 1;
@@ -46,6 +47,12 @@ public class RememberedItemAdapter extends BaseAdapter {
 	public RememberedItemAdapter(Context context) {
 		c = context;
 		items = new ArrayList<RememberedItem>();
+	}
+	
+	public void setAutoDelete(boolean delete)
+	{
+		autoDelete = delete;
+		Log.i("RozkladPKP", "Autodelete:" + Boolean.toString(autoDelete));
 	}
 	
 	public void reloadData() {
@@ -180,7 +187,7 @@ public class RememberedItemAdapter extends BaseAdapter {
         		
         		boolean showSaved = r.cacheValid != null && r.cacheValid.length() > 0;
         		
-        		if(showSaved)
+        		if(showSaved && autoDelete)
         		{
         			try{
         			itime.parse(r.cacheValid);
@@ -208,7 +215,7 @@ public class RememberedItemAdapter extends BaseAdapter {
         		
         		boolean showSaved = t.cacheValid != null && t.cacheValid.length() > 0;
         		
-        		if(showSaved)
+        		if(showSaved && autoDelete)
         		{
         			try{
         			itime.parse(t.cacheValid);

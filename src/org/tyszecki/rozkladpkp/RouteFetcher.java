@@ -37,8 +37,6 @@ import org.xml.sax.InputSource;
 import android.content.Context;
 import android.os.AsyncTask;
 
-
-
 public class RouteFetcher extends AsyncTask<RouteFetcher.RouteParams, Void, Document> {
 	private static byte[] sBuffer = new byte[512];
 
@@ -154,6 +152,8 @@ public class RouteFetcher extends AsyncTask<RouteFetcher.RouteParams, Void, Docu
 
 
 				InputStream inputStream = client.execute(request).getEntity().getContent();
+				
+				
 				ByteArrayOutputStream content = new ByteArrayOutputStream();
 
 				int readBytes = 0;

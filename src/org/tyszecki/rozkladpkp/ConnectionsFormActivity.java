@@ -456,14 +456,9 @@ public class ConnectionsFormActivity extends Activity {
 	@Override
 	protected void onPause() {
 		super.onPause();
-		Log.d("RozkladPKP", "Pause");
+		
 		if(task != null)
-		{
-			Log.e("RozkladPKP","Anulowanie...");
 			task.cancel(true);
-		}
-		else
-			Log.wtf("RozkladPKP","NULL...");
 	}
 	
 	private class GetLocality extends CommonUtils.GetLocalityTask{
@@ -479,7 +474,6 @@ public class ConnectionsFormActivity extends Activity {
 		@Override
 		protected void onPostExecute(String result) {
 			super.onPostExecute(result);
-			Log.i("RozkladPKP", "Post");
 			p.dismiss();
 
 			if(result == null)

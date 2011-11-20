@@ -16,6 +16,10 @@
  ******************************************************************************/
 package org.tyszecki.rozkladpkp;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import org.tyszecki.rozkladpkp.ConnectionList.ConnectionListCallback;
@@ -28,7 +32,9 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.DialogInterface.OnCancelListener;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -348,7 +354,21 @@ public class ConnectionListActivity extends Activity {
 			
 			startActivity(ni);
 			return true;
+			
+		case R.id.item_taxity:
+			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.taxity")));
+			return true;
+		case R.id.share:
+			Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+			sharingIntent.setType("text/plain");
+			sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, adapter.getContentForSharing());
+			startActivity(Intent.createChooser(sharingIntent, "Udostępnij przez..."));
+			return true;
 		}
+		
+		
+			
+		
 		return false;
 	}
 	

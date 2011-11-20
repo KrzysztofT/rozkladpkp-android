@@ -36,11 +36,13 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.TextPaint;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -194,6 +196,7 @@ public class ConnectionListItemAdapter extends BaseAdapter {
                 TextView tt = (TextView) v.findViewById(R.id.departure_time);
                 TextView bt = (TextView) v.findViewById(R.id.arrival_time);
 
+                ((ImageView) v.findViewById(R.id.info_icon)).setVisibility(o.hasMessages() ? View.VISIBLE : View.GONE);
                 
                 int tl = o.getTrainCount();
                 
@@ -204,8 +207,7 @@ public class ConnectionListItemAdapter extends BaseAdapter {
                 		bt.setWidth(arr_width);
                 }
                 
-                
-                String deptime = o.getTrain(0).deptime.toString();
+                String deptime = o.getTrain(0).deptime.toString(); 
                 if(o.getChange() != null && o.getChange().departureDelay != -1)
                 {
                 	
@@ -451,6 +453,43 @@ public class ConnectionListItemAdapter extends BaseAdapter {
 		if(!it.hasNext())
 			items.remove(items.size()-1);
 		notifyDataSetChanged();
+	}
+	
+	String getContentForSharing()
+	{
+		String msg = pln.departureStation().name + " - " +  pln.arrivalStation().name+" ";
+		
+		for(ConnectionListItem it : items)
+		{
+			if(it instanceof ConnectionListItem.DateItem)
+				msg += ((ConnectionListItem.DateItem)it).date + ":\n";
+			else if(it instanceof ConnectionListItem.TripItem)
+			{
+				TripItem t = (ConnectionListItem.TripItem)it;
+				Connection con = t.t.con;
+				
+				if(con.changes == 0)
+					msg += con.getTrain(0).deptime.toString()+",\n";
+				
+				else
+				{
+					msg += con.getTrain(0).deptime.toString();
+					msg += con.getTrainCount() > 2 ? " z przesiadkami (" :  " z przesiadką (";
+					
+					for(int i = 1; i < con.getTrainCount(); ++i)
+					{
+						Train tr = con.getTrain(i);
+						msg += tr.depstation.name + " "+tr.deptime.toString();
+						
+						if(i < con.getTrainCount() -1 )
+							msg += ", ";
+					}
+					msg += "),\n";
+				}
+			}
+		}
+		
+		return msg.substring(0,msg.length()-2)+'.';
 	}
 
 	public void setScrollingEnabled(boolean b) {

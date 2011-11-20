@@ -158,6 +158,11 @@ public class ConnectionList {
 					client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestExpectContinue.class);
 			        client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestUserAgent.class);
 			        
+			        for(int i = 0; i < data.size(); ++i)
+			        {
+			        	Log.i("RozkladPKP", data.get(i).getName() + "="+ data.get(i).getValue());
+			        }
+			        
 			        request.addHeader("Content-Type", "text/plain");
 			        try {
 						request.setEntity(new UrlEncodedFormEntity(data,"UTF-8"));
@@ -208,7 +213,6 @@ public class ConnectionList {
 	
 	public void abort()
 	{
-		Log.i("RozkladPKP", "Aborcja!");
 		aborted = true;
 		if(thread != null && thread.isAlive())
 		{
