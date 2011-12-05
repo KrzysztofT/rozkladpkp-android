@@ -254,4 +254,9 @@ public class StationEdit extends  AutoCompleteTextView {
 	{
 		return enableAC;
 	}
+	
+	public boolean inputValid()
+	{
+		return getText().toString().trim().length() > 0;
+	}
 }

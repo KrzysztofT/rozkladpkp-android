@@ -16,8 +16,8 @@
       along with RozkladPKP.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      package="org.tyszecki.rozkladpkp" android:versionName="0.3r10" android:versionCode="29">
-    <application android:icon="@drawable/icon" android:label="@string/app_name" android:name="RozkladPKPApplication">
+      package="org.tyszecki.rozkladpkp" android:versionName="0.4r1" android:versionCode="30">
+    <application android:icon="@drawable/icon" android:label="@string/app_name" android:name="RozkladPKPApplication" android:theme="@style/Theme.RozkladPKP">
         <activity android:name=".RozkladPKP"
                   android:label="@string/app_name">
             <intent-filter>
@@ -25,7 +25,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="RememberedActivity" android:configChanges="orientation|keyboard|keyboardHidden">
+        <activity android:name=".RememberedFragment" android:configChanges="orientation|keyboard|keyboardHidden">
         </activity>
         <activity android:name="TimetableActivity" android:configChanges="orientation|keyboard|keyboardHidden">
         </activity>

@@ -44,15 +44,14 @@ public class RememberedItemAdapter extends BaseAdapter {
 	final int HEADER = 0;
 	final int NORMAL = 1;
 	
-	public RememberedItemAdapter(Context context) {
-		c = context;
+	public RememberedItemAdapter() {
+		c = RozkladPKPApplication.getAppContext();
 		items = new ArrayList<RememberedItem>();
 	}
 	
 	public void setAutoDelete(boolean delete)
 	{
 		autoDelete = delete;
-		Log.i("RozkladPKP", "Autodelete:" + Boolean.toString(autoDelete));
 	}
 	
 	public void reloadData() {

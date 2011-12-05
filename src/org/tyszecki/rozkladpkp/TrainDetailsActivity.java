@@ -27,6 +27,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.DialogInterface.OnCancelListener;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.MenuItem;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -34,7 +36,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
-public class TrainDetailsActivity extends Activity {
+public class TrainDetailsActivity extends FragmentActivity {
 	
 	private ProgressDialog progressDialog = null; 
 	private RouteItemAdapter adapter;
@@ -51,6 +53,7 @@ public class TrainDetailsActivity extends Activity {
         
         
         setTitle("Informacje o pociągu");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         
         //startDate = getIntent().getExtras().getString("StartDate");
         PLN pln = new PLN(getIntent().getExtras().getByteArray("PLNData"));
@@ -175,5 +178,15 @@ public class TrainDetailsActivity extends Activity {
 		super.onPause();
 		if(task != null)
 			task.cancel(true);
+	}
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case android.R.id.home:
+			finish();
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
 	}
 }

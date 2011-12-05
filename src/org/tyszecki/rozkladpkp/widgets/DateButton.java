@@ -23,13 +23,15 @@ import org.tyszecki.rozkladpkp.R;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.text.Html;
 import android.text.format.Time;
 import android.util.AttributeSet;
 import android.widget.Button;
 import android.widget.DatePicker;
 
-public class DateButton extends Button {
+public class DateButton extends Button implements DialogControl {
 
 	Integer day,month,year;
 	Time time;
@@ -41,8 +43,8 @@ public class DateButton extends Button {
 		time	= new Time();
 	}
 
-	public Dialog dateDialog() {
-	    return new DatePickerDialog(getContext(),mDateSetListener ,year, month-1, day );
+	public DialogFragment getDialog() {
+	    return new DatePickerFragment();
 	}
 	
 	private DatePickerDialog.OnDateSetListener mDateSetListener =
@@ -86,9 +88,14 @@ public class DateButton extends Button {
 	
 	public void setDate(String date)
 	{
-		String[] t = date.split("\\."); 
-		if(t.length >= 3)
-			setDate(Integer.parseInt(t[0]), Integer.parseInt(t[1]),Integer.parseInt(t[2]));
+		if(date == null)
+			setToNow();
+		else
+		{
+			String[] t = date.split("\\."); 
+			if(t.length >= 3)
+				setDate(Integer.parseInt(t[0]), Integer.parseInt(t[1]),Integer.parseInt(t[2]));
+		}
 	}
 	
 	public void setPrefix(String pref)
@@ -105,5 +112,11 @@ public class DateButton extends Button {
 	public String getDate()
 	{
 		return day.toString()+"."+month.toString()+"."+year.toString();
+	}
+	
+	private class DatePickerFragment extends DialogFragment{
+		public Dialog onCreateDialog(Bundle savedInstanceState) {
+			return new DatePickerDialog(getActivity(), mDateSetListener, year, month-1, day);
+		}
 	}
 }

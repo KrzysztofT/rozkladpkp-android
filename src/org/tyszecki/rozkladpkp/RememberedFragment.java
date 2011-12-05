@@ -25,29 +25,42 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.Menu;
+import android.support.v4.view.MenuItem;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.ContextMenu;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
+import android.view.MenuInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 
-public class RememberedActivity extends Activity {
+public class RememberedFragment extends Fragment {
 	RememberedItemAdapter adapter;
 	boolean showForm;
 	
-	public void onCreate(Bundle savedInstanceState) {
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+	
+		return inflater.inflate(R.layout.remembered_list, null);
+	}
+	
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.remembered_list);
         
-        ListView lv = (ListView)findViewById(R.id.remembered_list);
+        setHasOptionsMenu(true);
         
-        adapter = new RememberedItemAdapter(this);
+        ListView lv = (ListView)getView().findViewById(R.id.remembered_list);
+        
+        adapter = new RememberedItemAdapter();
         lv.setAdapter(adapter);
         
         lv.setOnItemClickListener(new OnItemClickListener() {
@@ -100,8 +113,9 @@ public class RememberedActivity extends Activity {
 					
 				}
 				if(ni != null)
-				{
-					ni.putExtra("Products", getPreferences(MODE_PRIVATE).getString("Products", "11110001111111"));
+				{					
+					ni.putExtra("Products", getActivity().getPreferences(Activity.MODE_PRIVATE).getString("Products", "11110001111111"));
+					
 					Time time = new Time();
 					time.setToNow();
 					
@@ -115,13 +129,12 @@ public class RememberedActivity extends Activity {
         registerForContextMenu(lv);
     }
 	
-	@Override
+	
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
-		getMenuInflater().inflate(R.menu.remembered_list_context, menu);
+		getActivity().getMenuInflater().inflate(R.menu.remembered_list_context, menu);
 	}
 	
-	@Override
 	public boolean onContextItemSelected(MenuItem item) {
 		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
 		
@@ -134,17 +147,16 @@ public class RememberedActivity extends Activity {
 			return super.onContextItemSelected(item);
 	}
 	
-	public boolean onCreateOptionsMenu(Menu menu){
-		
-		getMenuInflater().inflate(R.menu.remembered, menu);
-		
-		return true;
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		inflater.inflate(R.menu.remembered, menu);
 	}
+	
 	
 	public boolean onOptionsItemSelected (MenuItem item){
 		switch(item.getItemId()){
 		case R.id.item_settings:
-			Intent ni = new Intent(getBaseContext(),PreferencesActivity.class);
+			Intent ni = new Intent(getActivity().getBaseContext(),PreferencesActivity.class);
 			startActivity(ni);
 			return true;
 		}
@@ -152,12 +164,12 @@ public class RememberedActivity extends Activity {
 	}
 	
 	@Override
-	protected void onResume() {
+	public void onResume() {
 		super.onResume();
-		adapter.setAutoDelete(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("autoDeleteTables", true));
+		
+		adapter.setAutoDelete(PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("autoDeleteTables", true));
 		
 		adapter.reloadData();
-		
-		showForm = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("showFormFromRemembered", false);
+		showForm = PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("showFormFromRemembered", false);
 	}
 }

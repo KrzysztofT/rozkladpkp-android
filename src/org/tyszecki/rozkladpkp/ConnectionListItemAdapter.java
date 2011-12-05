@@ -89,9 +89,6 @@ public class ConnectionListItemAdapter extends BaseAdapter {
 	}*/
 	
 	public ConnectionListItemAdapter(Context context) {
-		//d = context.getResources().getDrawable(R.drawable.time);
-    	//d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
-    	
 		c = context;
 		TypedArray t = c.obtainStyledAttributes(new int[]{android.R.attr.textSize});
 		textSize = t.getDimensionPixelSize(0, -1);
@@ -139,7 +136,7 @@ public class ConnectionListItemAdapter extends BaseAdapter {
 	private void calculateTextSizes() {
 		 TextPaint tp = new TextPaint();
          tp.setTypeface(Typeface.DEFAULT_BOLD);
-         tp.setTextSize(textSize);
+         tp.setTextSize(textSize+3);
          
          //Obliczenie wielkości pola tekstowego dla odjazdów
          int t = 0;

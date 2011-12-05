@@ -11,10 +11,12 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnMultiChoiceClickListener;
+import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.util.AttributeSet;
 import android.widget.Button;
 
-public class AttributesButton extends Button {
+public class AttributesButton extends Button implements DialogControl {
 
 	public static String join(AbstractCollection<String> s, String delimiter) {
 	    if (s.isEmpty()) return "";
@@ -64,40 +66,8 @@ public class AttributesButton extends Button {
 		super(context, attrs);
 	}
 
-	public Dialog getDialog() {
-		
-		AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-		builder.setTitle("Szczegóły połączenia");
-		
-		final boolean[] dial = new boolean[items.size()];
-		for(int i = 0; i < items.size(); i++)
-			dial[i] = items.get(i).checked;
-		
-		CharSequence[] titles = new CharSequence[items.size()];
-		for(int i = 0; i < items.size(); ++i)
-			titles[i] = items.get(i).name;
-		
-		builder.setMultiChoiceItems(titles, dial, new OnMultiChoiceClickListener() {
-			@Override
-			public void onClick(DialogInterface arg0, int arg1, boolean arg2) {
-				dial[arg1] = arg2;
-			}
-		});	
-		
-		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-	           public void onClick(DialogInterface dialog, int id) {
-	        	   for(int i = 0; i < items.size(); i++)
-	       				items.get(i).checked = dial[i];
-	        	   updateText();
-	        	   dialog.cancel();
-	           }
-	       })
-	       .setNegativeButton("Anuluj", new DialogInterface.OnClickListener() {
-	           public void onClick(DialogInterface dialog, int id) {
-	                dialog.dismiss();
-	           }
-	       });
-		return builder.create();
+	public DialogFragment getDialog() {
+		return new AttributePickerFragment();
 	}
 
 	public void setParameters(ArrayList<SerializableNameValuePair> list) {	
@@ -160,4 +130,40 @@ public class AttributesButton extends Button {
 		updateText();
 	}
 
+	private class AttributePickerFragment extends DialogFragment{
+		public Dialog onCreateDialog(Bundle savedInstanceState) {
+			AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+			builder.setTitle("Szczegóły połączenia");
+			
+			final boolean[] dial = new boolean[items.size()];
+			for(int i = 0; i < items.size(); i++)
+				dial[i] = items.get(i).checked;
+			
+			CharSequence[] titles = new CharSequence[items.size()];
+			for(int i = 0; i < items.size(); ++i)
+				titles[i] = items.get(i).name;
+			
+			builder.setMultiChoiceItems(titles, dial, new OnMultiChoiceClickListener() {
+				@Override
+				public void onClick(DialogInterface arg0, int arg1, boolean arg2) {
+					dial[arg1] = arg2;
+				}
+			});	
+			
+			builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+		           public void onClick(DialogInterface dialog, int id) {
+		        	   for(int i = 0; i < items.size(); i++)
+		       				items.get(i).checked = dial[i];
+		        	   updateText();
+		        	   dialog.cancel();
+		           }
+		       })
+		       .setNegativeButton("Anuluj", new DialogInterface.OnClickListener() {
+		           public void onClick(DialogInterface dialog, int id) {
+		                dialog.dismiss();
+		           }
+		       });
+			return builder.create();
+		}
+	}
 }

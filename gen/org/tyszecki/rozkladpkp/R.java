@@ -9,167 +9,1108 @@ package org.tyszecki.rozkladpkp;
 
 public final class R {
     public static final class array {
-        public static final int settingsTabsList=0x7f060000;
-        public static final int settingsTabsListValues=0x7f060001;
+        public static final int settingsTabsList=0x7f0a0000;
+        public static final int settingsTabsListValues=0x7f0a0001;
     }
     public static final class attr {
+        /** <p>May be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+<p>May be a color value, in the form of "<code>#<i>rgb</i></code>", "<code>#<i>argb</i></code>",
+"<code>#<i>rrggbb</i></code>", or "<code>#<i>aarrggbb</i></code>".
+         */
+        public static final int abBackground=0x7f01001e;
+        /** <p>May be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+<p>May be a color value, in the form of "<code>#<i>rgb</i></code>", "<code>#<i>argb</i></code>",
+"<code>#<i>rrggbb</i></code>", or "<code>#<i>aarrggbb</i></code>".
+         */
+        public static final int abBackgroundStacked=0x7f01001f;
+        /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+         */
+        public static final int abCustomNavigationLayout=0x7f010020;
+        /** <p>Must be one or more (separated by '|') of the following constant values.</p>
+<table>
+<colgroup align="left" />
+<colgroup align="left" />
+<colgroup align="left" />
+<tr><th>Constant</th><th>Value</th><th>Description</th></tr>
+<tr><td><code>useLogo</code></td><td>0x1</td><td></td></tr>
+<tr><td><code>showHome</code></td><td>0x2</td><td></td></tr>
+<tr><td><code>homeAsUp</code></td><td>0x4</td><td></td></tr>
+<tr><td><code>showTitle</code></td><td>0x8</td><td></td></tr>
+<tr><td><code>showCustom</code></td><td>0x10</td><td></td></tr>
+</table>
+         */
+        public static final int abDisplayOptions=0x7f010016;
+        /** <p>May be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+<p>May be a color value, in the form of "<code>#<i>rgb</i></code>", "<code>#<i>argb</i></code>",
+"<code>#<i>rrggbb</i></code>", or "<code>#<i>aarrggbb</i></code>".
+         */
+        public static final int abDivider=0x7f01001d;
+        /** <p>May be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+<p>May be a dimension value, which is a floating point number appended with a unit such as "<code>14.5sp</code>".
+Available units are: px (pixels), dp (density-independent pixels), sp (scaled pixels based on preferred font size),
+in (inches), mm (millimeters).
+         */
+        public static final int abHeight=0x7f010021;
+        /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+         */
+        public static final int abHomeLayout=0x7f010022;
+        /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+         */
+        public static final int abIcon=0x7f01001b;
+        /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+         */
+        public static final int abIndeterminateProgressStyle=0x7f010024;
+        /** <p>Must be a dimension value, which is a floating point number appended with a unit such as "<code>14.5sp</code>".
+Available units are: px (pixels), dp (density-independent pixels), sp (scaled pixels based on preferred font size),
+in (inches), mm (millimeters).
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+         */
+        public static final int abItemPadding=0x7f010026;
+        /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+         */
+        public static final int abLogo=0x7f01001c;
+        /** <p>Must be one of the following constant values.</p>
+<table>
+<colgroup align="left" />
+<colgroup align="left" />
+<colgroup align="left" />
+<tr><th>Constant</th><th>Value</th><th>Description</th></tr>
+<tr><td><code>normal</code></td><td>0</td><td></td></tr>
+<tr><td><code>listMode</code></td><td>1</td><td></td></tr>
+<tr><td><code>tabMode</code></td><td>2</td><td></td></tr>
+</table>
+         */
+        public static final int abNavigationMode=0x7f010015;
+        /** <p>Must be a dimension value, which is a floating point number appended with a unit such as "<code>14.5sp</code>".
+Available units are: px (pixels), dp (density-independent pixels), sp (scaled pixels based on preferred font size),
+in (inches), mm (millimeters).
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+         */
+        public static final int abProgressBarPadding=0x7f010025;
+        /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+         */
+        public static final int abProgressBarStyle=0x7f010023;
+        /** <p>Must be a string value, using '\\;' to escape characters such as '\\n' or '\\uxxxx' for a unicode character.
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+         */
+        public static final int abSubtitle=0x7f010018;
+        /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+         */
+        public static final int abSubtitleTextStyle=0x7f01001a;
+        /** <p>Must be a string value, using '\\;' to escape characters such as '\\n' or '\\uxxxx' for a unicode character.
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+         */
+        public static final int abTitle=0x7f010017;
+        /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+         */
+        public static final int abTitleTextStyle=0x7f010019;
+        /** attr name="actionBarStyle" format="reference" /
+         <p>May be a dimension value, which is a floating point number appended with a unit such as "<code>14.5sp</code>".
+Available units are: px (pixels), dp (density-independent pixels), sp (scaled pixels based on preferred font size),
+in (inches), mm (millimeters).
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+<p>May be one of the following constant values.</p>
+<table>
+<colgroup align="left" />
+<colgroup align="left" />
+<colgroup align="left" />
+<tr><th>Constant</th><th>Value</th><th>Description</th></tr>
+<tr><td><code>wrap_content</code></td><td>0</td><td></td></tr>
+</table>
+         */
+        public static final int actionBarSize=0x7f010007;
+        /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+         */
+        public static final int actionBarTabBarStyle=0x7f010003;
+        /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+         */
+        public static final int actionBarTabStyle=0x7f010002;
+        /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+         */
+        public static final int actionBarTabTextStyle=0x7f010004;
+        /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+         */
+        public static final int actionButtonStyle=0x7f010001;
+        /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+         */
+        public static final int actionDropDownStyle=0x7f010000;
+        /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+         */
+        public static final int actionHomeButtonStyle=0x7f010006;
+        /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+         */
+        public static final int actionMenuTextAppearance=0x7f010008;
+        /** <p>May be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+<p>May be a color value, in the form of "<code>#<i>rgb</i></code>", "<code>#<i>argb</i></code>",
+"<code>#<i>rrggbb</i></code>", or "<code>#<i>aarrggbb</i></code>".
+         */
+        public static final int actionMenuTextColor=0x7f010009;
+        /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+         */
+        public static final int actionModeBackground=0x7f01000b;
+        /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+         */
+        public static final int actionModeCloseButtonStyle=0x7f01000a;
+        /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+         */
+        public static final int actionModeCloseDrawable=0x7f01000c;
+        /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+         */
+        public static final int actionOverflowButtonStyle=0x7f010005;
+        /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+         */
+        public static final int actionSpinnerItemStyle=0x7f010012;
+        /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+         */
+        public static final int dropDownListViewStyle=0x7f01000f;
+        /** <p>Must be a dimension value, which is a floating point number appended with a unit such as "<code>14.5sp</code>".
+Available units are: px (pixels), dp (density-independent pixels), sp (scaled pixels based on preferred font size),
+in (inches), mm (millimeters).
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+         */
+        public static final int dropdownListPreferredItemHeight=0x7f010011;
+        /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+         */
+        public static final int homeAsUpIndicator=0x7f01000d;
+        /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+         */
+        public static final int popupMenuStyle=0x7f010010;
+        /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+         */
+        public static final int selectableItemBackground=0x7f01000e;
+        /** <p>Must be a boolean value, either "<code>true</code>" or "<code>false</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+         */
+        public static final int windowActionBar=0x7f010013;
+        /** <p>Must be a boolean value, either "<code>true</code>" or "<code>false</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+         */
+        public static final int windowActionModeOverlay=0x7f010014;
+    }
+    public static final class color {
+        public static final int abs__item_bg=0x7f060001;
+        public static final int abs__item_focused=0x7f060000;
+        public static final int abs__tab_text_color_dark=0x7f060002;
+        public static final int abs__tab_text_color_light=0x7f060003;
     }
     public static final class drawable {
-        public static final int arrival=0x7f020000;
-        public static final int back_bus=0x7f020001;
-        public static final int back_ec=0x7f020002;
-        public static final int back_eic=0x7f020003;
-        public static final int back_foot=0x7f020004;
-        public static final int back_ir=0x7f020005;
-        public static final int back_kdp=0x7f020006;
-        public static final int back_re=0x7f020007;
-        public static final int back_reg=0x7f020008;
-        public static final int back_skm=0x7f020009;
-        public static final int back_tlk=0x7f02000a;
-        public static final int changes=0x7f02000b;
-        public static final int clock=0x7f02000c;
-        public static final int departure=0x7f02000d;
-        public static final int end_gray=0x7f02000e;
-        public static final int end_green=0x7f02000f;
-        public static final int ic_love=0x7f020010;
-        public static final int ic_menu_change_order=0x7f020011;
-        public static final int ic_menu_directions=0x7f020012;
-        public static final int ic_menu_forward=0x7f020013;
-        public static final int ic_menu_more=0x7f020014;
-        public static final int ic_menu_preferences=0x7f020015;
-        public static final int ic_menu_revert=0x7f020016;
-        public static final int ic_menu_share=0x7f020017;
-        public static final int ic_menu_show_list=0x7f020018;
-        public static final int ic_menu_today=0x7f020019;
-        public static final int ic_mylocation=0x7f02001a;
-        public static final int icon=0x7f02001b;
-        public static final int info=0x7f02001c;
-        public static final int saved=0x7f02001d;
-        public static final int sta_gray=0x7f02001e;
-        public static final int sta_graygreen=0x7f02001f;
-        public static final int sta_green=0x7f020020;
-        public static final int sta_greengray=0x7f020021;
-        public static final int start_gray=0x7f020022;
-        public static final int start_green=0x7f020023;
-        public static final int taxity=0x7f020024;
-        public static final int time=0x7f020025;
+        public static final int abs__ab_stacked_transparent_dark_holo=0x7f020000;
+        public static final int abs__ab_stacked_transparent_light_holo=0x7f020001;
+        public static final int abs__action_item_divider=0x7f020002;
+        public static final int abs__cab_background_holo_dark=0x7f020003;
+        public static final int abs__cab_background_holo_light=0x7f020004;
+        public static final int abs__cab_ic_close_focused_holo=0x7f020005;
+        public static final int abs__cab_ic_close_holo=0x7f020006;
+        public static final int abs__cab_ic_close_normal_holo=0x7f020007;
+        public static final int abs__cab_ic_close_pressed_holo=0x7f020008;
+        public static final int abs__ic_ab_back_holo_dark=0x7f020009;
+        public static final int abs__ic_ab_back_holo_light=0x7f02000a;
+        public static final int abs__item_background_holo_dark=0x7f02000b;
+        public static final int abs__item_background_holo_light=0x7f02000c;
+        public static final int abs__list_focused_holo=0x7f02000d;
+        public static final int abs__list_longpressed_holo=0x7f02000e;
+        public static final int abs__list_pressed_holo_dark=0x7f02000f;
+        public static final int abs__list_pressed_holo_light=0x7f020010;
+        public static final int abs__list_selector_background_transition_holo_dark=0x7f020011;
+        public static final int abs__list_selector_background_transition_holo_light=0x7f020012;
+        public static final int abs__list_selector_disabled_holo_dark=0x7f020013;
+        public static final int abs__list_selector_disabled_holo_light=0x7f020014;
+        public static final int abs__spinner_background_holo_dark=0x7f020015;
+        public static final int abs__spinner_background_holo_light=0x7f020016;
+        public static final int abs__spinner_default_holo_dark=0x7f020017;
+        public static final int abs__spinner_default_holo_light=0x7f020018;
+        public static final int abs__spinner_disabled_holo_dark=0x7f020019;
+        public static final int abs__spinner_disabled_holo_light=0x7f02001a;
+        public static final int abs__spinner_focused_holo_dark=0x7f02001b;
+        public static final int abs__spinner_focused_holo_light=0x7f02001c;
+        public static final int abs__spinner_pressed_holo_dark=0x7f02001d;
+        public static final int abs__spinner_pressed_holo_light=0x7f02001e;
+        public static final int abs__tab_indicator_holo=0x7f02001f;
+        public static final int abs__tab_selected_focused_holo=0x7f020020;
+        public static final int abs__tab_selected_holo=0x7f020021;
+        public static final int abs__tab_selected_pressed_focused_holo=0x7f020022;
+        public static final int abs__tab_selected_pressed_holo=0x7f020023;
+        public static final int abs__tab_unselected_focused_holo=0x7f020024;
+        public static final int abs__tab_unselected_holo=0x7f020025;
+        public static final int abs__tab_unselected_pressed_focused_holo=0x7f020026;
+        public static final int abs__tab_unselected_pressed_holo=0x7f020027;
+        public static final int arrival=0x7f020028;
+        public static final int back_bus=0x7f020029;
+        public static final int back_ec=0x7f02002a;
+        public static final int back_eic=0x7f02002b;
+        public static final int back_foot=0x7f02002c;
+        public static final int back_ir=0x7f02002d;
+        public static final int back_kdp=0x7f02002e;
+        public static final int back_re=0x7f02002f;
+        public static final int back_reg=0x7f020030;
+        public static final int back_skm=0x7f020031;
+        public static final int back_tlk=0x7f020032;
+        public static final int btn_default_disabled_focused_holo_light=0x7f020033;
+        public static final int btn_default_disabled_holo_light=0x7f020034;
+        public static final int btn_default_focused_holo_light=0x7f020035;
+        public static final int btn_default_normal_holo_light=0x7f020036;
+        public static final int btn_default_pressed_holo_light=0x7f020037;
+        public static final int button_ics_holo=0x7f020038;
+        public static final int changes=0x7f020039;
+        public static final int clock=0x7f02003a;
+        public static final int departure=0x7f02003b;
+        public static final int end_gray=0x7f02003c;
+        public static final int end_green=0x7f02003d;
+        public static final int ic_love=0x7f02003e;
+        public static final int ic_menu_change_order=0x7f02003f;
+        public static final int ic_menu_directions=0x7f020040;
+        public static final int ic_menu_forward=0x7f020041;
+        public static final int ic_menu_more=0x7f020042;
+        public static final int ic_menu_preferences=0x7f020043;
+        public static final int ic_menu_revert=0x7f020044;
+        public static final int ic_menu_share=0x7f020045;
+        public static final int ic_menu_show_list=0x7f020046;
+        public static final int ic_menu_today=0x7f020047;
+        public static final int ic_mylocation=0x7f020048;
+        public static final int icon=0x7f020049;
+        public static final int info=0x7f02004a;
+        public static final int logo=0x7f02004b;
+        public static final int saved=0x7f02004c;
+        public static final int sta_gray=0x7f02004d;
+        public static final int sta_graygreen=0x7f02004e;
+        public static final int sta_green=0x7f02004f;
+        public static final int sta_greengray=0x7f020050;
+        public static final int start_gray=0x7f020051;
+        public static final int start_green=0x7f020052;
+        public static final int taxity=0x7f020053;
+        public static final int time=0x7f020054;
     }
     public static final class id {
-        public static final int arrival_edit=0x7f08000f;
-        public static final int arrival_icon=0x7f080008;
-        public static final int arrival_label=0x7f080023;
-        public static final int arrival_select=0x7f080018;
-        public static final int arrival_station=0x7f08000a;
-        public static final int arrival_time=0x7f080009;
-        public static final int attributes_button=0x7f080013;
-        public static final int carriers_button=0x7f080014;
-        public static final int changes=0x7f08001b;
-        public static final int changes_icon=0x7f08001a;
-        public static final int conn_header=0x7f080000;
-        public static final int connection_details=0x7f080001;
-        public static final int connection_list=0x7f080019;
-        public static final int date_button=0x7f080011;
-        public static final int departure_edit=0x7f08000c;
-        public static final int departure_icon=0x7f080003;
-        public static final int departure_label=0x7f080024;
-        public static final int departure_select=0x7f080016;
-        public static final int departure_station=0x7f080005;
-        public static final int departure_time=0x7f080004;
-        public static final int duration=0x7f080007;
-        public static final int duration_icon=0x7f080006;
-        public static final int header=0x7f08002e;
-        public static final int icon=0x7f080022;
-        public static final int info_icon=0x7f08001c;
-        public static final int item_carriers=0x7f080036;
-        public static final int item_continue_journey=0x7f080032;
-        public static final int item_delete=0x7f080037;
-        public static final int item_favourite=0x7f080030;
-        public static final int item_return_journey=0x7f080031;
-        public static final int item_settings=0x7f080034;
-        public static final int item_taxity=0x7f080033;
-        public static final int item_via=0x7f080035;
-        public static final int location_button=0x7f08000d;
-        public static final int ok_button=0x7f080015;
-        public static final int price=0x7f080002;
-        public static final int products_button=0x7f080012;
-        public static final int progress=0x7f080026;
-        public static final int remembered_list=0x7f08001e;
-        public static final int route=0x7f080021;
-        public static final int saved_icon=0x7f080020;
-        public static final int scrollitem_text=0x7f080027;
-        public static final int share=0x7f08002f;
-        public static final int station=0x7f080025;
-        public static final int station_edit=0x7f080029;
-        public static final int station_select=0x7f08002b;
-        public static final int text=0x7f08001f;
-        public static final int time=0x7f08002c;
-        public static final int time_button=0x7f080010;
-        public static final int timetable=0x7f080028;
-        public static final int train_number=0x7f08000b;
-        public static final int train_type=0x7f08002d;
-        public static final int type_button=0x7f08002a;
-        public static final int type_icons=0x7f08001d;
-        public static final int via_edit=0x7f08000e;
-        public static final int via_select=0x7f080017;
+        public static final int abs__action_bar=0x7f05001b;
+        public static final int abs__action_bar_container=0x7f05001a;
+        public static final int abs__action_bar_subtitle=0x7f050019;
+        public static final int abs__action_bar_title=0x7f050018;
+        public static final int abs__actions=0x7f05000a;
+        public static final int abs__content=0x7f05001c;
+        public static final int abs__custom=0x7f05000d;
+        public static final int abs__home=0x7f050010;
+        public static final int abs__home_wrapper=0x7f050009;
+        public static final int abs__iprogress=0x7f05000b;
+        public static final int abs__item_custom=0x7f050014;
+        public static final int abs__item_icon=0x7f050012;
+        public static final int abs__item_text=0x7f050013;
+        public static final int abs__nav_list=0x7f05000c;
+        public static final int abs__nav_tabs=0x7f05000e;
+        public static final int abs__nav_tabs_layout=0x7f050011;
+        public static final int abs__tab=0x7f050016;
+        public static final int abs__tab_custom=0x7f050017;
+        public static final int abs__tab_icon=0x7f050015;
+        public static final int abs__up=0x7f05000f;
+        public static final int arrival_edit=0x7f05002d;
+        public static final int arrival_icon=0x7f050026;
+        public static final int arrival_label=0x7f050041;
+        public static final int arrival_select=0x7f050036;
+        public static final int arrival_station=0x7f050028;
+        public static final int arrival_time=0x7f050027;
+        public static final int attributes_button=0x7f050031;
+        public static final int carriers_button=0x7f050032;
+        public static final int changes=0x7f050039;
+        public static final int changes_icon=0x7f050038;
+        public static final int conn_header=0x7f05001e;
+        public static final int connection_details=0x7f05001f;
+        public static final int connection_list=0x7f050037;
+        public static final int date_button=0x7f05002f;
+        public static final int departure_edit=0x7f05002a;
+        public static final int departure_icon=0x7f050021;
+        public static final int departure_label=0x7f050042;
+        public static final int departure_select=0x7f050034;
+        public static final int departure_station=0x7f050023;
+        public static final int departure_time=0x7f050022;
+        public static final int duration=0x7f050025;
+        public static final int duration_icon=0x7f050024;
+        public static final int header=0x7f05004c;
+        public static final int homeAsUp=0x7f050006;
+        public static final int icon=0x7f050040;
+        public static final int info_icon=0x7f05003a;
+        public static final int item_carriers=0x7f050054;
+        public static final int item_continue_journey=0x7f050050;
+        public static final int item_delete=0x7f050055;
+        public static final int item_favourite=0x7f05004e;
+        public static final int item_return_journey=0x7f05004f;
+        public static final int item_settings=0x7f050052;
+        public static final int item_taxity=0x7f050051;
+        public static final int item_via=0x7f050053;
+        public static final int listMode=0x7f050002;
+        public static final int location_button=0x7f05002b;
+        public static final int normal=0x7f050001;
+        public static final int ok_button=0x7f050033;
+        public static final int pager=0x7f05001d;
+        public static final int price=0x7f050020;
+        public static final int products_button=0x7f050030;
+        public static final int progress=0x7f050044;
+        public static final int remembered_list=0x7f05003c;
+        public static final int route=0x7f05003f;
+        public static final int saved_icon=0x7f05003e;
+        public static final int scrollitem_text=0x7f050045;
+        public static final int share=0x7f05004d;
+        public static final int showCustom=0x7f050008;
+        public static final int showHome=0x7f050005;
+        public static final int showTitle=0x7f050007;
+        public static final int station=0x7f050043;
+        public static final int station_edit=0x7f050047;
+        public static final int station_select=0x7f050049;
+        public static final int tabMode=0x7f050003;
+        public static final int text=0x7f05003d;
+        public static final int time=0x7f05004a;
+        public static final int time_button=0x7f05002e;
+        public static final int timetable=0x7f050046;
+        public static final int train_number=0x7f050029;
+        public static final int train_type=0x7f05004b;
+        public static final int type_button=0x7f050048;
+        public static final int type_icons=0x7f05003b;
+        public static final int useLogo=0x7f050004;
+        public static final int via_edit=0x7f05002c;
+        public static final int via_select=0x7f050035;
+        public static final int wrap_content=0x7f050000;
+    }
+    public static final class integer {
+        public static final int abs__max_action_buttons=0x7f070000;
     }
     public static final class layout {
-        public static final int common_date_header_row=0x7f030000;
-        public static final int connection_details=0x7f030001;
-        public static final int connection_details_price_row=0x7f030002;
-        public static final int connection_details_row=0x7f030003;
-        public static final int connection_form=0x7f030004;
-        public static final int connection_form_clarify=0x7f030005;
-        public static final int connection_list=0x7f030006;
-        public static final int connection_list_row=0x7f030007;
-        public static final int main=0x7f030008;
-        public static final int remembered_list=0x7f030009;
-        public static final int remembered_row=0x7f03000a;
-        public static final int route=0x7f03000b;
-        public static final int route_row=0x7f03000c;
-        public static final int scrollitem=0x7f03000d;
-        public static final int station_edit_item=0x7f03000e;
-        public static final int timetable=0x7f03000f;
-        public static final int timetable_form=0x7f030010;
-        public static final int timetable_form_clarify=0x7f030011;
-        public static final int timetable_row=0x7f030012;
-        public static final int train_details=0x7f030013;
-        public static final int train_details_header=0x7f030014;
-        public static final int warning_item=0x7f030015;
+        public static final int abs__action_bar=0x7f030000;
+        public static final int abs__action_bar_home=0x7f030001;
+        public static final int abs__action_bar_inline=0x7f030002;
+        public static final int abs__action_bar_item_layout=0x7f030003;
+        public static final int abs__action_bar_tab_layout=0x7f030004;
+        public static final int abs__action_bar_title_item=0x7f030005;
+        public static final int abs__screen_action_bar=0x7f030006;
+        public static final int abs__screen_action_bar_inline=0x7f030007;
+        public static final int abs__screen_action_bar_inline_overlay=0x7f030008;
+        public static final int abs__screen_action_bar_overlay=0x7f030009;
+        public static final int abs__screen_simple=0x7f03000a;
+        public static final int abs__simple_spinner_item=0x7f03000b;
+        public static final int actionbar_tabs_pager=0x7f03000c;
+        public static final int common_date_header_row=0x7f03000d;
+        public static final int connection_details=0x7f03000e;
+        public static final int connection_details_price_row=0x7f03000f;
+        public static final int connection_details_row=0x7f030010;
+        public static final int connection_form=0x7f030011;
+        public static final int connection_form_clarify=0x7f030012;
+        public static final int connection_list=0x7f030013;
+        public static final int connection_list_row=0x7f030014;
+        public static final int main=0x7f030015;
+        public static final int remembered_list=0x7f030016;
+        public static final int remembered_row=0x7f030017;
+        public static final int route=0x7f030018;
+        public static final int route_row=0x7f030019;
+        public static final int scrollitem=0x7f03001a;
+        public static final int station_edit_item=0x7f03001b;
+        public static final int timetable=0x7f03001c;
+        public static final int timetable_form=0x7f03001d;
+        public static final int timetable_form_clarify=0x7f03001e;
+        public static final int timetable_row=0x7f03001f;
+        public static final int train_details=0x7f030020;
+        public static final int train_details_header=0x7f030021;
+        public static final int warning_item=0x7f030022;
     }
     public static final class menu {
-        public static final int connection_details=0x7f070000;
-        public static final int connection_list=0x7f070001;
-        public static final int connections_form=0x7f070002;
-        public static final int remembered=0x7f070003;
-        public static final int remembered_list_context=0x7f070004;
-        public static final int timetable=0x7f070005;
-        public static final int timetable_form=0x7f070006;
+        public static final int connection_details=0x7f0b0000;
+        public static final int connection_list=0x7f0b0001;
+        public static final int connections_form=0x7f0b0002;
+        public static final int remembered=0x7f0b0003;
+        public static final int remembered_list_context=0x7f0b0004;
+        public static final int timetable=0x7f0b0005;
+        public static final int timetable_form=0x7f0b0006;
     }
     public static final class string {
-        public static final int app_name=0x7f050000;
-        public static final int arrivalShortLabel=0x7f05000b;
-        public static final int departureShortLabel=0x7f05000a;
-        public static final int hintArrivalStation=0x7f05000c;
-        public static final int hintDepartureStation=0x7f05000d;
-        public static final int hintStation=0x7f05000f;
-        public static final int hintViaStation=0x7f05000e;
-        public static final int menuAddVia=0x7f050010;
-        public static final int menuDisableAC=0x7f050015;
-        public static final int menuEnableAC=0x7f050014;
-        public static final int menuLessOptions=0x7f050013;
-        public static final int menuMoreOptions=0x7f050012;
-        public static final int menuRemoveVia=0x7f050011;
-        public static final int progressBodyLocation=0x7f050002;
-        public static final int progressSearchingStation=0x7f050003;
-        public static final int progressTitle=0x7f050001;
-        public static final int toastArrivalEmpty=0x7f050006;
-        public static final int toastDepartureEmpty=0x7f050007;
-        public static final int toastLocationError=0x7f050004;
-        public static final int toastSameStationsError=0x7f050005;
-        public static final int toastStationEmpty=0x7f050009;
-        public static final int toastViaEmpty=0x7f050008;
+        public static final int abs__tab_under_ab_tag=0x7f080000;
+        public static final int app_name=0x7f080001;
+        public static final int arrivalShortLabel=0x7f08000c;
+        public static final int departureShortLabel=0x7f08000b;
+        public static final int hintArrivalStation=0x7f08000d;
+        public static final int hintDepartureStation=0x7f08000e;
+        public static final int hintStation=0x7f080010;
+        public static final int hintViaStation=0x7f08000f;
+        public static final int menuAddVia=0x7f080011;
+        public static final int menuDisableAC=0x7f080016;
+        public static final int menuEnableAC=0x7f080015;
+        public static final int menuLessOptions=0x7f080014;
+        public static final int menuMoreOptions=0x7f080013;
+        public static final int menuRemoveVia=0x7f080012;
+        public static final int progressBodyLocation=0x7f080003;
+        public static final int progressSearchingStation=0x7f080004;
+        public static final int progressTitle=0x7f080002;
+        public static final int toastArrivalEmpty=0x7f080007;
+        public static final int toastDepartureEmpty=0x7f080008;
+        public static final int toastLocationError=0x7f080005;
+        public static final int toastSameStationsError=0x7f080006;
+        public static final int toastStationEmpty=0x7f08000a;
+        public static final int toastViaEmpty=0x7f080009;
+    }
+    public static final class style {
+        public static final int AutoCompleteTextViewLight=0x7f090022;
+        public static final int HoloButton=0x7f090023;
+        public static final int Internal_Widget_Sherlock_ActionBar=0x7f09001c;
+        public static final int Internal_Widget_Sherlock_Light_ActionBar=0x7f09001d;
+        public static final int RozkladABSubtitleTextStyle=0x7f090021;
+        public static final int RozkladABTabTextStyle=0x7f09001f;
+        public static final int RozkladABTitleTextStyle=0x7f090020;
+        public static final int TextAppearance_Widget_Subtitle=0x7f09001b;
+        public static final int TextAppearance_Widget_Title=0x7f09001a;
+        public static final int Theme_RozkladPKP=0x7f09001e;
+        public static final int Theme_Sherlock=0x7f090000;
+        public static final int Theme_Sherlock_Light=0x7f09000d;
+        public static final int Widget_Sherlock_ActionBar_TabBar=0x7f090001;
+        public static final int Widget_Sherlock_ActionBar_TabText=0x7f090003;
+        public static final int Widget_Sherlock_ActionBar_TabView=0x7f090002;
+        public static final int Widget_Sherlock_ActionButton=0x7f090004;
+        public static final int Widget_Sherlock_ActionButton_CloseMode=0x7f090006;
+        public static final int Widget_Sherlock_ActionButton_Home=0x7f090007;
+        public static final int Widget_Sherlock_ActionButton_Overflow=0x7f090008;
+        public static final int Widget_Sherlock_Light_ActionBar_TabBar=0x7f09000e;
+        public static final int Widget_Sherlock_Light_ActionBar_TabText=0x7f090010;
+        public static final int Widget_Sherlock_Light_ActionBar_TabView=0x7f09000f;
+        public static final int Widget_Sherlock_Light_ActionButton=0x7f090011;
+        public static final int Widget_Sherlock_Light_ActionButton_CloseMode=0x7f090016;
+        public static final int Widget_Sherlock_Light_ActionButton_Home=0x7f090012;
+        public static final int Widget_Sherlock_Light_ActionButton_Overflow=0x7f090013;
+        public static final int Widget_Sherlock_Light_ListPopupWindow=0x7f090018;
+        public static final int Widget_Sherlock_Light_ListView_DropDown=0x7f090017;
+        public static final int Widget_Sherlock_Light_PopupMenu=0x7f090019;
+        public static final int Widget_Sherlock_Light_Spinner=0x7f090015;
+        public static final int Widget_Sherlock_Light_TextView_SpinnerItem_ActionBar=0x7f090014;
+        public static final int Widget_Sherlock_ListPopupWindow=0x7f09000a;
+        public static final int Widget_Sherlock_ListView_DropDown=0x7f09000b;
+        public static final int Widget_Sherlock_PopupMenu=0x7f09000c;
+        public static final int Widget_Sherlock_Spinner=0x7f090005;
+        public static final int Widget_Sherlock_TextView_SpinnerItem_ActionBar=0x7f090009;
     }
     public static final class xml {
         public static final int preferences=0x7f040000;
     }
+    public static final class styleable {
+        /** Attributes that can be used with a SherlockTheme.
+           <p>Includes the following attributes:</p>
+           <table>
+           <colgroup align="left" />
+           <colgroup align="left" />
+           <tr><th>Attribute</th><th>Description</th></tr>
+           <tr><td><code>{@link #SherlockTheme_abBackground org.tyszecki.rozkladpkp:abBackground}</code></td><td></td></tr>
+           <tr><td><code>{@link #SherlockTheme_abBackgroundStacked org.tyszecki.rozkladpkp:abBackgroundStacked}</code></td><td></td></tr>
+           <tr><td><code>{@link #SherlockTheme_abCustomNavigationLayout org.tyszecki.rozkladpkp:abCustomNavigationLayout}</code></td><td></td></tr>
+           <tr><td><code>{@link #SherlockTheme_abDisplayOptions org.tyszecki.rozkladpkp:abDisplayOptions}</code></td><td></td></tr>
+           <tr><td><code>{@link #SherlockTheme_abDivider org.tyszecki.rozkladpkp:abDivider}</code></td><td></td></tr>
+           <tr><td><code>{@link #SherlockTheme_abHeight org.tyszecki.rozkladpkp:abHeight}</code></td><td></td></tr>
+           <tr><td><code>{@link #SherlockTheme_abHomeLayout org.tyszecki.rozkladpkp:abHomeLayout}</code></td><td></td></tr>
+           <tr><td><code>{@link #SherlockTheme_abIcon org.tyszecki.rozkladpkp:abIcon}</code></td><td></td></tr>
+           <tr><td><code>{@link #SherlockTheme_abIndeterminateProgressStyle org.tyszecki.rozkladpkp:abIndeterminateProgressStyle}</code></td><td></td></tr>
+           <tr><td><code>{@link #SherlockTheme_abItemPadding org.tyszecki.rozkladpkp:abItemPadding}</code></td><td></td></tr>
+           <tr><td><code>{@link #SherlockTheme_abLogo org.tyszecki.rozkladpkp:abLogo}</code></td><td></td></tr>
+           <tr><td><code>{@link #SherlockTheme_abNavigationMode org.tyszecki.rozkladpkp:abNavigationMode}</code></td><td></td></tr>
+           <tr><td><code>{@link #SherlockTheme_abProgressBarPadding org.tyszecki.rozkladpkp:abProgressBarPadding}</code></td><td></td></tr>
+           <tr><td><code>{@link #SherlockTheme_abProgressBarStyle org.tyszecki.rozkladpkp:abProgressBarStyle}</code></td><td></td></tr>
+           <tr><td><code>{@link #SherlockTheme_abSubtitle org.tyszecki.rozkladpkp:abSubtitle}</code></td><td></td></tr>
+           <tr><td><code>{@link #SherlockTheme_abSubtitleTextStyle org.tyszecki.rozkladpkp:abSubtitleTextStyle}</code></td><td></td></tr>
+           <tr><td><code>{@link #SherlockTheme_abTitle org.tyszecki.rozkladpkp:abTitle}</code></td><td></td></tr>
+           <tr><td><code>{@link #SherlockTheme_abTitleTextStyle org.tyszecki.rozkladpkp:abTitleTextStyle}</code></td><td></td></tr>
+           <tr><td><code>{@link #SherlockTheme_actionBarSize org.tyszecki.rozkladpkp:actionBarSize}</code></td><td>attr name="actionBarStyle" format="reference" /</td></tr>
+           <tr><td><code>{@link #SherlockTheme_actionBarTabBarStyle org.tyszecki.rozkladpkp:actionBarTabBarStyle}</code></td><td></td></tr>
+           <tr><td><code>{@link #SherlockTheme_actionBarTabStyle org.tyszecki.rozkladpkp:actionBarTabStyle}</code></td><td></td></tr>
+           <tr><td><code>{@link #SherlockTheme_actionBarTabTextStyle org.tyszecki.rozkladpkp:actionBarTabTextStyle}</code></td><td></td></tr>
+           <tr><td><code>{@link #SherlockTheme_actionButtonStyle org.tyszecki.rozkladpkp:actionButtonStyle}</code></td><td></td></tr>
+           <tr><td><code>{@link #SherlockTheme_actionDropDownStyle org.tyszecki.rozkladpkp:actionDropDownStyle}</code></td><td></td></tr>
+           <tr><td><code>{@link #SherlockTheme_actionHomeButtonStyle org.tyszecki.rozkladpkp:actionHomeButtonStyle}</code></td><td></td></tr>
+           <tr><td><code>{@link #SherlockTheme_actionMenuTextAppearance org.tyszecki.rozkladpkp:actionMenuTextAppearance}</code></td><td></td></tr>
+           <tr><td><code>{@link #SherlockTheme_actionMenuTextColor org.tyszecki.rozkladpkp:actionMenuTextColor}</code></td><td></td></tr>
+           <tr><td><code>{@link #SherlockTheme_actionModeBackground org.tyszecki.rozkladpkp:actionModeBackground}</code></td><td></td></tr>
+           <tr><td><code>{@link #SherlockTheme_actionModeCloseButtonStyle org.tyszecki.rozkladpkp:actionModeCloseButtonStyle}</code></td><td></td></tr>
+           <tr><td><code>{@link #SherlockTheme_actionModeCloseDrawable org.tyszecki.rozkladpkp:actionModeCloseDrawable}</code></td><td></td></tr>
+           <tr><td><code>{@link #SherlockTheme_actionOverflowButtonStyle org.tyszecki.rozkladpkp:actionOverflowButtonStyle}</code></td><td></td></tr>
+           <tr><td><code>{@link #SherlockTheme_actionSpinnerItemStyle org.tyszecki.rozkladpkp:actionSpinnerItemStyle}</code></td><td></td></tr>
+           <tr><td><code>{@link #SherlockTheme_dropDownListViewStyle org.tyszecki.rozkladpkp:dropDownListViewStyle}</code></td><td></td></tr>
+           <tr><td><code>{@link #SherlockTheme_dropdownListPreferredItemHeight org.tyszecki.rozkladpkp:dropdownListPreferredItemHeight}</code></td><td></td></tr>
+           <tr><td><code>{@link #SherlockTheme_homeAsUpIndicator org.tyszecki.rozkladpkp:homeAsUpIndicator}</code></td><td></td></tr>
+           <tr><td><code>{@link #SherlockTheme_popupMenuStyle org.tyszecki.rozkladpkp:popupMenuStyle}</code></td><td></td></tr>
+           <tr><td><code>{@link #SherlockTheme_selectableItemBackground org.tyszecki.rozkladpkp:selectableItemBackground}</code></td><td></td></tr>
+           <tr><td><code>{@link #SherlockTheme_windowActionBar org.tyszecki.rozkladpkp:windowActionBar}</code></td><td></td></tr>
+           <tr><td><code>{@link #SherlockTheme_windowActionModeOverlay org.tyszecki.rozkladpkp:windowActionModeOverlay}</code></td><td></td></tr>
+           </table>
+           @see #SherlockTheme_abBackground
+           @see #SherlockTheme_abBackgroundStacked
+           @see #SherlockTheme_abCustomNavigationLayout
+           @see #SherlockTheme_abDisplayOptions
+           @see #SherlockTheme_abDivider
+           @see #SherlockTheme_abHeight
+           @see #SherlockTheme_abHomeLayout
+           @see #SherlockTheme_abIcon
+           @see #SherlockTheme_abIndeterminateProgressStyle
+           @see #SherlockTheme_abItemPadding
+           @see #SherlockTheme_abLogo
+           @see #SherlockTheme_abNavigationMode
+           @see #SherlockTheme_abProgressBarPadding
+           @see #SherlockTheme_abProgressBarStyle
+           @see #SherlockTheme_abSubtitle
+           @see #SherlockTheme_abSubtitleTextStyle
+           @see #SherlockTheme_abTitle
+           @see #SherlockTheme_abTitleTextStyle
+           @see #SherlockTheme_actionBarSize
+           @see #SherlockTheme_actionBarTabBarStyle
+           @see #SherlockTheme_actionBarTabStyle
+           @see #SherlockTheme_actionBarTabTextStyle
+           @see #SherlockTheme_actionButtonStyle
+           @see #SherlockTheme_actionDropDownStyle
+           @see #SherlockTheme_actionHomeButtonStyle
+           @see #SherlockTheme_actionMenuTextAppearance
+           @see #SherlockTheme_actionMenuTextColor
+           @see #SherlockTheme_actionModeBackground
+           @see #SherlockTheme_actionModeCloseButtonStyle
+           @see #SherlockTheme_actionModeCloseDrawable
+           @see #SherlockTheme_actionOverflowButtonStyle
+           @see #SherlockTheme_actionSpinnerItemStyle
+           @see #SherlockTheme_dropDownListViewStyle
+           @see #SherlockTheme_dropdownListPreferredItemHeight
+           @see #SherlockTheme_homeAsUpIndicator
+           @see #SherlockTheme_popupMenuStyle
+           @see #SherlockTheme_selectableItemBackground
+           @see #SherlockTheme_windowActionBar
+           @see #SherlockTheme_windowActionModeOverlay
+         */
+        public static final int[] SherlockTheme = {
+            0x7f010000, 0x7f010001, 0x7f010002, 0x7f010003,
+            0x7f010004, 0x7f010005, 0x7f010006, 0x7f010007,
+            0x7f010008, 0x7f010009, 0x7f01000a, 0x7f01000b,
+            0x7f01000c, 0x7f01000d, 0x7f01000e, 0x7f01000f,
+            0x7f010010, 0x7f010011, 0x7f010012, 0x7f010013,
+            0x7f010014, 0x7f010015, 0x7f010016, 0x7f010017,
+            0x7f010018, 0x7f010019, 0x7f01001a, 0x7f01001b,
+            0x7f01001c, 0x7f01001d, 0x7f01001e, 0x7f01001f,
+            0x7f010020, 0x7f010021, 0x7f010022, 0x7f010023,
+            0x7f010024, 0x7f010025, 0x7f010026
+        };
+        /**
+          <p>This symbol is the offset where the {@link org.tyszecki.rozkladpkp.R.attr#abBackground}
+          attribute's value can be found in the {@link #SherlockTheme} array.
+
+
+          <p>May be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+<p>May be a color value, in the form of "<code>#<i>rgb</i></code>", "<code>#<i>argb</i></code>",
+"<code>#<i>rrggbb</i></code>", or "<code>#<i>aarrggbb</i></code>".
+          @attr name android:abBackground
+        */
+        public static final int SherlockTheme_abBackground = 30;
+        /**
+          <p>This symbol is the offset where the {@link org.tyszecki.rozkladpkp.R.attr#abBackgroundStacked}
+          attribute's value can be found in the {@link #SherlockTheme} array.
+
+
+          <p>May be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+<p>May be a color value, in the form of "<code>#<i>rgb</i></code>", "<code>#<i>argb</i></code>",
+"<code>#<i>rrggbb</i></code>", or "<code>#<i>aarrggbb</i></code>".
+          @attr name android:abBackgroundStacked
+        */
+        public static final int SherlockTheme_abBackgroundStacked = 31;
+        /**
+          <p>This symbol is the offset where the {@link org.tyszecki.rozkladpkp.R.attr#abCustomNavigationLayout}
+          attribute's value can be found in the {@link #SherlockTheme} array.
+
+
+          <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+          @attr name android:abCustomNavigationLayout
+        */
+        public static final int SherlockTheme_abCustomNavigationLayout = 32;
+        /**
+          <p>This symbol is the offset where the {@link org.tyszecki.rozkladpkp.R.attr#abDisplayOptions}
+          attribute's value can be found in the {@link #SherlockTheme} array.
+
+
+          <p>Must be one or more (separated by '|') of the following constant values.</p>
+<table>
+<colgroup align="left" />
+<colgroup align="left" />
+<colgroup align="left" />
+<tr><th>Constant</th><th>Value</th><th>Description</th></tr>
+<tr><td><code>useLogo</code></td><td>0x1</td><td></td></tr>
+<tr><td><code>showHome</code></td><td>0x2</td><td></td></tr>
+<tr><td><code>homeAsUp</code></td><td>0x4</td><td></td></tr>
+<tr><td><code>showTitle</code></td><td>0x8</td><td></td></tr>
+<tr><td><code>showCustom</code></td><td>0x10</td><td></td></tr>
+</table>
+          @attr name android:abDisplayOptions
+        */
+        public static final int SherlockTheme_abDisplayOptions = 22;
+        /**
+          <p>This symbol is the offset where the {@link org.tyszecki.rozkladpkp.R.attr#abDivider}
+          attribute's value can be found in the {@link #SherlockTheme} array.
+
+
+          <p>May be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+<p>May be a color value, in the form of "<code>#<i>rgb</i></code>", "<code>#<i>argb</i></code>",
+"<code>#<i>rrggbb</i></code>", or "<code>#<i>aarrggbb</i></code>".
+          @attr name android:abDivider
+        */
+        public static final int SherlockTheme_abDivider = 29;
+        /**
+          <p>This symbol is the offset where the {@link org.tyszecki.rozkladpkp.R.attr#abHeight}
+          attribute's value can be found in the {@link #SherlockTheme} array.
+
+
+          <p>May be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+<p>May be a dimension value, which is a floating point number appended with a unit such as "<code>14.5sp</code>".
+Available units are: px (pixels), dp (density-independent pixels), sp (scaled pixels based on preferred font size),
+in (inches), mm (millimeters).
+          @attr name android:abHeight
+        */
+        public static final int SherlockTheme_abHeight = 33;
+        /**
+          <p>This symbol is the offset where the {@link org.tyszecki.rozkladpkp.R.attr#abHomeLayout}
+          attribute's value can be found in the {@link #SherlockTheme} array.
+
+
+          <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+          @attr name android:abHomeLayout
+        */
+        public static final int SherlockTheme_abHomeLayout = 34;
+        /**
+          <p>This symbol is the offset where the {@link org.tyszecki.rozkladpkp.R.attr#abIcon}
+          attribute's value can be found in the {@link #SherlockTheme} array.
+
+
+          <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+          @attr name android:abIcon
+        */
+        public static final int SherlockTheme_abIcon = 27;
+        /**
+          <p>This symbol is the offset where the {@link org.tyszecki.rozkladpkp.R.attr#abIndeterminateProgressStyle}
+          attribute's value can be found in the {@link #SherlockTheme} array.
+
+
+          <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+          @attr name android:abIndeterminateProgressStyle
+        */
+        public static final int SherlockTheme_abIndeterminateProgressStyle = 36;
+        /**
+          <p>This symbol is the offset where the {@link org.tyszecki.rozkladpkp.R.attr#abItemPadding}
+          attribute's value can be found in the {@link #SherlockTheme} array.
+
+
+          <p>Must be a dimension value, which is a floating point number appended with a unit such as "<code>14.5sp</code>".
+Available units are: px (pixels), dp (density-independent pixels), sp (scaled pixels based on preferred font size),
+in (inches), mm (millimeters).
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+          @attr name android:abItemPadding
+        */
+        public static final int SherlockTheme_abItemPadding = 38;
+        /**
+          <p>This symbol is the offset where the {@link org.tyszecki.rozkladpkp.R.attr#abLogo}
+          attribute's value can be found in the {@link #SherlockTheme} array.
+
+
+          <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+          @attr name android:abLogo
+        */
+        public static final int SherlockTheme_abLogo = 28;
+        /**
+          <p>This symbol is the offset where the {@link org.tyszecki.rozkladpkp.R.attr#abNavigationMode}
+          attribute's value can be found in the {@link #SherlockTheme} array.
+
+
+          <p>Must be one of the following constant values.</p>
+<table>
+<colgroup align="left" />
+<colgroup align="left" />
+<colgroup align="left" />
+<tr><th>Constant</th><th>Value</th><th>Description</th></tr>
+<tr><td><code>normal</code></td><td>0</td><td></td></tr>
+<tr><td><code>listMode</code></td><td>1</td><td></td></tr>
+<tr><td><code>tabMode</code></td><td>2</td><td></td></tr>
+</table>
+          @attr name android:abNavigationMode
+        */
+        public static final int SherlockTheme_abNavigationMode = 21;
+        /**
+          <p>This symbol is the offset where the {@link org.tyszecki.rozkladpkp.R.attr#abProgressBarPadding}
+          attribute's value can be found in the {@link #SherlockTheme} array.
+
+
+          <p>Must be a dimension value, which is a floating point number appended with a unit such as "<code>14.5sp</code>".
+Available units are: px (pixels), dp (density-independent pixels), sp (scaled pixels based on preferred font size),
+in (inches), mm (millimeters).
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+          @attr name android:abProgressBarPadding
+        */
+        public static final int SherlockTheme_abProgressBarPadding = 37;
+        /**
+          <p>This symbol is the offset where the {@link org.tyszecki.rozkladpkp.R.attr#abProgressBarStyle}
+          attribute's value can be found in the {@link #SherlockTheme} array.
+
+
+          <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+          @attr name android:abProgressBarStyle
+        */
+        public static final int SherlockTheme_abProgressBarStyle = 35;
+        /**
+          <p>This symbol is the offset where the {@link org.tyszecki.rozkladpkp.R.attr#abSubtitle}
+          attribute's value can be found in the {@link #SherlockTheme} array.
+
+
+          <p>Must be a string value, using '\\;' to escape characters such as '\\n' or '\\uxxxx' for a unicode character.
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+          @attr name android:abSubtitle
+        */
+        public static final int SherlockTheme_abSubtitle = 24;
+        /**
+          <p>This symbol is the offset where the {@link org.tyszecki.rozkladpkp.R.attr#abSubtitleTextStyle}
+          attribute's value can be found in the {@link #SherlockTheme} array.
+
+
+          <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+          @attr name android:abSubtitleTextStyle
+        */
+        public static final int SherlockTheme_abSubtitleTextStyle = 26;
+        /**
+          <p>This symbol is the offset where the {@link org.tyszecki.rozkladpkp.R.attr#abTitle}
+          attribute's value can be found in the {@link #SherlockTheme} array.
+
+
+          <p>Must be a string value, using '\\;' to escape characters such as '\\n' or '\\uxxxx' for a unicode character.
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+          @attr name android:abTitle
+        */
+        public static final int SherlockTheme_abTitle = 23;
+        /**
+          <p>This symbol is the offset where the {@link org.tyszecki.rozkladpkp.R.attr#abTitleTextStyle}
+          attribute's value can be found in the {@link #SherlockTheme} array.
+
+
+          <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+          @attr name android:abTitleTextStyle
+        */
+        public static final int SherlockTheme_abTitleTextStyle = 25;
+        /**
+          <p>
+          @attr description
+          attr name="actionBarStyle" format="reference" /
+
+
+          <p>May be a dimension value, which is a floating point number appended with a unit such as "<code>14.5sp</code>".
+Available units are: px (pixels), dp (density-independent pixels), sp (scaled pixels based on preferred font size),
+in (inches), mm (millimeters).
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+<p>May be one of the following constant values.</p>
+<table>
+<colgroup align="left" />
+<colgroup align="left" />
+<colgroup align="left" />
+<tr><th>Constant</th><th>Value</th><th>Description</th></tr>
+<tr><td><code>wrap_content</code></td><td>0</td><td></td></tr>
+</table>
+          <p>This is a private symbol.
+          @attr name android:actionBarSize
+        */
+        public static final int SherlockTheme_actionBarSize = 7;
+        /**
+          <p>This symbol is the offset where the {@link org.tyszecki.rozkladpkp.R.attr#actionBarTabBarStyle}
+          attribute's value can be found in the {@link #SherlockTheme} array.
+
+
+          <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+          @attr name android:actionBarTabBarStyle
+        */
+        public static final int SherlockTheme_actionBarTabBarStyle = 3;
+        /**
+          <p>This symbol is the offset where the {@link org.tyszecki.rozkladpkp.R.attr#actionBarTabStyle}
+          attribute's value can be found in the {@link #SherlockTheme} array.
+
+
+          <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+          @attr name android:actionBarTabStyle
+        */
+        public static final int SherlockTheme_actionBarTabStyle = 2;
+        /**
+          <p>This symbol is the offset where the {@link org.tyszecki.rozkladpkp.R.attr#actionBarTabTextStyle}
+          attribute's value can be found in the {@link #SherlockTheme} array.
+
+
+          <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+          @attr name android:actionBarTabTextStyle
+        */
+        public static final int SherlockTheme_actionBarTabTextStyle = 4;
+        /**
+          <p>This symbol is the offset where the {@link org.tyszecki.rozkladpkp.R.attr#actionButtonStyle}
+          attribute's value can be found in the {@link #SherlockTheme} array.
+
+
+          <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+          @attr name android:actionButtonStyle
+        */
+        public static final int SherlockTheme_actionButtonStyle = 1;
+        /**
+          <p>This symbol is the offset where the {@link org.tyszecki.rozkladpkp.R.attr#actionDropDownStyle}
+          attribute's value can be found in the {@link #SherlockTheme} array.
+
+
+          <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+          @attr name android:actionDropDownStyle
+        */
+        public static final int SherlockTheme_actionDropDownStyle = 0;
+        /**
+          <p>This symbol is the offset where the {@link org.tyszecki.rozkladpkp.R.attr#actionHomeButtonStyle}
+          attribute's value can be found in the {@link #SherlockTheme} array.
+
+
+          <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+          @attr name android:actionHomeButtonStyle
+        */
+        public static final int SherlockTheme_actionHomeButtonStyle = 6;
+        /**
+          <p>This symbol is the offset where the {@link org.tyszecki.rozkladpkp.R.attr#actionMenuTextAppearance}
+          attribute's value can be found in the {@link #SherlockTheme} array.
+
+
+          <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+          @attr name android:actionMenuTextAppearance
+        */
+        public static final int SherlockTheme_actionMenuTextAppearance = 8;
+        /**
+          <p>This symbol is the offset where the {@link org.tyszecki.rozkladpkp.R.attr#actionMenuTextColor}
+          attribute's value can be found in the {@link #SherlockTheme} array.
+
+
+          <p>May be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+<p>May be a color value, in the form of "<code>#<i>rgb</i></code>", "<code>#<i>argb</i></code>",
+"<code>#<i>rrggbb</i></code>", or "<code>#<i>aarrggbb</i></code>".
+          @attr name android:actionMenuTextColor
+        */
+        public static final int SherlockTheme_actionMenuTextColor = 9;
+        /**
+          <p>This symbol is the offset where the {@link org.tyszecki.rozkladpkp.R.attr#actionModeBackground}
+          attribute's value can be found in the {@link #SherlockTheme} array.
+
+
+          <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+          @attr name android:actionModeBackground
+        */
+        public static final int SherlockTheme_actionModeBackground = 11;
+        /**
+          <p>This symbol is the offset where the {@link org.tyszecki.rozkladpkp.R.attr#actionModeCloseButtonStyle}
+          attribute's value can be found in the {@link #SherlockTheme} array.
+
+
+          <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+          @attr name android:actionModeCloseButtonStyle
+        */
+        public static final int SherlockTheme_actionModeCloseButtonStyle = 10;
+        /**
+          <p>This symbol is the offset where the {@link org.tyszecki.rozkladpkp.R.attr#actionModeCloseDrawable}
+          attribute's value can be found in the {@link #SherlockTheme} array.
+
+
+          <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+          @attr name android:actionModeCloseDrawable
+        */
+        public static final int SherlockTheme_actionModeCloseDrawable = 12;
+        /**
+          <p>This symbol is the offset where the {@link org.tyszecki.rozkladpkp.R.attr#actionOverflowButtonStyle}
+          attribute's value can be found in the {@link #SherlockTheme} array.
+
+
+          <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+          @attr name android:actionOverflowButtonStyle
+        */
+        public static final int SherlockTheme_actionOverflowButtonStyle = 5;
+        /**
+          <p>This symbol is the offset where the {@link org.tyszecki.rozkladpkp.R.attr#actionSpinnerItemStyle}
+          attribute's value can be found in the {@link #SherlockTheme} array.
+
+
+          <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+          @attr name android:actionSpinnerItemStyle
+        */
+        public static final int SherlockTheme_actionSpinnerItemStyle = 18;
+        /**
+          <p>This symbol is the offset where the {@link org.tyszecki.rozkladpkp.R.attr#dropDownListViewStyle}
+          attribute's value can be found in the {@link #SherlockTheme} array.
+
+
+          <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+          @attr name android:dropDownListViewStyle
+        */
+        public static final int SherlockTheme_dropDownListViewStyle = 15;
+        /**
+          <p>This symbol is the offset where the {@link org.tyszecki.rozkladpkp.R.attr#dropdownListPreferredItemHeight}
+          attribute's value can be found in the {@link #SherlockTheme} array.
+
+
+          <p>Must be a dimension value, which is a floating point number appended with a unit such as "<code>14.5sp</code>".
+Available units are: px (pixels), dp (density-independent pixels), sp (scaled pixels based on preferred font size),
+in (inches), mm (millimeters).
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+          @attr name android:dropdownListPreferredItemHeight
+        */
+        public static final int SherlockTheme_dropdownListPreferredItemHeight = 17;
+        /**
+          <p>This symbol is the offset where the {@link org.tyszecki.rozkladpkp.R.attr#homeAsUpIndicator}
+          attribute's value can be found in the {@link #SherlockTheme} array.
+
+
+          <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+          @attr name android:homeAsUpIndicator
+        */
+        public static final int SherlockTheme_homeAsUpIndicator = 13;
+        /**
+          <p>This symbol is the offset where the {@link org.tyszecki.rozkladpkp.R.attr#popupMenuStyle}
+          attribute's value can be found in the {@link #SherlockTheme} array.
+
+
+          <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+          @attr name android:popupMenuStyle
+        */
+        public static final int SherlockTheme_popupMenuStyle = 16;
+        /**
+          <p>This symbol is the offset where the {@link org.tyszecki.rozkladpkp.R.attr#selectableItemBackground}
+          attribute's value can be found in the {@link #SherlockTheme} array.
+
+
+          <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+          @attr name android:selectableItemBackground
+        */
+        public static final int SherlockTheme_selectableItemBackground = 14;
+        /**
+          <p>This symbol is the offset where the {@link org.tyszecki.rozkladpkp.R.attr#windowActionBar}
+          attribute's value can be found in the {@link #SherlockTheme} array.
+
+
+          <p>Must be a boolean value, either "<code>true</code>" or "<code>false</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+          @attr name android:windowActionBar
+        */
+        public static final int SherlockTheme_windowActionBar = 19;
+        /**
+          <p>This symbol is the offset where the {@link org.tyszecki.rozkladpkp.R.attr#windowActionModeOverlay}
+          attribute's value can be found in the {@link #SherlockTheme} array.
+
+
+          <p>Must be a boolean value, either "<code>true</code>" or "<code>false</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+          @attr name android:windowActionModeOverlay
+        */
+        public static final int SherlockTheme_windowActionModeOverlay = 20;
+    };
 }

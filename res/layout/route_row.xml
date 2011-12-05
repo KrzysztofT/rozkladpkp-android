@@ -32,24 +32,34 @@
 	    				<TableRow>
 	    					<TextView 
 	    						android:text="@string/arrivalShortLabel"
+	    						android:textColor="#606060"
+            					android:textSize="15sp"	
 	    						android:id="@+id/arrival_label"/>
 	        				<TextView 
 	        					android:id="@+id/arrival_time" 
+	        					android:textColor="#606060"
+            					android:textSize="15sp"
 	        					android:textStyle="bold"
 	        					android:paddingLeft="6dip"/>
 	        			</TableRow>
 	        			<TableRow>
 	        				<TextView 
 	        					android:text="@string/departureShortLabel"
+	        					android:textColor="#606060"
+            					android:textSize="15sp"
 	        					android:id="@+id/departure_label"/>
 	        				<TextView 
 	        					android:id="@+id/departure_time" 
+	        					android:textColor="#606060"
+            					android:textSize="15sp"
 	        					android:textStyle="bold"
 	        					android:paddingLeft="6dip"/>
 	        			</TableRow>
 	    		</TableLayout>
 		<TextView
 	        android:id="@+id/station"
+	        android:textColor="#606060"
+            android:textSize="15sp"
 	        android:layout_height="fill_parent"
 	        android:paddingLeft="15dip"
 	        android:gravity="center_vertical" />

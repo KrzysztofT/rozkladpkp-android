@@ -31,6 +31,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.DialogInterface.OnCancelListener;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -38,7 +39,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 
-public class ConnectionDetailsActivity extends Activity {
+public class ConnectionDetailsActivity extends FragmentActivity {
 	private ConnectionDetailsItemAdapter adapter;
 	private PLN pln;
 	//private String startDate;
@@ -51,6 +52,8 @@ public class ConnectionDetailsActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.connection_details);
         setTitle("Plan podróży");
+        
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         
         //startDate = getIntent().getExtras().getString("StartDate");
         pln = new PLN(getIntent().getExtras().getByteArray("PLNData"));
@@ -160,21 +163,28 @@ public class ConnectionDetailsActivity extends Activity {
 			priceProgress.dismiss();
 	}
 	
-	/*public boolean onCreateOptionsMenu(Menu menu){
+	@Override
+	public boolean onCreateOptionsMenu(android.support.v4.view.Menu menu) {
 		getMenuInflater().inflate(R.menu.connection_details, menu);
 		return true;
 	}
 	
-	public boolean onOptionsItemSelected (MenuItem item){
-		Bundle extras = getIntent().getExtras();
-		Intent ni = null;
+	@Override
+	public boolean onOptionsItemSelected(android.support.v4.view.MenuItem item) {
+		//Bundle extras = getIntent().getExtras();
+		//Intent ni = null;
 		switch(item.getItemId()){
-		case R.id.share:
+		case android.R.id.home:
+			finish();
+		    return true;
+	/*	case R.id.share:
 			Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
 			sharingIntent.setType("text/plain");
 			sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, adapter.getContentForSharing());
 			startActivity(Intent.createChooser(sharingIntent, "Udostępnij przez..."));
-			return true;
+			return true;*/
+		default:
+            return super.onOptionsItemSelected(item);
 		}
-	}*/
+	}
 }

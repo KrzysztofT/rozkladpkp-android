@@ -29,6 +29,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.Menu;
@@ -38,7 +39,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 
-public class TimetableActivity extends Activity {
+public class TimetableActivity extends FragmentActivity {
 
 	private TimetableItemAdapter m_adapter;
 
@@ -62,7 +63,9 @@ public class TimetableActivity extends Activity {
         
         RememberedManager.addtoHistory(this, stationID, dep, null);
         
-        setTitle((dep?"Odjazdy z ":"Przyjazdy do ")+extras.getString("Station"));
+        getSupportActionBar().setTitle(extras.getString("Station"));
+        getSupportActionBar().setSubtitle(dep?"Odjazdy":"Przyjazdy");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         
      
         if(extras.containsKey("Filename"))
@@ -175,13 +178,18 @@ public class TimetableActivity extends Activity {
     	alertDialog.show();
 	}
 	
-	public boolean onCreateOptionsMenu(Menu menu){
+	@Override
+	public boolean onCreateOptionsMenu(android.support.v4.view.Menu menu) {
 		getMenuInflater().inflate(R.menu.timetable, menu);
 		return true;
 	}
 	
-	public boolean onOptionsItemSelected (MenuItem item){
+	@Override
+	public boolean onOptionsItemSelected(android.support.v4.view.MenuItem item) {
 		switch(item.getItemId()){
+		case android.R.id.home:
+			finish();
+		    return true;
 		case R.id.item_favourite:
 			RememberedManager.saveStation(this, CommonUtils.StationIDfromSID(SID), dep);
 			return true;

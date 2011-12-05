@@ -80,12 +80,17 @@ public class StationSpinner extends Spinner {
 	
 	public void setUserInput(String s, String id)
 	{
-		stations = new String[1][2];
-		stations[0][0] = s;
-		stations[0][1] = id;
-		acHandler.post(showUpdate);
-		if(pdialog != null && pdialog.isShowing()) pdialog.dismiss();
-        if(callback != null)callback.dataLoaded();
+		if(id == null)
+			setUserInput(s);
+		else
+		{
+			stations = new String[1][2];
+			stations[0][0] = s;
+			stations[0][1] = id;
+			acHandler.post(showUpdate);
+			if(pdialog != null && pdialog.isShowing()) pdialog.dismiss();
+	        if(callback != null)callback.dataLoaded();
+		}
 	}
 
 	

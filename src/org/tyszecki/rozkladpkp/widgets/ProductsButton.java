@@ -19,14 +19,17 @@ package org.tyszecki.rozkladpkp.widgets;
 import java.util.ArrayList;
 
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnMultiChoiceClickListener;
+import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.util.AttributeSet;
 import android.widget.Button;
 
-public class ProductsButton extends Button {
+public class ProductsButton extends Button implements DialogControl {
 
 	//KDP,Ex,D,Os,Bus,Tram,Sub
 	boolean[] p = new boolean[7];
@@ -37,37 +40,8 @@ public class ProductsButton extends Button {
 		super(context, attrs);
 	}
 	
-	public Dialog getDialog() {
-		
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-		builder.setTitle("Środki transportu");
-		
-		for(int i = 0; i < 7; i++)
-			dial[i] = p[i];
-		
-		builder.setMultiChoiceItems(items, p, new OnMultiChoiceClickListener() {
-			
-			@Override
-			public void onClick(DialogInterface arg0, int arg1, boolean arg2) {
-				dial[arg1] = arg2;
-			}
-		});	
-		
-		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-	           public void onClick(DialogInterface dialog, int id) {
-	        	   for(int i = 0; i < 7; i++)
-	       				p[i] = dial[i];
-	        	   updateText();
-	        	   dialog.cancel();
-	           }
-	       })
-	       .setNegativeButton("Anuluj", new DialogInterface.OnClickListener() {
-	           public void onClick(DialogInterface dialog, int id) {
-	                dialog.dismiss();
-	           }
-	       });
-		return builder.create();
+	public DialogFragment getDialog() {
+		return new ProductPickerFragment();
 	}
 
 	public void setProductString(String s)
@@ -121,6 +95,39 @@ public class ProductsButton extends Button {
 				}
 				setText(t);
 			}
+		}
+	}
+	
+	private class ProductPickerFragment extends DialogFragment{
+		public Dialog onCreateDialog(Bundle savedInstanceState) {
+			AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+			builder.setTitle("Środki transportu");
+			
+			for(int i = 0; i < 7; i++)
+				dial[i] = p[i];
+			
+			builder.setMultiChoiceItems(items, p, new OnMultiChoiceClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface arg0, int arg1, boolean arg2) {
+					dial[arg1] = arg2;
+				}
+			});	
+			
+			builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+		           public void onClick(DialogInterface dialog, int id) {
+		        	   for(int i = 0; i < 7; i++)
+		       				p[i] = dial[i];
+		        	   updateText();
+		        	   dialog.cancel();
+		           }
+		       })
+		       .setNegativeButton("Anuluj", new DialogInterface.OnClickListener() {
+		           public void onClick(DialogInterface dialog, int id) {
+		                dialog.dismiss();
+		           }
+		       });
+			return builder.create();
 		}
 	}
 }

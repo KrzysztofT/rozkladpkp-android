@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.RozkladPKP" parent="@style/Theme.Sherlock.Light">
+    	<item name="abBackground">#292929</item>
+    	<item name="abTitleTextStyle">@style/RozkladABTitleTextStyle</item>
+    	<item name="abSubtitleTextStyle">@style/RozkladABSubtitleTextStyle</item>
+    	<item name="actionBarTabTextStyle">@style/RozkladABTabTextStyle</item>
+    	<item name="abLogo">@drawable/logo</item>
+    	
+    	<item name="android:autoCompleteTextViewStyle">@style/AutoCompleteTextViewLight</item>
+    	<item name="android:buttonStyle">@style/HoloButton</item>
+    </style>
+    
+  
+    <style name="RozkladABTabTextStyle" parent="@style/Theme.Sherlock.Light">
+        <item name="android:textColor">#ffffff</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    
+    <style name="RozkladABTitleTextStyle" parent="@style/TextAppearance.Widget.Title">
+        <item name="android:textColor">#ffffff</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    
+    <style name="RozkladABSubtitleTextStyle" parent="@style/TextAppearance.Widget.Subtitle">
+        <item name="android:textColor">#ffffff</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+ 	
+    <style name="AutoCompleteTextViewLight" parent="@android:style/Widget.AutoCompleteTextView">
+		<item name="android:textColor">@android:color/primary_text_light</item>
+		
+	</style>
+	
+    <style name="HoloButton" parent="@android:style/Widget.Button">
+        <item name="android:background">@drawable/button_ics_holo</item>
+        <item name="android:padding">12dp</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceMediumInverse</item>
+    </style>
+</resources>

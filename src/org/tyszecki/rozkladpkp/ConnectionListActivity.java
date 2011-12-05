@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import org.tyszecki.rozkladpkp.ConnectionList.ConnectionListCallback;
 import org.tyszecki.rozkladpkp.ConnectionListItem.ScrollItem;
 import org.tyszecki.rozkladpkp.ConnectionListItem.TripItem;
+import org.tyszecki.rozkladpkp.PLN.Trip;
+import org.tyszecki.rozkladpkp.PLN.TripIterator;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -35,6 +37,8 @@ import android.content.DialogInterface.OnCancelListener;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.app.FragmentActivity;
+import android.text.format.Time;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -45,14 +49,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
-public class ConnectionListActivity extends Activity {
+public class ConnectionListActivity extends FragmentActivity {
 	
 	private ProgressDialog m_ProgressDialog;
 	private boolean hasFullTable = false;
 	private boolean inFront = true, showNCDialog = false;
 	private String timetableUrl = null;
 	private ArrayList<SerializableNameValuePair> commonFieldsList;
-	
 	
 	private Bundle extras;
 	
@@ -67,7 +70,7 @@ public class ConnectionListActivity extends Activity {
 		
         adapter = new ConnectionListItemAdapter(this); 
         extras = getIntent().getExtras();
-        
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         clistCallback = new ConnectionListCallback() {
 			@Override
 			public void contentReady(ConnectionList list, boolean error) {
@@ -84,7 +87,8 @@ public class ConnectionListActivity extends Activity {
 			}
 		};
 		
-        setTitle("Połączenia "+extras.getString("depName")+" - "+extras.getString("arrName"));
+		getSupportActionBar().setTitle(extras.getString("depName")+" →");
+		getSupportActionBar().setSubtitle(extras.getString("arrName"));
         
         setupCommonFields();
 		setupContents(savedInstanceState);
@@ -312,16 +316,20 @@ public class ConnectionListActivity extends Activity {
 		});
 	}
 
-	
-	public boolean onCreateOptionsMenu(Menu menu){
+	@Override
+	public boolean onCreateOptionsMenu(android.support.v4.view.Menu menu) {
 		getMenuInflater().inflate(R.menu.connection_list, menu);
 		return true;
 	}
 	
-	public boolean onOptionsItemSelected (MenuItem item){
+
+	public boolean onOptionsItemSelected (android.support.v4.view.MenuItem item){
 		Bundle extras = getIntent().getExtras();
 		Intent ni = null;
 		switch(item.getItemId()){
+		case android.R.id.home:
+			finish();
+		    return true;
 		/*case R.id.savepln:
 			File f = new File(Environment.getExternalStorageDirectory(),"PLN");
 			FileOutputStream w = null;
@@ -335,10 +343,31 @@ public class ConnectionListActivity extends Activity {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			return true;*/
-		case R.id.item_favourite:
-			RememberedManager.addtoHistory(ConnectionListActivity.this, CommonUtils.StationIDfromSID(extras.getString("SID")), CommonUtils.StationIDfromSID(extras.getString("ZID")),"");
+			return true;
+		*/case R.id.item_favourite:
+			try{TripIterator p = clist.getPLN().tripIterator(); //TODO: Ładniej, to jest na szybko.
+			p.moveToLast();
+			Trip t1 = p.next();
+			Time time = new Time();
+			String t = null;
+			
+			String r[] = t1.date.split("\\.");
+			String u[] = t1.con.getTrain(0).deptime.toString().split(":");
+			String jt[] = t1.con.getJourneyTime().toString().split(":");
+			
+			
+			time.set(0, Integer.parseInt(u[1]), ((Integer.parseInt(u[0])+23)%24)+1, Integer.parseInt(r[0]), Integer.parseInt(r[1])-1, Integer.parseInt(r[2]));
+			time.hour += Integer.parseInt(jt[0])+3;
+			time.minute += Integer.parseInt(jt[1]);
+			time.normalize(false);
+			
+			t = time.format2445();
+			RememberedManager.addtoHistory(ConnectionListActivity.this, CommonUtils.StationIDfromSID(extras.getString("SID")), CommonUtils.StationIDfromSID(extras.getString("ZID")),t);
 			RememberedManager.saveRoute(ConnectionListActivity.this, CommonUtils.StationIDfromSID(extras.getString("SID")), CommonUtils.StationIDfromSID(extras.getString("ZID")));
+			}
+			catch(Exception e){
+				return true;
+			}
 			return true;
 		
 		case R.id.item_return_journey:

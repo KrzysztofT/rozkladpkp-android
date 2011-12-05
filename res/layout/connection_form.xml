@@ -29,20 +29,23 @@
         	android:layout_width="match_parent"
         	android:layout_height="wrap_content">
 			<org.tyszecki.rozkladpkp.widgets.StationEdit
+			    android:imeOptions="actionDone"
 	        	android:id="@+id/departure_edit"
 	        	android:layout_width="fill_parent"
 	        	android:layout_height="wrap_content"
 				android:layout_toLeftOf="@+id/location_button"
 				/>
 			<ImageButton 
+			    style="@style/HoloButton"
 				android:src="@drawable/ic_mylocation"
 				android:id="@+id/location_button" 
-				android:layout_width="50dp"
-				android:layout_height="50dp"
+				android:layout_width="48dp"
+				android:layout_height="48dp"
 				android:layout_alignParentRight="true" />
 		</RelativeLayout>
 
 		<org.tyszecki.rozkladpkp.widgets.StationEdit
+		    android:imeOptions="actionDone"
         	android:id="@+id/via_edit"
 			android:visibility="gone"        	
         	android:layout_width="fill_parent"
@@ -50,6 +53,7 @@
         	
         <org.tyszecki.rozkladpkp.widgets.StationEdit
         	android:id="@+id/arrival_edit"
+        	android:imeOptions="actionDone"
         	android:layout_width="fill_parent"
         	android:layout_height="wrap_content"/>
         	

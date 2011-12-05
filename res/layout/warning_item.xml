@@ -25,5 +25,7 @@
             android:layout_height="wrap_content"
             android:padding="6dip"          
             android:gravity="center"
+            android:textColor="#606060"
+            android:textSize="15sp"
         />
 </LinearLayout>

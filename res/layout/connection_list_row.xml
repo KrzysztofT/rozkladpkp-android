@@ -22,8 +22,8 @@
     android:layout_height="wrap_content">
     <TableRow
     	android:gravity="center_vertical"
-    	android:paddingTop="6dip"
-    	android:paddingBottom="6dip">
+    	android:paddingTop="8dip"
+    	android:paddingBottom="8dip">
         <ImageView 
 	        android:id="@+id/departure_icon" 
 	        android:src="@drawable/departure"/>
@@ -32,13 +32,17 @@
             android:textStyle="bold"
             android:layout_marginLeft="3dip"
             android:layout_marginRight="13dip"
+            android:textColor="#606060"
+            android:textSize="16sp"
             />
         <ImageView 
 	        android:id="@+id/arrival_icon" 
 	        android:src="@drawable/arrival"/>
         <TextView
             android:id="@+id/arrival_time"
+            android:textSize="16sp"
             android:textStyle="bold"
+            android:textColor="#606060"
             android:layout_marginLeft="3dip"
             android:layout_marginRight="13dip"/>
         <ImageView 
@@ -46,6 +50,8 @@
 	        android:src="@drawable/time"/>
         <TextView
             android:id="@+id/duration"
+            android:textSize="16sp"
+            android:textColor="#606060"
             android:layout_marginLeft="3dip"
             android:layout_marginRight="13dip"/>
         <ImageView 
@@ -53,6 +59,8 @@
 	        android:src="@drawable/changes"/>
         <TextView
             android:id="@+id/changes"
+            android:textSize="16sp"
+            android:textColor="#606060"
             android:layout_marginLeft="3dip"
             android:layout_marginRight="13dip"/>
         <ImageView 

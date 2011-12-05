@@ -21,13 +21,16 @@ import org.tyszecki.rozkladpkp.R;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.text.Html;
 import android.text.format.Time;
 import android.util.AttributeSet;
 import android.widget.Button;
 import android.widget.TimePicker;
 
-public class TimeButton extends Button {
+public class TimeButton extends Button implements DialogControl {
 
 	private String txt = "";
 	Integer minute,hour;
@@ -39,8 +42,8 @@ public class TimeButton extends Button {
 		time	= new Time();
 	}
 	
-	public Dialog timeDialog() {
-	    return new TimePickerDialog(getContext(),mTimeSetListener, hour, minute, true);
+	public DialogFragment getDialog() {
+	    return new TimePickerFragment();
 	}
 	
 	private TimePickerDialog.OnTimeSetListener mTimeSetListener =
@@ -77,9 +80,14 @@ public class TimeButton extends Button {
 	
 	public void setTime(String time)
 	{
-		String[] t = time.split(":"); 
-		if(t.length >= 2)
-			setTime(Integer.parseInt(t[0]), Integer.parseInt(t[1]));
+		if(time == null)
+			setToNow();
+		else
+		{
+			String[] t = time.split(":"); 
+			if(t.length >= 2)
+				setTime(Integer.parseInt(t[0]), Integer.parseInt(t[1]));
+		}
 	}
 	
 	public void setPrefix(String pref)
@@ -96,5 +104,19 @@ public class TimeButton extends Button {
 	public String getTime()
 	{
 		return hour.toString()+":"+minute.toString();
+	}
+	
+	public void forceFocus()
+	{
+		setFocusable(true);
+    	setFocusableInTouchMode(true);
+    	requestFocus();
+    	requestFocusFromTouch();
+	}
+	
+	private class TimePickerFragment extends DialogFragment{
+		public Dialog onCreateDialog(Bundle savedInstanceState) {
+			return new TimePickerDialog(getActivity(), mTimeSetListener, hour, minute, true);
+		}
 	}
 }

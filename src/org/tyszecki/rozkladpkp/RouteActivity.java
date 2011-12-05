@@ -25,12 +25,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.DialogInterface.OnCancelListener;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 
-public class RouteActivity extends Activity {
+public class RouteActivity extends FragmentActivity {
 	
 	private RouteItemAdapter adapter;
 	private RouteTask task = null;
@@ -41,6 +43,7 @@ public class RouteActivity extends Activity {
         
         final Bundle extras = getIntent().getExtras();
         
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         
 		adapter = new RouteItemAdapter(this);
         ListView lv = ((ListView)findViewById(R.id.route));
@@ -145,5 +148,20 @@ public class RouteActivity extends Activity {
 		super.onPause();
 		if(task != null)
 			task.cancel(true);
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+        case android.R.id.home:
+            // app icon in action bar clicked; go home
+            /*Intent intent = new Intent(this, RozkladPKP.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);*/
+        	finish();
+            return true;
+        default:
+            return super.onOptionsItemSelected(item);
+    }
 	}
 }

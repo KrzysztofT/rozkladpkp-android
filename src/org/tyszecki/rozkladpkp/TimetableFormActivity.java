@@ -1,316 +1,44 @@
-/*******************************************************************************
- * This file is part of the RozkladPKP project.
- * 
- *     RozkladPKP is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU General Public License as published by
- *     the Free Software Foundation, either version 3 of the License, or
- *     (at your option) any later version.
- * 
- *     RozkladPKP is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU General Public License for more details.
- * 
- *     You should have received a copy of the GNU General Public License 
- *     along with RozkladPKP.  If not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************/
 package org.tyszecki.rozkladpkp;
 
-import org.tyszecki.rozkladpkp.widgets.DateButton;
-import org.tyszecki.rozkladpkp.widgets.ProductsButton;
-import org.tyszecki.rozkladpkp.widgets.StationEdit;
-import org.tyszecki.rozkladpkp.widgets.StationSpinner;
-import org.tyszecki.rozkladpkp.widgets.TimeButton;
-import org.tyszecki.rozkladpkp.widgets.TimetableTypeButton;
-import org.tyszecki.rozkladpkp.widgets.StationSpinner.onDataLoaded;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.ProgressDialog;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.res.Resources;
-import android.content.DialogInterface;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.Selection;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.Toast;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.MenuItem;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.FrameLayout;
 
-public class TimetableFormActivity extends Activity {
-	
-	SharedPreferences pref;
-	
-	TimeButton timeb;
-	DateButton dateb;
-	ProductsButton prodb;
-
-	private Resources res;
-	
-	/*
-	 * Zwraca wartość true, jeśli obecnie należy wyświetlić formularz precyzujący
-	 * (z listą stacji zamiast pola edycji) 
-	 */
-	private boolean clarifyingForm()
-	{
-		Bundle e = getIntent().getExtras();
-		if(e != null)
-			return e.containsKey("userText");
-		return false;
-	}
-	
-	/*
-	 * Metoda zwraca Stringa zapisanego w Extras.
-	 * TODO: DRY (metoda jest powtórzona w ConnectionsFormActivity) 
-	 */
-	private String safeExtras(String key)
-	{
-		Bundle e = getIntent().getExtras();
-		if(e != null && e.containsKey(key))
-			return e.getString(key);
-		return null;
-	}
-	
-	public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        
-        //Czy potrzeba sprecyzować nazwę stacji?
-        final boolean clarify = clarifyingForm();
-        
-        setContentView(clarify ? R.layout.timetable_form_clarify : R.layout.timetable_form);
-        res = getResources();
-        pref = getPreferences(MODE_PRIVATE);
-        
-        timeb	= (TimeButton) findViewById(R.id.time_button);
-        
-        
-        if(!clarify)
-        {
-        	StationEdit autoComplete = (StationEdit)  findViewById(R.id.station_edit);
-	        autoComplete.setHint(res.getString(R.string.hintStation));
-	        autoComplete.setAutoComplete(pref.getBoolean("EnableStationAC", true));
-	        
-	        Bundle extras = getIntent().getExtras();
-	        
-	        if(extras != null && extras.containsKey("Station"))
-	        {
-	        	autoComplete.setText(extras.getString("Station"));
-	        	timeb.setFocusable(true);
-            	timeb.setFocusableInTouchMode(true);
-            	timeb.requestFocus();
-            	timeb.requestFocusFromTouch();
-	        }
-        }
-        else
-        {
-        	final ProgressDialog progressDialog = ProgressDialog.show(TimetableFormActivity.this, 
-        			res.getString(R.string.progressTitle), res.getString(R.string.progressSearchingStation), true);
-        	
-            final StationSpinner sp = (StationSpinner)  findViewById(R.id.station_select);
-            sp.setOnDataLoaded(new onDataLoaded() {
-				
-				@Override
-				public void dataLoaded() {
-					progressDialog.dismiss();
-					if(sp.getStationCount() == 0)
-					{
-						runOnUiThread(new Runnable() {
-							public void run() {
-								AlertDialog alertDialog;
-	        			    	alertDialog = new AlertDialog.Builder(TimetableFormActivity.this).create();
-	        			    	alertDialog.setTitle("Błąd wyszukiwania!");
-	        			    	alertDialog.setMessage("Nie można odnaleźć wskazanej stacji.");
-	        			    	alertDialog.setCancelable(false);
-	        			    	alertDialog.setOnKeyListener(CommonUtils.getOnlyDPadListener());
-	        			    	
-	        			    	alertDialog.setButton("Powrót", new DialogInterface.OnClickListener() {
-	        						public void onClick(DialogInterface arg0, int arg1) {
-	        							TimetableFormActivity.this.finish();
-	        						}
-	        					});
-	        			    	alertDialog.show();		
-							}
-						});
-					}
-				}
-			}); 
-            sp.setUserInput(getIntent().getExtras().getString("userText"));
-        }
-        
-        String ex;
-        
-        
-        
-        ex 		= safeExtras("Time");
-        if(ex == null)
-        	timeb.setToNow();
-        else
-        	timeb.setTime(ex);
-        
-        timeb.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View arg0) {
-				showDialog(0);
-			}
-		});
-        
-        dateb = (DateButton) findViewById(R.id.date_button);
-        
-        ex 		= safeExtras("Date");
-        if(ex == null)
-        	dateb.setToNow();
-        else
-        	dateb.setDate(ex);
-        
-        dateb.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View arg0) {
-				showDialog(1);
-			}
-		});
-        
-        prodb = (ProductsButton) findViewById(R.id.products_button);
-        prodb.setProductString(pref.getString("Products", "11110001111111"));
-        prodb.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View arg0) {
-				showDialog(2);
-				
-			}
-		});
-        
-        ex 		= safeExtras("Type");
-        if(ex == null)
-        	ex = "dep";
-        
-        ((TimetableTypeButton)findViewById(R.id.type_button)).setType(ex);
-        
-        ((Button) findViewById(R.id.ok_button)).setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View arg0) {
-				Intent ni;
-				if(!clarify)
-				{
-					//Nie wprowadzono nazwy stacji w ogóle
-					StationEdit autoComplete = (StationEdit)  findViewById(R.id.station_edit);
-					if(autoComplete.getText().toString().trim().length() == 0)
-					{
-						Toast.makeText(getApplicationContext(), res.getString(R.string.toastStationEmpty), Toast.LENGTH_SHORT).show();
-						return;
-					}
-					
-					//Wprowadzono coś, dalsze akcje wymagają połączenia internetowego
-					if(!CommonUtils.onlineCheck())
-						return;
-					String sid = autoComplete.getCurrentSID();
-					
-					//Niepełna nazwa, konieczne doprecyzowanie
-					if(sid.equals(""))
-					{
-						ni = new Intent(arg0.getContext(),TimetableFormActivity.class);
-						ni.putExtra("userText", autoComplete.getText().toString());
-					}
-					//Pełna nazwa, można wystartować aktywność rozkładu jazdy
-					else
-					{
-						ni = new Intent(arg0.getContext(),TimetableActivity.class);
-						ni.putExtra("SID", sid);
-						ni.putExtra("Station", autoComplete.getText().toString());
-					}
-				}
-				else
-				{
-					//Wybrano stację z dostępnej listy
-					ni = new Intent(arg0.getContext(),TimetableActivity.class);
-					StationSpinner sp = (StationSpinner)  findViewById(R.id.station_select);
-					sp.saveInDatabase();
-					
-					ni.putExtra("SID", sp.getCurrentSID());
-					ni.putExtra("Station", sp.getText());
-				}
-				
-				//Wystartowanie wybranej aktywności
-				ni.putExtra("Time", timeb.getTime());
-				ni.putExtra("Date", dateb.getDate());
-				ni.putExtra("Type", ((TimetableTypeButton)findViewById(R.id.type_button)).getType());
-				ni.putExtra("Products", prodb.getProductString());
-				
-				pref.edit().putString("Products", prodb.getProductString()).commit();
-				startActivity(ni);
-			}
-		});
-        
-        if(!clarify)
-        {
-	        ((ImageButton)findViewById(R.id.location_button)).setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					(new GetLocality()).execute();			
-				}
-			});
-        }
-	}
-	
-	
-	public boolean onCreateOptionsMenu(Menu menu){
-		getMenuInflater().inflate(R.menu.timetable_form, menu);
-		return true;
-	}
-	
-	public boolean onOptionsItemSelected (MenuItem item){
-		switch(item.getItemId()){
-		case R.id.item_settings:
-			Intent ni = new Intent(getBaseContext(),PreferencesActivity.class);
-			startActivity(ni);
-			return true;
-		}
-		return false;
-	}
+public class TimetableFormActivity extends FragmentActivity {
+	final int VIEW_ID = 0x1234;
 	
 	@Override
-	protected Dialog onCreateDialog(int id) {
-	    switch (id) {
-	    case 0:
-	        return timeb.timeDialog();
-	    case 1:
-	    	return dateb.dateDialog();
-	    case 2:
-	    	return prodb.getDialog();
-	    }
-	    return null;
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		
+		FrameLayout frame = new FrameLayout(this);
+        frame.setId(VIEW_ID);
+        setContentView(frame, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+        
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("Przeglądanie rozkładów");
+        
+        
+        if (savedInstanceState == null) {
+            Fragment newFragment = new TimetableFormFragment();
+            newFragment.setArguments(getIntent().getExtras());
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.add(VIEW_ID, newFragment).commit();
+        }
 	}
-	
-	private class GetLocality extends CommonUtils.GetLocalityTask{
-		ProgressDialog p;
-		
-		@Override
-		protected void onPreExecute() {
-			super.onPreExecute();
-			p = ProgressDialog.show(TimetableFormActivity.this, res.getString(R.string.progressTitle), res.getString(R.string.progressBodyLocation));
-		}
-		
-		@Override
-		protected void onPostExecute(String result) {
-			super.onPostExecute(result);
-			p.dismiss();
-
-			if(result == null)
-				Toast.makeText(getApplicationContext(), res.getText(R.string.toastLocationError), Toast.LENGTH_SHORT).show();
-			else
-			{
-				StationEdit ed = (StationEdit) findViewById(R.id.station_edit);
-				ed.setText(result);
-				final Editable etext = ed.getText();
-				final int position = etext.length();
-				Selection.setSelection(etext, position);
-			}
-		}
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    switch (item.getItemId()) {
+	        case android.R.id.home:
+	        	finish();
+	            return true;
+	        default:
+	            return super.onOptionsItemSelected(item);
+	    }
 	}
 }

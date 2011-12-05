@@ -7,7 +7,7 @@ import org.tyszecki.rozkladpkp.SerializableNameValuePair;
 import android.content.Context;
 import android.util.AttributeSet;
 
-public class CarriersButton extends AttributesButton {
+public class CarriersButton extends AttributesButton{
 
 	
 	public CarriersButton(Context context, AttributeSet attrs) {
