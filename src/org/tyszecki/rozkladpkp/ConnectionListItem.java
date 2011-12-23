@@ -18,9 +18,11 @@ package org.tyszecki.rozkladpkp;
 
 import org.tyszecki.rozkladpkp.PLN.Trip;
 
+import android.text.format.Time;
+
 public class ConnectionListItem {
 	static class DateItem extends ConnectionListItem{
-		String date;
+		Time date;
 	}
 	static class TripItem extends ConnectionListItem{
 		Trip t;

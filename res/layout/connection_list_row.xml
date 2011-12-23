@@ -17,7 +17,7 @@
 -->
 <TableLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
-	android:stretchColumns="9"
+	android:stretchColumns="10"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content">
     <TableRow
@@ -32,7 +32,7 @@
             android:textStyle="bold"
             android:layout_marginLeft="3dip"
             android:layout_marginRight="13dip"
-            android:textColor="#606060"
+            
             android:textSize="16sp"
             />
         <ImageView 
@@ -42,7 +42,7 @@
             android:id="@+id/arrival_time"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:textColor="#606060"
+           
             android:layout_marginLeft="3dip"
             android:layout_marginRight="13dip"/>
         <ImageView 
@@ -51,7 +51,7 @@
         <TextView
             android:id="@+id/duration"
             android:textSize="16sp"
-            android:textColor="#606060"
+            
             android:layout_marginLeft="3dip"
             android:layout_marginRight="13dip"/>
         <ImageView 
@@ -60,12 +60,18 @@
         <TextView
             android:id="@+id/changes"
             android:textSize="16sp"
-            android:textColor="#606060"
+            
             android:layout_marginLeft="3dip"
             android:layout_marginRight="13dip"/>
         <ImageView 
 	        android:id="@+id/info_icon"   
 	        android:src="@drawable/info"
+	        android:layout_marginRight="5dip"
+	        android:visibility="gone"/>
+        <ImageView 
+	        android:id="@+id/walk_icon"   
+	        android:src="@drawable/walk"
+	        android:layout_width="13dip"
 	        android:layout_marginRight="5dip"
 	        android:visibility="gone"/>
         <LinearLayout

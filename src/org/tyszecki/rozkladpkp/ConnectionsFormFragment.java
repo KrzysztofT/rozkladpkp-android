@@ -18,6 +18,7 @@ package org.tyszecki.rozkladpkp;
 
 import java.util.ArrayList;
 
+import org.tyszecki.rozkladpkp.LocationHelper.LocationState;
 import org.tyszecki.rozkladpkp.widgets.AttributesButton;
 import org.tyszecki.rozkladpkp.widgets.CarriersButton;
 import org.tyszecki.rozkladpkp.widgets.DateButton;
@@ -203,8 +204,11 @@ public class ConnectionsFormFragment extends Fragment {
 	        ((ImageButton) getView().findViewById(R.id.location_button)).setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					//task = new GetLocality();
-					//task.execute();
+					LocationState state = LocationHelper.getLocationState();
+					if(state == LocationState.Unavailable)
+						Toast.makeText(RozkladPKPApplication.getAppContext(), res.getText(R.string.toastLocationError), Toast.LENGTH_SHORT).show();
+					else if(state == LocationState.Ready)
+						depEdit.setText(LocationHelper.getLocation());
 				}
 			});
         }
@@ -363,15 +367,22 @@ public class ConnectionsFormFragment extends Fragment {
 	
 	@Override
 	public boolean onOptionsItemSelected(android.support.v4.view.MenuItem item) {
+		Intent ni;
 		switch(item.getItemId()){
 		case R.id.item_settings:
-			Intent ni = new Intent(getActivity(),PreferencesActivity.class); //TODO: Fragmentacja ;)
+			ni = new Intent(getActivity(),PreferencesActivity.class); //TODO: Fragmentacja ;)
 			startActivity(ni);
 			return true;
 		case R.id.item_via:
 			viaEdit.setVisibility(viaEdit.isShown() ? View.GONE : View.VISIBLE);
+			return true;
 		case R.id.item_carriers:
 			carriersButton.setVisibility(carriersButton.isShown() ? View.GONE : View.VISIBLE);
+			return true;
+		case R.id.item_about:
+			ni = new Intent(getActivity().getBaseContext(),AboutActivity.class);
+			startActivity(ni);
+			return true;
 		}
 		return false;
 	}

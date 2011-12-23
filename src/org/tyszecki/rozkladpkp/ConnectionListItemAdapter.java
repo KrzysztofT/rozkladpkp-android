@@ -33,8 +33,12 @@ import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.TextPaint;
+import android.text.format.Time;
+import android.text.style.AbsoluteSizeSpan;
+import android.text.style.BackgroundColorSpan;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.Gravity;
@@ -63,9 +67,9 @@ public class ConnectionListItemAdapter extends BaseAdapter {
 	TripIterator it;
 	
 	Context c;
-	private String lastDate;
 	private boolean scrolling = true;
 	private boolean delayInfo = false;
+	private String depStation;
 	
 	private int dep_width,arr_width;
 	private int textSize;
@@ -101,21 +105,21 @@ public class ConnectionListItemAdapter extends BaseAdapter {
 	public void setPLN(PLN file, boolean loadAll, boolean delays)
 	{
 		pln = file;
+		depStation = pln.departureStation().name;
+		
 		
 		delayInfo = delays;
 		if(delays)
 			calculateTextSizes();
 			
 		it = pln.tripIterator();
-	
-		lastDate = "";
+		
 		loadData(loadAll);
 		
 		ExternalDelayFetcher.requestUpdate(new ExternalDelayFetcherCallback() {
 			
 			@Override
 			public void ready(HashMap<String, Integer> delays, boolean cached) {
-				lastDate = "";
 				it = pln.tripIterator();
 				
 				pln.addExternalDelayInfo(delays);
@@ -194,6 +198,7 @@ public class ConnectionListItemAdapter extends BaseAdapter {
                 TextView bt = (TextView) v.findViewById(R.id.arrival_time);
 
                 ((ImageView) v.findViewById(R.id.info_icon)).setVisibility(o.hasMessages() ? View.VISIBLE : View.GONE);
+                ((ImageView) v.findViewById(R.id.walk_icon)).setVisibility(o.getTrain(0).depstation.name.equals(depStation) ? View.GONE : View.VISIBLE);
                 
                 int tl = o.getTrainCount();
                 
@@ -296,11 +301,14 @@ public class ConnectionListItemAdapter extends BaseAdapter {
                 		continue;
                 	
                 	String s = CommonUtils.trainType(o.getTrain(i).number);
-                	
+                	s = (s.length() > 0 ? s : "OS");
                 	TextView t = new TextView(c);
-                	t.setText(s.length() > 0 ? s : "OS");
+                	//Spannable str = new SpannableString(s.length() > 0 ? s : "OS");
+                	//str.setSpan(new BackgroundColorSpan(Color.BLUE), 0, str.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                	//str.setSpan(new AbsoluteSizeSpan(100), 0, str.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                	t.setText(s);
                 	t.setTextColor(Color.BLACK);
-                	t.setPadding(0, 0, 6, 0);
+                	
                 	t.setGravity(Gravity.CENTER_VERTICAL);
                 	t.setSingleLine();
                     
@@ -312,7 +320,7 @@ public class ConnectionListItemAdapter extends BaseAdapter {
         else if (con instanceof DateItem)
         {
         	TextView head = (TextView) v.findViewById(R.id.conn_header);
-            head.setText(((ConnectionListItem.DateItem)con).date);
+            head.setText(((ConnectionListItem.DateItem)con).date.format("%A, %d.%m.%Y"));
         }
         else
         {
@@ -395,14 +403,14 @@ public class ConnectionListItemAdapter extends BaseAdapter {
 	
 	private void loadData(boolean loadAll) {
 		items.clear();
-		
+		Time lastDate = null;
 		//FIXME: Zrobic to poprawniej, teraz jest to "skrot myslowy"
 		if(loadAll && scrolling)
 			items.add(new ConnectionListItem.ScrollItem(true));
 		while(it.hasNext()){
 			
         	Trip t = it.next();
-        	if(!t.date.equals(lastDate))
+        	if(lastDate == null || Time.compare(lastDate, t.date) != 0)
         	{
         		ConnectionListItem.DateItem d = new ConnectionListItem.DateItem();
         		
@@ -428,6 +436,7 @@ public class ConnectionListItemAdapter extends BaseAdapter {
 	
 	void loadMore()
 	{
+		Time lastDate = null;
 		int i = 0;
 		int s = items.size()-2;
 		
@@ -459,7 +468,7 @@ public class ConnectionListItemAdapter extends BaseAdapter {
 		for(ConnectionListItem it : items)
 		{
 			if(it instanceof ConnectionListItem.DateItem)
-				msg += ((ConnectionListItem.DateItem)it).date + ":\n";
+				msg += ((ConnectionListItem.DateItem)it).date.format("%d.%m.%Y") + ":\n";
 			else if(it instanceof ConnectionListItem.TripItem)
 			{
 				TripItem t = (ConnectionListItem.TripItem)it;

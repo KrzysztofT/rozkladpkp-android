@@ -22,6 +22,8 @@ import org.tyszecki.rozkladpkp.widgets.StationEdit;
 
 import android.app.Application;
 import android.content.Context;
+import android.os.Debug;
+import android.util.Log;
 
 @ReportsCrashes(formKey = "dFlJOVYyS1hYbENUWEVmQnE5azlKNFE6MQ")
 
@@ -32,10 +34,17 @@ public class RozkladPKPApplication extends Application {
 	@Override
     public void onCreate() {
         // The following line triggers the initialization of ACRA
-        //ACRA.init(this);
+        ACRA.init(this);
         super.onCreate();
         context = getApplicationContext();
+        
+        long startTime = System.currentTimeMillis();
         StationEdit.initTree();
+        long stopTime = System.currentTimeMillis();
+        long elapsedTime = stopTime - startTime;
+        Log.w("RozkladPKP", "Czas: "+Long.toString(elapsedTime));
+        
+        LocationHelper.init();
     }
 	
 	public static Context getAppContext()

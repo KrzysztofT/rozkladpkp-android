@@ -19,7 +19,9 @@ package org.tyszecki.rozkladpkp;
 import java.util.ArrayList;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ActionBar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -32,7 +34,7 @@ public class RozkladPKP extends FragmentActivity  {
     
     ViewPager  mViewPager;
     TabsAdapter mTabsAdapter;
-    
+    static SharedPreferences sp = null;
     /** Called when the activity is first created. */
 	
     @Override
@@ -54,64 +56,15 @@ public class RozkladPKP extends FragmentActivity  {
         mTabsAdapter.addTab(tab1, RememberedFragment.class);
         mTabsAdapter.addTab(tab2, ConnectionsFormFragment.class);
         mTabsAdapter.addTab(tab3, TimetableFormFragment.class);
-        //mTabsAdapter.addTab(tab2, ConnectionsFormActivity.class);
-        //mTabsAdapter.addTab(tab3, TimetableFormActivity.class);
-
-        if (savedInstanceState != null) {
-        	getSupportActionBar().setSelectedNavigationItem(savedInstanceState.getInt("index"));
-        }
         
-    	
-    	
-        /*Resources res = getResources(); // Resource object to get Drawables
-        tabHost = getTabHost();  // The activity TabHost
-        TabHost.TabSpec spec;  // Reusable TabSpec for each tab
-        Intent intent;  // Reusable Intent for each tab
-
-        // Create an Intent to launch an Activity for the tab (to be reused)
-        intent = new Intent().setClass(this, RememberedActivity.class);
-
-        // Initialize a TabSpec for each tab and add it to the TabHost
-        spec = tabHost.newTabSpec("remembered").setIndicator("Zapamiętane",
-                          res.getDrawable(R.drawable.ic_love))
-                      .setContent(intent);
-        tabHost.addTab(spec);
-
-        // Do the same for the other tabs
-        intent = new Intent().setClass(this, ConnectionsFormActivity.class);
-        spec = tabHost.newTabSpec("trips").setIndicator("Połączenia",
-                          res.getDrawable(R.drawable.ic_menu_change_order))
-                      .setContent(intent);
-        tabHost.addTab(spec);
-
-        intent = new Intent().setClass(this, TimetableFormActivity.class);
-        spec = tabHost.newTabSpec("boards").setIndicator("Rozkłady",
-                          res.getDrawable(R.drawable.ic_menu_show_list))
-                      .setContent(intent);
-        tabHost.addTab(spec);
-        
-        tabHost.setOnTabChangedListener( new OnTabChangeListener() {
-			
-			@Override
-			public void onTabChanged(String tabId) {
-					int cur = 1;
-					
-					if(tabId.equals("remembered"))cur=0;
-					if(tabId.equals("trips"))cur=1;
-					if(tabId.equals("boards"))cur=2;
-					
-					sp.edit().putInt("lastSelectedTab", cur).commit();
-				
-			}
-		});
-
         sp = PreferenceManager.getDefaultSharedPreferences(this);
         
-        int t = Integer.parseInt(sp.getString("defaultTab", "-1"));
-        if(t == -1)
-        	t = sp.getInt("lastSelectedTab", 1); 
-        	
-        tabHost.setCurrentTab(t);*/
+        if (savedInstanceState == null) {
+            int t = Integer.parseInt(sp.getString("defaultTab", "-1"));
+            if(t == -1)
+            	t = sp.getInt("lastSelectedTab", 1);
+        	getSupportActionBar().setSelectedNavigationItem(t);
+        }
     }
     public static class TabsAdapter extends FragmentPagerAdapter implements ViewPager.OnPageChangeListener, ActionBar.TabListener {
         private final Context mContext;
@@ -160,6 +113,7 @@ public class RozkladPKP extends FragmentActivity  {
     	@Override
     	public void onTabSelected(Tab tab, FragmentTransaction ft) {
     		mViewPager.setCurrentItem(tab.getPosition());
+    		
     	}
 
     	@Override
@@ -169,5 +123,11 @@ public class RozkladPKP extends FragmentActivity  {
     	@Override
     	public void onTabUnselected(Tab tab, FragmentTransaction ft) {
     	}
+    }
+    @Override
+    protected void onPause() {
+    	super.onPause();
+    	if(sp != null)
+			sp.edit().putInt("lastSelectedTab", getSupportActionBar().getSelectedNavigationIndex()).commit();
     }
 }

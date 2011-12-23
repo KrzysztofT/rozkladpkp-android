@@ -18,4 +18,5 @@
 <item android:id="@+id/item_settings" android:title="Ustawienia" android:icon="@drawable/ic_menu_preferences"></item>
 <item android:id="@+id/item_via" android:title="@string/menuAddVia" android:icon="@drawable/ic_menu_directions"></item>
 <item android:id="@+id/item_carriers" android:icon="@drawable/ic_menu_more"></item>
+<item android:id="@+id/item_about" android:title="O programie" android:icon="@drawable/ic_menu_info_details"></item>
 </menu>

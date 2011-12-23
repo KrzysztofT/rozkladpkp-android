@@ -26,6 +26,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 
+import android.util.Log;
+
 public class StationSearch {
 	private DefaultHttpClient client;
 	
@@ -36,7 +38,7 @@ public class StationSearch {
 	}
 	
 	public InputStream search(String station) throws IllegalStateException, IOException {
-		
+		Log.i("RozkladPKP", "szukam stacji...");
 		//Dla tych którzy wpadną na pomysł wpisania cudzysłowów itp. do nazwy stacji
 		station = station.replaceAll("[^a-zA-Z0-9]", "");
 		

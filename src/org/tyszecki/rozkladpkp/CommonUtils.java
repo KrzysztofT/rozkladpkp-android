@@ -37,11 +37,14 @@ import android.database.sqlite.SQLiteDatabase;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.text.format.Time;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.Toast;
 
@@ -138,27 +141,6 @@ public class CommonUtils {
 			return "Przejście";
 		
 		else return number.replaceAll("\\s+", " ");
-	}
-	
-	/*
-	 * Zwraca miejscowość, na podstawie pamiętanej przez urządzenie lokalizacji, 
-	 * do przeciążenia.
-	 */
-	public static class GetLocalityTask extends AsyncTask<Void, Void, String>
-	{
-		@Override
-		protected String doInBackground(Void... params) {
-			LocationManager lm = (LocationManager) RozkladPKPApplication.getAppContext().getSystemService(Context.LOCATION_SERVICE);
-			Location l = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-			Geocoder c = new Geocoder(RozkladPKPApplication.getAppContext());
-			
-			try {
-				List<Address> addresses = c.getFromLocation(l.getLatitude(), l.getLongitude(), 1);
-				return addresses.get(0).getLocality();
-			} catch (Exception e) {
-				return null;
-			} 
-		}
 	}
 	
 	public static abstract class StationIDfromNameProgress{

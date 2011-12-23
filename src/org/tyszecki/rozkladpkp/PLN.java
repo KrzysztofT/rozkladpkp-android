@@ -17,13 +17,13 @@
 package org.tyszecki.rozkladpkp;
 
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.BitSet;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
+import android.util.Log;
 
 public class PLN {
 	
@@ -96,6 +96,7 @@ public class PLN {
 		void addOffset(int offset)
 		{
 			offsets.add(offset);
+			Log.w("RozkladPKP",Integer.toString(offset));
 		}
 		
 		Message[] get(int offset)
@@ -105,7 +106,7 @@ public class PLN {
 			
 			int n = data.length; 
 			//Następny offset
-			try{offsets.tailSet(offset+1).first();}catch (Exception e) {}
+			try{n = offsets.tailSet(offset+1).first();}catch (Exception e) {}
 			
 			int cnt = (n-offset)/18;
 			Message[] t = new Message[cnt];
@@ -386,12 +387,13 @@ public class PLN {
 	}
 	
 	public class Trip {
-		public Trip(Connection connection, int idx, String d) {
+		public Trip(Connection connection, int idx, android.text.format.Time d) {
 			con = connection;
-			date = d; 
+			
+			date = d;
 			conidx = idx;
 		}
-		String date;
+		android.text.format.Time date;
 		Connection con;
 		//FIXME: Wymyśleć, jak zastąpić to, żeby było ładnie.
 		int conidx;
@@ -471,7 +473,7 @@ public class PLN {
 				pos++;
 				tripsLeft--;
 				time.hour = time.minute = time.second = 0;
-				return new Trip(connections[cix], cix, time.format("%d.%m.%Y"));
+				return new Trip(connections[cix], cix, new android.text.format.Time(time));
 			}
 			else
 				return null;
@@ -497,7 +499,8 @@ public class PLN {
 	}
 	
 	public PLN(byte[] byte_data) {
-		data = byte_data;
+		
+		data = byte_data;Log.w("RozkladPKP","N: "+Integer.toString(data.length));
 		strings = new StringManager();
 		attributes = new AttributeManager();
 		messages = new MessageManager();

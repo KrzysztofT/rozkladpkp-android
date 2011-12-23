@@ -16,10 +16,14 @@
  ******************************************************************************/
 package org.tyszecki.rozkladpkp;
 
+import org.tyszecki.rozkladpkp.PLN.Trip;
+import org.tyszecki.rozkladpkp.PLN.TripIterator;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.text.format.Time;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -153,5 +157,22 @@ public class RememberedManager {
 			Toast.makeText(c, add?"Trasę dodano do zapamiętanych":"Trasa już jest na liście zapamiętanych", Toast.LENGTH_SHORT).show();
 			db.close();
 		}
+	}
+	
+	public static String getCacheString(PLN pln)
+	{
+		try{
+			TripIterator p = pln.tripIterator(); //TODO: Ładniej, to jest na szybko.
+			p.moveToLast();
+			Trip t1 = p.next();
+			Time result = new Time(t1.date);
+			result.allDay = false;
+			result.monthDay++;
+			result.normalize(false);
+			
+			return result.format2445();
+		}
+		catch(Exception e){}
+		return null;
 	}
 }

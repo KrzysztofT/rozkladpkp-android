@@ -28,7 +28,6 @@ import org.tyszecki.rozkladpkp.ConnectionListItem.TripItem;
 import org.tyszecki.rozkladpkp.PLN.Trip;
 import org.tyszecki.rozkladpkp.PLN.TripIterator;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -37,11 +36,10 @@ import android.content.DialogInterface.OnCancelListener;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.text.format.Time;
 import android.view.Gravity;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -65,6 +63,7 @@ public class ConnectionListActivity extends FragmentActivity {
 	private ConnectionListCallback clistCallback;
 	
 	public void onCreate(Bundle savedInstanceState) {
+		//setTheme(Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(this).getString("defaultTheme", "0")) == 0 ? R.style.Theme_RozkladPKP : R.style.Theme_RozkladPKP_Dark);
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.connection_list);
 		
@@ -126,7 +125,7 @@ public class ConnectionListActivity extends FragmentActivity {
 					ni.putExtra("PLNData", clist.getPLN().data);
 					ni.putExtra("ConnectionIndex",((TripItem)b).t.conidx);
 					ni.putExtra("ConnectionId", cix);
-					ni.putExtra("StartDate",((TripItem)b).t.date);
+					ni.putExtra("StartDate",((TripItem)b).t.date.format("%d.%m.%Y"));
 					ni.putExtra("Attributes", extras.getSerializable("Attributes"));
 					ni.putExtra("Products", extras.getString("Products"));
 					startActivity(ni);
@@ -345,29 +344,8 @@ public class ConnectionListActivity extends FragmentActivity {
 			}
 			return true;
 		*/case R.id.item_favourite:
-			try{TripIterator p = clist.getPLN().tripIterator(); //TODO: Ładniej, to jest na szybko.
-			p.moveToLast();
-			Trip t1 = p.next();
-			Time time = new Time();
-			String t = null;
-			
-			String r[] = t1.date.split("\\.");
-			String u[] = t1.con.getTrain(0).deptime.toString().split(":");
-			String jt[] = t1.con.getJourneyTime().toString().split(":");
-			
-			
-			time.set(0, Integer.parseInt(u[1]), ((Integer.parseInt(u[0])+23)%24)+1, Integer.parseInt(r[0]), Integer.parseInt(r[1])-1, Integer.parseInt(r[2]));
-			time.hour += Integer.parseInt(jt[0])+3;
-			time.minute += Integer.parseInt(jt[1]);
-			time.normalize(false);
-			
-			t = time.format2445();
-			RememberedManager.addtoHistory(ConnectionListActivity.this, CommonUtils.StationIDfromSID(extras.getString("SID")), CommonUtils.StationIDfromSID(extras.getString("ZID")),t);
+			RememberedManager.addtoHistory(ConnectionListActivity.this, CommonUtils.StationIDfromSID(extras.getString("SID")), CommonUtils.StationIDfromSID(extras.getString("ZID")),RememberedManager.getCacheString(clist.getPLN()));
 			RememberedManager.saveRoute(ConnectionListActivity.this, CommonUtils.StationIDfromSID(extras.getString("SID")), CommonUtils.StationIDfromSID(extras.getString("ZID")));
-			}
-			catch(Exception e){
-				return true;
-			}
 			return true;
 		
 		case R.id.item_return_journey:
@@ -431,6 +409,4 @@ public class ConnectionListActivity extends FragmentActivity {
 		hideLoader();
 		inFront = false;
 	}
-	
-	
 }

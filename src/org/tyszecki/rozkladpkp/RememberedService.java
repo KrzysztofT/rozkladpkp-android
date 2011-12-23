@@ -25,7 +25,6 @@ public class RememberedService extends IntentService {
 		//Do poprawienia jest ogólnie większość rzeczy związana z zapamiętywaniem czasu w PLN.
 		//FIXME: Tutaj zakładamy, że hafas zwraca wyniki w strefie czasowej użytkownika, co nie jest prawdą.
 		//Z drugiej strony, nie wiadomo w jakiej strefie te wyniki są zwracane.
-		Time time = new Time();
 		String t = null;
 		
 		String Sid = ex.getString("SID");
@@ -42,17 +41,9 @@ public class RememberedService extends IntentService {
 				TripIterator p = pln.tripIterator();
 				p.moveToLast();
 				Trip t1 = p.next();
-				
-				String r[] = t1.date.split("\\.");
-				String u[] = t1.con.getTrain(0).deptime.toString().split(":");
-				String jt[] = t1.con.getJourneyTime().toString().split(":");
-				
-				
-				time.set(0, Integer.parseInt(u[1]), ((Integer.parseInt(u[0])+23)%24)+1, Integer.parseInt(r[0]), Integer.parseInt(r[1])-1, Integer.parseInt(r[2]));
-				time.hour += Integer.parseInt(jt[0])+3;
-				time.minute += Integer.parseInt(jt[1]);
+				Time time = new Time(t1.date);
+				time.monthDay++;
 				time.normalize(false);
-				
 				t = time.format2445();
 				
 				String s = CommonUtils.ResultsHash(Sid, Zid, null);
@@ -67,7 +58,6 @@ public class RememberedService extends IntentService {
 			catch(Exception e){
 				return;
 			}
-			
 			RememberedManager.addtoHistory(this, Sid, Zid, t);
 		}
 		else if(ex.containsKey("timetable"))

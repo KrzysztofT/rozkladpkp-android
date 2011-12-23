@@ -154,9 +154,14 @@ public class RememberedFragment extends Fragment {
 	
 	
 	public boolean onOptionsItemSelected (MenuItem item){
+		Intent ni;
 		switch(item.getItemId()){
 		case R.id.item_settings:
-			Intent ni = new Intent(getActivity().getBaseContext(),PreferencesActivity.class);
+			ni = new Intent(getActivity().getBaseContext(),PreferencesActivity.class);
+			startActivity(ni);
+			return true;
+		case R.id.item_about:
+			ni = new Intent(getActivity().getBaseContext(),AboutActivity.class);
 			startActivity(ni);
 			return true;
 		}

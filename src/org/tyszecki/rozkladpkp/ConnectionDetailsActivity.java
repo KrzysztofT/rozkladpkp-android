@@ -21,7 +21,6 @@ import java.io.InputStream;
 
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.tyszecki.rozkladpkp.ConnectionDetailsItem.PriceItem;
 import org.tyszecki.rozkladpkp.PLN.Connection;
 import org.tyszecki.rozkladpkp.TimetableItem.TrainItem;
 
@@ -69,7 +68,7 @@ public class ConnectionDetailsActivity extends FragmentActivity {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int pos, long id) {
 				
-				if(adapter.getItem(pos) instanceof PriceItem)
+				if(adapter.getItemViewType(pos) == 0)
 				{
 					if(!CommonUtils.onlineCheck())
 						return;
@@ -128,7 +127,7 @@ public class ConnectionDetailsActivity extends FragmentActivity {
 					});
 					priceThread.start();
 				}
-				else if(adapter.getItem(pos) instanceof ConnectionDetailsItem.TrainItem)
+				else if(adapter.getItemViewType(pos) == 1)
 				{
 					Intent ni = new Intent(arg0.getContext(),TrainDetailsActivity.class);
 					

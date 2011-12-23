@@ -16,6 +16,7 @@
  ******************************************************************************/
 package org.tyszecki.rozkladpkp;
 
+import org.tyszecki.rozkladpkp.LocationHelper.LocationState;
 import org.tyszecki.rozkladpkp.widgets.DateButton;
 import org.tyszecki.rozkladpkp.widgets.DialogControl;
 import org.tyszecki.rozkladpkp.widgets.ProductsButton;
@@ -44,6 +45,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 public class TimetableFormFragment extends Fragment {
@@ -140,15 +142,19 @@ public class TimetableFormFragment extends Fragment {
 			}
 		});
         
-        /*if(!clarify)
+        if(!clarify)
         {
-	        ((ImageButton)findViewById(R.id.location_button)).setOnClickListener(new OnClickListener() {
+	        ((ImageButton)getView().findViewById(R.id.location_button)).setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					(new GetLocality()).execute();			
+							LocationState state = LocationHelper.getLocationState();
+					if(state == LocationState.Unavailable)
+						Toast.makeText(RozkladPKPApplication.getAppContext(), res.getText(R.string.toastLocationError), Toast.LENGTH_SHORT).show();
+					else if(state == LocationState.Ready)
+						stationEdit.setText(LocationHelper.getLocation());
 				}
 			});
-        }*/
+        }
 	}
 	
 	@Override
@@ -158,9 +164,14 @@ public class TimetableFormFragment extends Fragment {
 
 	
 	public boolean onOptionsItemSelected (MenuItem item){
+		Intent ni;
 		switch(item.getItemId()){
 		case R.id.item_settings:
-			Intent ni = new Intent(getActivity(),PreferencesActivity.class);
+			ni = new Intent(getActivity(),PreferencesActivity.class);
+			startActivity(ni);
+			return true;
+		case R.id.item_about:
+			ni = new Intent(getActivity().getBaseContext(),AboutActivity.class);
 			startActivity(ni);
 			return true;
 		}
@@ -250,7 +261,6 @@ public class TimetableFormFragment extends Fragment {
 	
 	private class SpinnerOnDataLoaded implements StationSpinner.onDataLoaded
 	{
-
 		@Override
 		public void dataLoaded() {
 			progressDialog.dismiss();
@@ -277,30 +287,4 @@ public class TimetableFormFragment extends Fragment {
 		}
 		
 	}
-	/*private class GetLocality extends CommonUtils.GetLocalityTask{
-		ProgressDialog p;
-		
-		@Override
-		protected void onPreExecute() {
-			super.onPreExecute();
-			p = ProgressDialog.show(TimetableFormActivity.this, res.getString(R.string.progressTitle), res.getString(R.string.progressBodyLocation));
-		}
-		
-		@Override
-		protected void onPostExecute(String result) {
-			super.onPostExecute(result);
-			p.dismiss();
-
-			if(result == null)
-				Toast.makeText(getApplicationContext(), res.getText(R.string.toastLocationError), Toast.LENGTH_SHORT).show();
-			else
-			{
-				StationEdit ed = (StationEdit) findViewById(R.id.station_edit);
-				ed.setText(result);
-				final Editable etext = ed.getText();
-				final int position = etext.length();
-				Selection.setSelection(etext, position);
-			}
-		}
-	}*/
 }
