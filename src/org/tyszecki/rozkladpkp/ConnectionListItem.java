@@ -34,4 +34,5 @@ public class ConnectionListItem {
 		}
 		boolean up;
 	}
+	static class WarningItem extends ConnectionListItem{}
 }

@@ -18,6 +18,7 @@ package org.tyszecki.rozkladpkp;
 
 import java.util.ArrayList;
 
+import org.tyszecki.rozkladpkp.R;
 import org.tyszecki.rozkladpkp.LocationHelper.LocationState;
 import org.tyszecki.rozkladpkp.widgets.AttributesButton;
 import org.tyszecki.rozkladpkp.widgets.CarriersButton;
@@ -350,6 +351,11 @@ public class ConnectionsFormFragment extends Fragment {
 	@Override
 	public void onCreateOptionsMenu(android.support.v4.view.Menu menu, MenuInflater inflater) {
 		inflater.inflate(R.menu.connections_form, menu);
+		if(clarify)
+		{
+			menu.getItem(1).setVisible(false);
+			menu.getItem(2).setVisible(false);
+		}
 	}
 	
 	@Override
@@ -378,6 +384,11 @@ public class ConnectionsFormFragment extends Fragment {
 			return true;
 		case R.id.item_carriers:
 			carriersButton.setVisibility(carriersButton.isShown() ? View.GONE : View.VISIBLE);
+			return true;
+		case R.id.item_return:
+			String t = arrEdit.getText().toString();
+			arrEdit.setText(depEdit.getText());
+			depEdit.setText(t);
 			return true;
 		case R.id.item_about:
 			ni = new Intent(getActivity().getBaseContext(),AboutActivity.class);

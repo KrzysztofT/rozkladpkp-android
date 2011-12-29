@@ -98,7 +98,7 @@ public class ProductsButton extends Button implements DialogControl {
 		}
 	}
 	
-	private class ProductPickerFragment extends DialogFragment{
+	public class ProductPickerFragment extends DialogFragment{
 		public Dialog onCreateDialog(Bundle savedInstanceState) {
 			AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 			builder.setTitle("Środki transportu");

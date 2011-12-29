@@ -26,7 +26,6 @@
         <TextView
             android:id="@+id/time"
             android:gravity="center_vertical"
-            android:textColor="#606060"
             android:textSize="15sp"
         />
         <TextView
@@ -37,7 +36,6 @@
         />
 	    <TextView
 	        android:id="@+id/train_number"
-	        android:textColor="#606060"
             android:textSize="15sp"
 	        android:layout_width="wrap_content"
         	android:layout_height="fill_parent"
@@ -45,7 +43,6 @@
 	        android:gravity="center_vertical"/>
         <TextView
             android:id="@+id/station"
-            android:textColor="#606060"
             android:textSize="15sp"
             android:layout_width="fill_parent"
             android:ellipsize="end"

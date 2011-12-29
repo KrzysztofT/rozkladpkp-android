@@ -26,14 +26,17 @@
         <org.tyszecki.rozkladpkp.widgets.StationSpinner
         	android:id="@+id/departure_select"
         	android:layout_width="fill_parent"
+        	android:textColor="#000"
         	android:layout_height="wrap_content"/>
         <org.tyszecki.rozkladpkp.widgets.StationSpinner
         	android:id="@+id/via_select"
         	android:layout_width="fill_parent"
+        	android:textColor="#000"
         	android:visibility="gone"
         	android:layout_height="wrap_content"/>
         <org.tyszecki.rozkladpkp.widgets.StationSpinner
         	android:id="@+id/arrival_select"
+        	android:textColor="#000"
         	android:layout_width="fill_parent"
         	android:layout_height="wrap_content"/>
         	

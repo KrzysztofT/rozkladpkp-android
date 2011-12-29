@@ -21,7 +21,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
+import org.tyszecki.rozkladpkp.R;
 import org.tyszecki.rozkladpkp.ConnectionList.ConnectionListCallback;
 import org.tyszecki.rozkladpkp.ConnectionListItem.ScrollItem;
 import org.tyszecki.rozkladpkp.ConnectionListItem.TripItem;
@@ -37,7 +39,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ActionBar;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.MenuItem;
 import android.text.format.Time;
 import android.view.Gravity;
 import android.view.View;
@@ -51,7 +55,7 @@ public class ConnectionListActivity extends FragmentActivity {
 	
 	private ProgressDialog m_ProgressDialog;
 	private boolean hasFullTable = false;
-	private boolean inFront = true, showNCDialog = false;
+	private boolean inFront = true, showNCDialog = false, showERDialog;
 	private String timetableUrl = null;
 	private ArrayList<SerializableNameValuePair> commonFieldsList;
 	
@@ -63,6 +67,7 @@ public class ConnectionListActivity extends FragmentActivity {
 	private ConnectionListCallback clistCallback;
 	
 	public void onCreate(Bundle savedInstanceState) {
+		setTheme(RozkladPKPApplication.getThemeId());
 		//setTheme(Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(this).getString("defaultTheme", "0")) == 0 ? R.style.Theme_RozkladPKP : R.style.Theme_RozkladPKP_Dark);
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.connection_list);
@@ -72,14 +77,14 @@ public class ConnectionListActivity extends FragmentActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         clistCallback = new ConnectionListCallback() {
 			@Override
-			public void contentReady(ConnectionList list, boolean error) {
+			public void contentReady(ConnectionList list, final boolean error, final boolean deutsch) {
 				if(clist == null)
 					clist = list;
 				
 				Runnable uit = new Runnable() {
 					@Override
 					public void run() {
-						updateDisplayedPLN();
+						updateDisplayedPLN(error,deutsch);
 					}
 				};
 				runOnUiThread(uit);
@@ -229,9 +234,19 @@ public class ConnectionListActivity extends FragmentActivity {
     		m_ProgressDialog = null;
 		}
 	}
-	public void updateDisplayedPLN()
+	public void updateDisplayedPLN(boolean error, boolean deutsch)
 	{
 		hideLoader();
+		
+		if(error)
+		{
+			if(inFront)
+				serverErrorAlert();
+			else
+				showERDialog = true;
+			
+			return;
+		}
 		
 		if(clist == null || clist.getPLN() == null)
 			return;
@@ -250,7 +265,7 @@ public class ConnectionListActivity extends FragmentActivity {
 		}
 		else
 		{
-			adapter.setPLN(clist.getPLN(), !hasFullTable, clist.getPLN().hasDelayInfo());
+			adapter.setPLN(clist.getPLN(), !hasFullTable, clist.getPLN().hasDelayInfo(), deutsch);
 
 			//Zapisanie wyników
 			Bundle extras = ConnectionListActivity.this.getIntent().getExtras(); 
@@ -282,7 +297,23 @@ public class ConnectionListActivity extends FragmentActivity {
 		});
     	alertDialog.show();
 	}
-      
+	protected void serverErrorAlert() {
+		//Pokazuje okno dialogowe informujące o braku połączeń i umożliwia powrót do wcześniejszej aktywności.
+		AlertDialog alertDialog;
+    	alertDialog = new AlertDialog.Builder(this).create();
+    	alertDialog.setTitle("Błąd serwera!");
+    	alertDialog.setMessage("Serwer systemu SITKOL obecnie nie działa. Odczekaj chwilę i ponów próbę.");
+    	alertDialog.setOnKeyListener(CommonUtils.getOnlyDPadListener());
+    	alertDialog.setCancelable(false);
+    	
+    	alertDialog.setButton("Powrót", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface arg0, int arg1) {
+				ConnectionListActivity.this.finish();
+			}
+		});
+    	alertDialog.show();
+	}
+	
 	
 	protected void getConnections(){
 		
@@ -398,6 +429,11 @@ public class ConnectionListActivity extends FragmentActivity {
 		{
 			noConnectionsAlert();
 			showNCDialog = false;
+		}
+		else if(showERDialog)
+		{
+			serverErrorAlert();
+			showERDialog = false;
 		}
 		
 	}

@@ -16,6 +16,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.util.Log;
+import android.widget.SlidingDrawer;
 
 public class ConnectionList {
 
@@ -33,10 +34,12 @@ public class ConnectionList {
 	
 	
 	private final String URL = "http://rozklad.sitkol.pl/bin/query.exe/pn"; //http://mobile.bahn.de/bin/mobil/query.exe
-	private final int MAX_ATTEMPTS = 20;
+	private final String DBURL = "http://reiseauskunft.bahn.de/bin/query.exe/pn";
+	//private final String DBURL = "http://persoenlicherfahrplan.bahn.de/bin/pf/query-p2w.exe/pn";
+	private final int MAX_ATTEMPTS = 15;
 	
 	public interface ConnectionListCallback{
-		void contentReady(ConnectionList list, boolean error);
+		void contentReady(ConnectionList list, boolean error, boolean reserver);
 	}
 	
 	ConnectionListCallback callback;
@@ -82,7 +85,7 @@ public class ConnectionList {
 	    
 	    
 	    if(ret.callback != null)
-	    	ret.callback.contentReady(ret, false);
+	    	ret.callback.contentReady(ret, false, false);
 	    
 		return ret;
 	}
@@ -96,7 +99,7 @@ public class ConnectionList {
 		ret.pln = new PLN(array);
 		
 		if(ret.callback != null)
-	    	ret.callback.contentReady(ret, false);
+	    	ret.callback.contentReady(ret, false, false);
 		
 		return ret;
 	}
@@ -115,7 +118,7 @@ public class ConnectionList {
 		data.add(new SerializableNameValuePair("time", time));
 		data.add(new SerializableNameValuePair("h2g-direct", "1"));
 		
-		attempts = 0;
+		attempts = 1;
 		download(data);
 	}
 	
@@ -127,49 +130,93 @@ public class ConnectionList {
 		seqnr++;
 		
 		ArrayList<SerializableNameValuePair> data = new ArrayList<SerializableNameValuePair>();
-		data.addAll(common);
-		
+		//data.addAll(common);
+		data.add(new SerializableNameValuePair("REQ0HafasOptimize1", "1"));
 		data.add(new SerializableNameValuePair("seqnr", Integer.toString(seqnr)));
-		data.add(new SerializableNameValuePair("ident", pln.id()));
-		data.add(new SerializableNameValuePair("hcount", "1"));
-		data.add(new SerializableNameValuePair("REQ0HafasScrollDir", next ? "2" : "1"));
+		
+		data.add(new SerializableNameValuePair("clientSystem", "android14"));
+		data.add(new SerializableNameValuePair("existOptimizePrice", "1"));
+		data.add(new SerializableNameValuePair("hcount", "0"));
 		data.add(new SerializableNameValuePair("ignoreMinuteRound", "yes"));
-		data.add(new SerializableNameValuePair("androidversion", "1.1.4"));
+		data.add(new SerializableNameValuePair("androidversion", "2.0.8"));
+		
+		data.add(new SerializableNameValuePair("ident", pln.id()));
+		//data.add(new SerializableNameValuePair("ld", pln.ld()));
+		//data.add(new SerializableNameValuePair("hcount", "1"));
+		data.add(new SerializableNameValuePair("REQ0HafasScrollDir", next ? "2" : "1"));
+		
+		//data.add(new SerializableNameValuePair("androidversion", "1.1.4"));
 		data.add(new SerializableNameValuePair("h2g-direct", "1"));
+		data.add(new SerializableNameValuePair("clientDevice", "google_sdk"));
+		data.add(new SerializableNameValuePair("clientDevice", "ANDROID"));
+		data.add(new SerializableNameValuePair("htype", "google_sdk"));
+		
+		
 	    	
 		attempts = MAX_ATTEMPTS;
 		download(data);		
 	}
 	
-	private void download(final ArrayList<SerializableNameValuePair> data)
+	ArrayList<SerializableNameValuePair> removeDiacritics(ArrayList<SerializableNameValuePair> in)
+	{
+		ArrayList<SerializableNameValuePair> ret = new ArrayList<SerializableNameValuePair>();
+		for(SerializableNameValuePair p : in)
+		{
+			if(p.name.endsWith("ID"))
+			{
+				ret.add(new SerializableNameValuePair(p.name, CommonUtils.depol(p.value)));
+				Log.i("RozkladPKP",CommonUtils.depol(p.value));
+			}
+			else
+				ret.add(p);
+		}
+		return ret;
+	}
+	
+	private void download(final ArrayList<SerializableNameValuePair> in)
 	{
 		aborted = false;
+		
 		thread = new Thread(new Runnable() {
 			
 			@Override
 			public void run() {
-				
-				int tries = attempts;
+				boolean backup = false;
+				String u = URL;
+					if(pln != null)
+						u +="?ld="+pln.ld(); //!!!! ufff... dodanie tego parametru zwiększa wielokrotnie wydajność systemu.
+					  //Bez niego program wolniej działa, a serwer Sitkola jest DDOSowany :) 
+					  //Ah ten HAFAS i jego tajemnice.
+
+					
+				int tries = attempts;boolean failed = false;
+				ArrayList<SerializableNameValuePair> data = in;
 				do
-				{
+				{	
+					failed = false;
 					DefaultHttpClient client = new DefaultHttpClient();
 					
-					HttpPost request = new HttpPost(URL);
+					 
+					HttpPost request = new HttpPost(u);
 					client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestExpectContinue.class);
 			        client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestUserAgent.class);
 			        
-			        for(int i = 0; i < data.size(); ++i)
+			        
+			        /*for(int i = 0; i < data.size(); ++i)
 			        {
 			        	Log.i("RozkladPKP", data.get(i).getName() + "="+ data.get(i).getValue());
-			        }
-			        
+			        }*/
+			        Log.i("RozkladPKP", Integer.toString(tries));
 			        request.addHeader("Content-Type", "text/plain");
 			        try {
 						request.setEntity(new UrlEncodedFormEntity(data,"UTF-8"));
 					} catch (UnsupportedEncodingException e) {
-						if(!aborted)
-							callback.contentReady(ConnectionList.this, true);
-						return;
+						failed = true;
+						if(!aborted && backup)
+						{
+							callback.contentReady(ConnectionList.this, true, backup);
+							return;
+						}
 					}
 					
 					ByteArrayOutputStream content = new ByteArrayOutputStream();
@@ -186,16 +233,39 @@ public class ConnectionList {
 				            content.write(sBuffer, 0, readBytes);
 				        }
 					} catch (Exception e) {
-						if(!aborted)
-							callback.contentReady(ConnectionList.this, true);
-						return;
+						failed = true;
+						if(!aborted && backup)
+						{
+							callback.contentReady(ConnectionList.this, true, backup);
+							return;
+						}
 					}
 					
-			        pln = new PLN(content.toByteArray());
-			        if(callback != null && (tries == 0 || pln.conCnt > 0) && !aborted)
-				    	callback.contentReady(ConnectionList.this, false);
-			        
-				}while(pln.conCnt == 0 && --tries > 0);
+					if(!failed)
+						try{
+						PLN t =new PLN(content.toByteArray()); 
+						pln = t;
+						}
+					catch(Exception e)
+					{failed = true;pln = null;}
+			        if(!failed && callback != null && (tries == 0 || pln.conCnt > 0) && !aborted)
+			        {
+			        	callback.contentReady(ConnectionList.this, false, backup);
+			        	return;
+			        }
+			        else if(tries == 1 && backup == false)
+			        {
+			        	backup = true;
+			        	u = DBURL; //Ukryta opcja niemiecka
+						if(pln != null)
+							u +="?ld="+pln.ld();
+						tries = attempts+1;
+						data = removeDiacritics(data);
+						Log.i("RozkladPKP", "Przełączam na DB");
+			        }
+				}while((failed || pln.conCnt == 0) && --tries > 0);
+				
+				callback.contentReady(ConnectionList.this, true, backup);
 			}
 		});
 		thread.start();

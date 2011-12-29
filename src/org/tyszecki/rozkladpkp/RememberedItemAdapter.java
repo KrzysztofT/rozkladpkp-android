@@ -18,6 +18,7 @@ package org.tyszecki.rozkladpkp;
 
 import java.util.ArrayList;
 
+import org.tyszecki.rozkladpkp.R;
 import org.tyszecki.rozkladpkp.RememberedItem.HeaderItem;
 import org.tyszecki.rozkladpkp.RememberedItem.RouteItem;
 import org.tyszecki.rozkladpkp.RememberedItem.TimetableItem;
@@ -44,8 +45,8 @@ public class RememberedItemAdapter extends BaseAdapter {
 	final int HEADER = 0;
 	final int NORMAL = 1;
 	
-	public RememberedItemAdapter() {
-		c = RozkladPKPApplication.getAppContext();
+	public RememberedItemAdapter(Context co) {
+		c = co;//RozkladPKPApplication.getAppContext();
 		items = new ArrayList<RememberedItem>();
 	}
 	

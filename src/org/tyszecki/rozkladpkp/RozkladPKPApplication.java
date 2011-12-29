@@ -22,33 +22,51 @@ import org.tyszecki.rozkladpkp.widgets.StationEdit;
 
 import android.app.Application;
 import android.content.Context;
-import android.os.Debug;
-import android.util.Log;
+import android.preference.PreferenceManager;
 
 @ReportsCrashes(formKey = "dFlJOVYyS1hYbENUWEVmQnE5azlKNFE6MQ")
 
 public class RozkladPKPApplication extends Application {
 	
 	private static Context context;
-	
+	private static int themeId = R.style.Theme_RozkladPKP;
+	private static String themeSetting;
 	@Override
     public void onCreate() {
         // The following line triggers the initialization of ACRA
         ACRA.init(this);
         super.onCreate();
+        
         context = getApplicationContext();
+        reloadTheme();
+      
         
-        long startTime = System.currentTimeMillis();
         StationEdit.initTree();
-        long stopTime = System.currentTimeMillis();
-        long elapsedTime = stopTime - startTime;
-        Log.w("RozkladPKP", "Czas: "+Long.toString(elapsedTime));
-        
         LocationHelper.init();
     }
+	
+	public static void reloadTheme()
+	{
+		themeSetting = PreferenceManager.getDefaultSharedPreferences(context).getString("defaultTheme", "0");
+        if(themeSetting.equals("0"))
+        	themeId = R.style.Theme_RozkladPKP;
+        else
+        	themeId = R.style.Theme_RozkladPKP_Dark;
+	}
 	
 	public static Context getAppContext()
 	{
 		return context;
 	}
+	
+	public static int getThemeId()
+	{
+		return themeId;
+	}
+	
+	public static String getThemeSetting()
+	{
+		return themeSetting;
+	}
+	
 }

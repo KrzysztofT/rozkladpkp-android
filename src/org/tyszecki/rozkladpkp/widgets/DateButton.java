@@ -114,7 +114,7 @@ public class DateButton extends Button implements DialogControl {
 		return day.toString()+"."+month.toString()+"."+year.toString();
 	}
 	
-	private class DatePickerFragment extends DialogFragment{
+	public class DatePickerFragment extends DialogFragment{
 		public Dialog onCreateDialog(Bundle savedInstanceState) {
 			return new DatePickerDialog(getActivity(), mDateSetListener, year, month-1, day);
 		}

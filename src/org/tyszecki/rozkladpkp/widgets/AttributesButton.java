@@ -130,7 +130,7 @@ public class AttributesButton extends Button implements DialogControl {
 		updateText();
 	}
 
-	private class AttributePickerFragment extends DialogFragment{
+	public class AttributePickerFragment extends DialogFragment{
 		public Dialog onCreateDialog(Bundle savedInstanceState) {
 			AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 			builder.setTitle("Szczegóły połączenia");

@@ -19,5 +19,6 @@
 	android:id="@+id/connection_details" 
 	android:textColor="#606060"
 	android:textSize="15sp"
+	android:divider="?DividerColor"
 	android:layout_width="fill_parent" 
 	android:layout_height="fill_parent"/> 

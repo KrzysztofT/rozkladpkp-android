@@ -16,6 +16,7 @@
  ******************************************************************************/
 package org.tyszecki.rozkladpkp;
 
+import org.tyszecki.rozkladpkp.R;
 import org.tyszecki.rozkladpkp.PLN.Train;
 import org.tyszecki.rozkladpkp.RouteFetcher.RouteParams;
 import org.w3c.dom.Document;
@@ -45,6 +46,7 @@ public class TrainDetailsActivity extends FragmentActivity {
 	RouteTask task;
 	
 	public void onCreate(Bundle savedInstanceState) {
+		setTheme(RozkladPKPApplication.getThemeId());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.train_details);
         
@@ -53,7 +55,9 @@ public class TrainDetailsActivity extends FragmentActivity {
         
         
         setTitle("Informacje o pociągu");
+       
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        
         
         //startDate = getIntent().getExtras().getString("StartDate");
         PLN pln = new PLN(getIntent().getExtras().getByteArray("PLNData"));
@@ -61,13 +65,11 @@ public class TrainDetailsActivity extends FragmentActivity {
         int trainidx = getIntent().getExtras().getInt("TrainIndex");
         
         t = pln.connections[conidx].getTrain(trainidx);
+        getSupportActionBar().setSubtitle(t.number);
         
         TextView tv = (TextView) v.findViewById(R.id.header);
           
         StringBuilder b = new StringBuilder();
-        b.append("Pociąg ");
-        b.append(t.number);
-        b.append("\n");
         
         for(int i = 0; i < t.getAttributeCount(); i++)
         	b.append("-"+t.getAttribute(i)+"\n");

@@ -536,6 +536,17 @@ public class PLN {
 		return strings.get(readShort(attributesEnd+0xc));
 	}
 	
+	public String ld()
+	{
+		try{
+		return strings.get(readShort(attributesEnd+0xc)+id().length()+1);
+		}
+		catch(Exception e)
+		{
+			return "hw1";
+		}
+	}
+	
 	public int connectionCount()
 	{
 		if(totalConCnt == -1)

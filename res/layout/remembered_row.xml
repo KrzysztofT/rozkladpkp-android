@@ -19,16 +19,15 @@
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	android:stretchColumns="0"
 	android:layout_width="fill_parent"
-	android:layout_height="?android:attr/listPreferredItemHeight"
+	android:layout_height="fill_parent"
 	>
 <TableRow
 	android:paddingBottom="8dip"
 	android:paddingTop="6dip"
 	android:gravity="center_vertical">
+
 	<TextView 
-	    android:textAppearance="?android:attr/textAppearanceSmallInverse"
-	    android:textColor="#606060"
-		android:id="@+id/text"/>
+	    android:id="@+id/text"/>
 	<ImageView 
 	    android:id="@+id/saved_icon" 
 	    android:paddingRight="6dip"

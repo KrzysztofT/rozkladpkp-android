@@ -114,7 +114,7 @@ public class TimeButton extends Button implements DialogControl {
     	requestFocusFromTouch();
 	}
 	
-	private class TimePickerFragment extends DialogFragment{
+	public class TimePickerFragment extends DialogFragment{
 		public Dialog onCreateDialog(Bundle savedInstanceState) {
 			return new TimePickerDialog(getActivity(), mTimeSetListener, hour, minute, true);
 		}

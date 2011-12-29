@@ -16,6 +16,7 @@
  ******************************************************************************/
 package org.tyszecki.rozkladpkp;
 
+import org.tyszecki.rozkladpkp.R;
 import org.tyszecki.rozkladpkp.CommonUtils.StationIDfromNameProgress;
 import org.tyszecki.rozkladpkp.TimetableItem.ScrollItem;
 import org.tyszecki.rozkladpkp.TimetableItem.TrainItem;
@@ -52,6 +53,7 @@ public class TimetableActivity extends FragmentActivity {
 	TrainItem titem;
 	
 	public void onCreate(Bundle savedInstanceState) {
+		setTheme(RozkladPKPApplication.getThemeId());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.timetable);
         Bundle extras = getIntent().getExtras();

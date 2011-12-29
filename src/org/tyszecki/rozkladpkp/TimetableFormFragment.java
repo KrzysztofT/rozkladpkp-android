@@ -16,6 +16,7 @@
  ******************************************************************************/
 package org.tyszecki.rozkladpkp;
 
+import org.tyszecki.rozkladpkp.R;
 import org.tyszecki.rozkladpkp.LocationHelper.LocationState;
 import org.tyszecki.rozkladpkp.widgets.DateButton;
 import org.tyszecki.rozkladpkp.widgets.DialogControl;

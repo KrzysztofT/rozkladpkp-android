@@ -18,6 +18,7 @@ package org.tyszecki.rozkladpkp;
 
 import java.util.ArrayList;
 
+import org.tyszecki.rozkladpkp.R;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

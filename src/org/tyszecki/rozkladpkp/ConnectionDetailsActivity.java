@@ -48,6 +48,7 @@ public class ConnectionDetailsActivity extends FragmentActivity {
 	Thread priceThread;
 	
 	public void onCreate(Bundle savedInstanceState) {
+		setTheme(RozkladPKPApplication.getThemeId());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.connection_details);
         setTitle("Plan podróży");

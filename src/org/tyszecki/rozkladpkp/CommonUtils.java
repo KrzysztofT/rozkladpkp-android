@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.tyszecki.rozkladpkp.R;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -273,9 +274,9 @@ public class CommonUtils {
 
 	private static char strip(char in)
 	{
-		in = Character.toLowerCase(in);
-		if(chmap.containsKey(in))
-			in = chmap.get(in);
+		char out = Character.toLowerCase(in);
+		if(chmap.containsKey(out))
+			return chmap.get(out);
 		return in;
 	}
 

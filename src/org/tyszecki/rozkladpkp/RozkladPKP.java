@@ -18,8 +18,12 @@ package org.tyszecki.rozkladpkp;
 
 import java.util.ArrayList;
 
+import org.tyszecki.rozkladpkp.R;
+
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActionBar;
@@ -29,23 +33,28 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ActionBar.Tab;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 
 public class RozkladPKP extends FragmentActivity  {
     
     ViewPager  mViewPager;
     TabsAdapter mTabsAdapter;
     static SharedPreferences sp = null;
+    OnSharedPreferenceChangeListener listener;
+    boolean schduledRestart = false;
     /** Called when the activity is first created. */
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
+    	//setTheme(RozkladPKPApplication.getThemeId());
     	super.onCreate(savedInstanceState);
     	
     	setContentView(R.layout.actionbar_tabs_pager);
         getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayUseLogoEnabled(true);
-        
         
         ActionBar.Tab tab1 = getSupportActionBar().newTab().setText("Zapamiętane");
         ActionBar.Tab tab2 = getSupportActionBar().newTab().setText("Połączenia");
@@ -59,6 +68,10 @@ public class RozkladPKP extends FragmentActivity  {
         
         sp = PreferenceManager.getDefaultSharedPreferences(this);
         
+        listener = new themeListener();
+        sp.registerOnSharedPreferenceChangeListener(listener);
+        
+        
         if (savedInstanceState == null) {
             int t = Integer.parseInt(sp.getString("defaultTab", "-1"));
             if(t == -1)
@@ -66,7 +79,22 @@ public class RozkladPKP extends FragmentActivity  {
         	getSupportActionBar().setSelectedNavigationItem(t);
         }
     }
-    public static class TabsAdapter extends FragmentPagerAdapter implements ViewPager.OnPageChangeListener, ActionBar.TabListener {
+    private class themeListener implements OnSharedPreferenceChangeListener{
+
+		@Override
+		public void onSharedPreferenceChanged(SharedPreferences spref, String key) {
+			Log.i("RozkladPKP", "prefChanged");
+			if(key.equals("defaultTheme") && !spref.getString(key, "0").equals(RozkladPKPApplication.getThemeSetting()))
+			{
+				RozkladPKPApplication.reloadTheme();
+				schduledRestart = true;
+				//setTheme(RozkladPKPApplication.getThemeId());
+				//recreate();
+			}
+		}
+    }
+    
+    public class TabsAdapter extends FragmentPagerAdapter implements ViewPager.OnPageChangeListener, ActionBar.TabListener {
         private final Context mContext;
         private final ActionBar mActionBar;
         private final ViewPager mViewPager;
@@ -112,8 +140,13 @@ public class RozkladPKP extends FragmentActivity  {
 
     	@Override
     	public void onTabSelected(Tab tab, FragmentTransaction ft) {
+    		if(tab.getPosition() == 0)
+    		{
+	    		//Ukrywanie klawiatury na pierwszej zakłądce
+	    		InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+	    		imm.hideSoftInputFromWindow(mViewPager.getWindowToken(), 0);
+    		}
     		mViewPager.setCurrentItem(tab.getPosition());
-    		
     	}
 
     	@Override
@@ -129,5 +162,17 @@ public class RozkladPKP extends FragmentActivity  {
     	super.onPause();
     	if(sp != null)
 			sp.edit().putInt("lastSelectedTab", getSupportActionBar().getSelectedNavigationIndex()).commit();
+    }
+    
+    @Override
+    protected void onResume() {
+    	super.onResume();
+    	if(schduledRestart)
+    	{
+    		schduledRestart = false;
+    		Intent i = getBaseContext().getPackageManager().getLaunchIntentForPackage( getBaseContext().getPackageName() );
+    		i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+    		startActivity(i);
+    	}
     }
 }

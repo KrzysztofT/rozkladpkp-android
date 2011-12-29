@@ -29,13 +29,11 @@
 			android:src="@drawable/departure" />
 		<TextView 
 			android:id="@+id/departure_time"
-			android:textColor="#606060"
 			android:textSize="15sp"
 			android:layout_marginLeft="3dip" />
 		<TextView 
 			android:id="@+id/departure_station"
 			android:textSize="15sp"
-			android:textColor="#606060"
 			android:layout_marginLeft="8dip" />
 		<LinearLayout
 			android:gravity="right"
@@ -50,7 +48,6 @@
 			<TextView
 				android:id="@+id/duration"
 				android:textSize="15sp"
-				android:textColor="#606060"
 				android:layout_height="wrap_content"
 				android:layout_width="wrap_content"
 				android:layout_marginLeft="3dip"
@@ -66,13 +63,11 @@
 	        android:src="@drawable/arrival"/>
         <TextView
             android:id="@+id/arrival_time"	
-            android:textColor="#606060"
             android:textSize="15sp"
             android:layout_marginLeft="3dip"/>
         <TextView
             android:id="@+id/arrival_station"
-            android:textColor="#606060"
-            	android:textSize="15sp"
+            android:textSize="15sp"
             android:layout_marginLeft="8dip"/>
 	    <TextView
 	        android:id="@+id/train_number"

@@ -18,10 +18,12 @@ package org.tyszecki.rozkladpkp;
 
 import java.util.ArrayList;
 
+import org.tyszecki.rozkladpkp.R;
 import org.tyszecki.rozkladpkp.RememberedItem.TimetableItem;
 import org.tyszecki.rozkladpkp.RememberedItem.TimetableType;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -35,7 +37,9 @@ import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
@@ -60,7 +64,7 @@ public class RememberedFragment extends Fragment {
         
         ListView lv = (ListView)getView().findViewById(R.id.remembered_list);
         
-        adapter = new RememberedItemAdapter();
+        adapter = new RememberedItemAdapter(getActivity());
         lv.setAdapter(adapter);
         
         lv.setOnItemClickListener(new OnItemClickListener() {
@@ -171,6 +175,7 @@ public class RememberedFragment extends Fragment {
 	@Override
 	public void onResume() {
 		super.onResume();
+		
 		
 		adapter.setAutoDelete(PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("autoDeleteTables", true));
 		

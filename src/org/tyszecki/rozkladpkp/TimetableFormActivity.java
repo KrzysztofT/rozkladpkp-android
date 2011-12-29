@@ -14,6 +14,7 @@ public class TimetableFormActivity extends FragmentActivity {
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		setTheme(RozkladPKPApplication.getThemeId());
 		super.onCreate(savedInstanceState);
 		
 		FrameLayout frame = new FrameLayout(this);

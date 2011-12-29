@@ -16,6 +16,7 @@
  ******************************************************************************/
 package org.tyszecki.rozkladpkp;
 
+import org.tyszecki.rozkladpkp.R;
 import org.tyszecki.rozkladpkp.RouteFetcher.RouteParams;
 import org.w3c.dom.Document;
 
@@ -38,6 +39,7 @@ public class RouteActivity extends FragmentActivity {
 	private RouteTask task = null;
 	
 	public void onCreate(Bundle savedInstanceState) {
+		setTheme(RozkladPKPApplication.getThemeId());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.route);
         

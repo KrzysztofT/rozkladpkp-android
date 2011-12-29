@@ -21,6 +21,7 @@ import java.util.HashMap;
 import org.tyszecki.rozkladpkp.ConnectionListItem.DateItem;
 import org.tyszecki.rozkladpkp.ConnectionListItem.ScrollItem;
 import org.tyszecki.rozkladpkp.ConnectionListItem.TripItem;
+import org.tyszecki.rozkladpkp.ConnectionListItem.WarningItem;
 import org.tyszecki.rozkladpkp.ExternalDelayFetcher.ExternalDelayFetcherCallback;
 import org.tyszecki.rozkladpkp.PLN.Connection;
 import org.tyszecki.rozkladpkp.PLN.Train;
@@ -45,6 +46,8 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
+import android.view.animation.RotateAnimation;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -56,11 +59,13 @@ public class ConnectionListItemAdapter extends BaseAdapter {
 	final int HEADER = 0;
 	final int NORMAL = 1;
 	final int SCROLL = 2;
+	final int WARNING = 3;
 	
 	static final int PRELOAD_ITEMS = 30;
 	static final String LOG_TAG = "PAGEADAPTER";
 	Boolean loading;
 	boolean allItemsLoaded;
+	boolean deutsch;
 	
 	private ArrayList<ConnectionListItem> items;
 	private PLN pln;
@@ -77,7 +82,8 @@ public class ConnectionListItemAdapter extends BaseAdapter {
 	private ForegroundColorSpan greenSpan = new ForegroundColorSpan(Color.rgb(73,194,98));
 	private ForegroundColorSpan redSpan = new ForegroundColorSpan(Color.rgb(220, 59, 76));
 	private ForegroundColorSpan yellowSpan = new ForegroundColorSpan(Color.rgb(197,170,73));
-
+	
+	RotateAnimation ranim;
 	/*Drawable d;
 	private class mySpan implements LineBackgroundSpan {
 
@@ -94,6 +100,9 @@ public class ConnectionListItemAdapter extends BaseAdapter {
 	
 	public ConnectionListItemAdapter(Context context) {
 		c = context;
+		ranim = (RotateAnimation)AnimationUtils.loadAnimation(c, R.anim.vtext);
+		ranim.setFillAfter(true);
+		
 		TypedArray t = c.obtainStyledAttributes(new int[]{android.R.attr.textSize});
 		textSize = t.getDimensionPixelSize(0, -1);
 		if(textSize == -1)
@@ -102,11 +111,11 @@ public class ConnectionListItemAdapter extends BaseAdapter {
 		items = new ArrayList<ConnectionListItem>();
 	}
 	
-	public void setPLN(PLN file, boolean loadAll, boolean delays)
+	public void setPLN(PLN file, boolean loadAll, boolean delays, boolean backup_server)
 	{
 		pln = file;
 		depStation = pln.departureStation().name;
-		
+		deutsch = backup_server;
 		
 		delayInfo = delays;
 		if(delays)
@@ -187,7 +196,9 @@ public class ConnectionListItemAdapter extends BaseAdapter {
             	v = vi.inflate(R.layout.connection_list_row, null);
             else if(con instanceof DateItem)
             	v = vi.inflate(R.layout.common_date_header_row, null);
-            else 
+            else if(con instanceof WarningItem)
+            	v = vi.inflate(R.layout.warning_item, null);
+            else
             	v = vi.inflate(R.layout.scrollitem, null);
         }
         
@@ -311,6 +322,7 @@ public class ConnectionListItemAdapter extends BaseAdapter {
                 	
                 	t.setGravity(Gravity.CENTER_VERTICAL);
                 	t.setSingleLine();
+                	//t.setAnimation(ranim);
                     
                     t.setBackgroundResource(CommonUtils.drawableForTrainType(s));
                 	lay.addView(t);
@@ -321,6 +333,10 @@ public class ConnectionListItemAdapter extends BaseAdapter {
         {
         	TextView head = (TextView) v.findViewById(R.id.conn_header);
             head.setText(((ConnectionListItem.DateItem)con).date.format("%A, %d.%m.%Y"));
+        }
+        else if(con instanceof WarningItem)
+        {
+        	((TextView) v.findViewById(R.id.text)).setText("Uwaga! Z powodu problemów z serwerem systemu SITKOL, zwrócono wyniki z serwera kolei niemieckich. Mogą one zawierać mniej szczegółów i być mniej nieaktualne. Proszę zachować ostrożność.");
         }
         else
         {
@@ -374,13 +390,15 @@ public class ConnectionListItemAdapter extends BaseAdapter {
 			return HEADER;
 		else if(items.get(arg0) instanceof ConnectionListItem.TripItem)
 			return NORMAL;
+		else if(items.get(arg0) instanceof ConnectionListItem.WarningItem)
+			return WARNING;
 		else
 			return SCROLL;
 	}
 
 	@Override
 	public int getViewTypeCount() {
-		return 3;
+		return 4;
 	}
 
 	@Override
@@ -407,6 +425,10 @@ public class ConnectionListItemAdapter extends BaseAdapter {
 		//FIXME: Zrobic to poprawniej, teraz jest to "skrot myslowy"
 		if(loadAll && scrolling)
 			items.add(new ConnectionListItem.ScrollItem(true));
+		
+		if(deutsch)
+			items.add(new ConnectionListItem.WarningItem());
+		
 		while(it.hasNext()){
 			
         	Trip t = it.next();

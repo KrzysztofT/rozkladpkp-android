@@ -16,6 +16,8 @@
  ******************************************************************************/
 package org.tyszecki.rozkladpkp;
 
+import org.tyszecki.rozkladpkp.R;
+
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.PreferenceActivity;
@@ -25,6 +27,7 @@ import android.widget.EditText;
 public class PreferencesActivity extends PreferenceActivity {
 	
 	protected void onCreate(Bundle savedInstanceState) {
+		setTheme(RozkladPKPApplication.getThemeId());
 		super.onCreate(savedInstanceState);
 	    
 	    // Load the preferences from an XML resource

@@ -11,6 +11,7 @@ import android.widget.TextView;
 public class AboutActivity extends FragmentActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		setTheme(RozkladPKPApplication.getThemeId());
 		super.onCreate(savedInstanceState);
 		
 		

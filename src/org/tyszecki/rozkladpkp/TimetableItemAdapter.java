@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.tyszecki.rozkladpkp.R;
 import org.tyszecki.rozkladpkp.TimetableItem.DateItem;
 import org.tyszecki.rozkladpkp.TimetableItem.ScrollItem;
 import org.tyszecki.rozkladpkp.TimetableItem.TrainItem;
@@ -361,9 +362,8 @@ public class TimetableItemAdapter  extends BaseAdapter {
                 TextView type = (TextView) v.findViewById(R.id.train_type);
                 type.requestLayout(); //Przeliczenie wymiarów, dzięki tej linijce po kilkukrotnym przewinięciu listy, elementy nie będą tej samej długości
                
-                String t = CommonUtils.trainType(o.number);
-                type.setText(t.length() > 0 ? t : "Osob");
-                type.setBackgroundResource(CommonUtils.drawableForTrainType(t));                    
+                type.setText(o.number);
+                type.setBackgroundResource(CommonUtils.drawableForTrainType(CommonUtils.trainType(o.number)));                    
         }
         else if(b instanceof DateItem){
         	TextView head = (TextView) v.findViewById(R.id.conn_header);
