@@ -4,26 +4,16 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.zip.GZIPInputStream;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-
-import android.util.Log;
-import android.widget.SlidingDrawer;
+import org.tyszecki.rozkladpkp.servers.HafasServer;
+import org.tyszecki.rozkladpkp.servers.ServerManager;
 
 public class ConnectionList {
 
 	private PLN pln;
 	private int seqnr = 0;
 	private boolean isStatic = false;
-	private boolean aborted = false;
 	private Thread thread;
 	private int attempts;
 	
@@ -33,9 +23,7 @@ public class ConnectionList {
 	private byte[] sBuffer = new byte[512];
 	
 	
-	private final String URL = "http://rozklad.sitkol.pl/bin/query.exe/pn"; //http://mobile.bahn.de/bin/mobil/query.exe
-	private final String DBURL = "http://reiseauskunft.bahn.de/bin/query.exe/pn";
-	//private final String DBURL = "http://persoenlicherfahrplan.bahn.de/bin/pf/query-p2w.exe/pn";
+	
 	private final int MAX_ATTEMPTS = 15;
 	
 	public interface ConnectionListCallback{
@@ -141,8 +129,6 @@ public class ConnectionList {
 		data.add(new SerializableNameValuePair("androidversion", "2.0.8"));
 		
 		data.add(new SerializableNameValuePair("ident", pln.id()));
-		//data.add(new SerializableNameValuePair("ld", pln.ld()));
-		//data.add(new SerializableNameValuePair("hcount", "1"));
 		data.add(new SerializableNameValuePair("REQ0HafasScrollDir", next ? "2" : "1"));
 		
 		//data.add(new SerializableNameValuePair("androidversion", "1.1.4"));
@@ -152,120 +138,46 @@ public class ConnectionList {
 		data.add(new SerializableNameValuePair("htype", "google_sdk"));
 		
 		
-	    	
 		attempts = MAX_ATTEMPTS;
 		download(data);		
 	}
 	
-	ArrayList<SerializableNameValuePair> removeDiacritics(ArrayList<SerializableNameValuePair> in)
-	{
-		ArrayList<SerializableNameValuePair> ret = new ArrayList<SerializableNameValuePair>();
-		for(SerializableNameValuePair p : in)
-		{
-			if(p.name.endsWith("ID"))
-			{
-				ret.add(new SerializableNameValuePair(p.name, CommonUtils.depol(p.value)));
-				Log.i("RozkladPKP",CommonUtils.depol(p.value));
-			}
-			else
-				ret.add(p);
-		}
-		return ret;
-	}
-	
 	private void download(final ArrayList<SerializableNameValuePair> in)
 	{
-		aborted = false;
-		
 		thread = new Thread(new Runnable() {
 			
 			@Override
 			public void run() {
-				boolean backup = false;
-				String u = URL;
-					if(pln != null)
-						u +="?ld="+pln.ld(); //!!!! ufff... dodanie tego parametru zwiększa wielokrotnie wydajność systemu.
-					  //Bez niego program wolniej działa, a serwer Sitkola jest DDOSowany :) 
-					  //Ah ten HAFAS i jego tajemnice.
-
-					
-				int tries = attempts;boolean failed = false;
-				ArrayList<SerializableNameValuePair> data = in;
-				do
-				{	
-					failed = false;
-					DefaultHttpClient client = new DefaultHttpClient();
-					
-					 
-					HttpPost request = new HttpPost(u);
-					client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestExpectContinue.class);
-			        client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestUserAgent.class);
-			        
-			        
-			        /*for(int i = 0; i < data.size(); ++i)
-			        {
-			        	Log.i("RozkladPKP", data.get(i).getName() + "="+ data.get(i).getValue());
-			        }*/
-			        Log.i("RozkladPKP", Integer.toString(tries));
-			        request.addHeader("Content-Type", "text/plain");
-			        try {
-						request.setEntity(new UrlEncodedFormEntity(data,"UTF-8"));
-					} catch (UnsupportedEncodingException e) {
-						failed = true;
-						if(!aborted && backup)
-						{
-							callback.contentReady(ConnectionList.this, true, backup);
-							return;
-						}
-					}
-					
-					ByteArrayOutputStream content = new ByteArrayOutputStream();
-			        HttpResponse response;
-			        
-					try {
-						response = client.execute(request);
-				        HttpEntity entity = response.getEntity();
-				        InputStream inputStream = entity.getContent();
-				        GZIPInputStream in = new GZIPInputStream(inputStream);
-				        
-				        int readBytes = 0;
-				        while ((readBytes = in.read(sBuffer)) != -1) {
-				            content.write(sBuffer, 0, readBytes);
-				        }
-					} catch (Exception e) {
-						failed = true;
-						if(!aborted && backup)
-						{
-							callback.contentReady(ConnectionList.this, true, backup);
-							return;
-						}
-					}
-					
-					if(!failed)
-						try{
-						PLN t =new PLN(content.toByteArray()); 
-						pln = t;
-						}
-					catch(Exception e)
-					{failed = true;pln = null;}
-			        if(!failed && callback != null && (tries == 0 || pln.conCnt > 0) && !aborted)
-			        {
-			        	callback.contentReady(ConnectionList.this, false, backup);
-			        	return;
-			        }
-			        else if(tries == 1 && backup == false)
-			        {
-			        	backup = true;
-			        	u = DBURL; //Ukryta opcja niemiecka
-						if(pln != null)
-							u +="?ld="+pln.ld();
-						tries = attempts+1;
-						data = removeDiacritics(data);
-						Log.i("RozkladPKP", "Przełączam na DB");
-			        }
-				}while((failed || pln.conCnt == 0) && --tries > 0);
 				
-				callback.contentReady(ConnectionList.this, true, backup);
+				for(int i = 0;;++i)
+				{
+					HafasServer s = ServerManager.getServer(i);
+					
+					if(s == null)
+						break; //Koniec serwerów
+					
+					String ld = (pln != null) ? pln.ld() : null; 
+					//!!!! ufff... dodanie tego parametru zwiększa wielokrotnie wydajność systemu.
+					//Bez niego program wolniej działa, a serwer Sitkola jest DDOSowany :) 
+					//Ah ten HAFAS i jego tajemnice.
+		
+					int tries = attempts;
+					int result;
+					do
+					{	
+						result = s.getConnections(in, ld);
+						if(result == HafasServer.DOWNLOAD_OK)
+						{
+							pln = s.getPLN();
+							callback.contentReady(ConnectionList.this, false, i != 0);
+							return;
+						}
+						else if(result == HafasServer.DOWNLOAD_ERROR_SERVER_FAULT)
+							break; //Następny serwer, jeśli ten nie działa.
+						
+					}while((result != HafasServer.DOWNLOAD_OK) && --tries > 0);
+				}
+				callback.contentReady(ConnectionList.this, true, true);
 			}
 		});
 		thread.start();
@@ -283,7 +195,6 @@ public class ConnectionList {
 	
 	public void abort()
 	{
-		aborted = true;
 		if(thread != null && thread.isAlive())
 		{
 			thread.interrupt();
