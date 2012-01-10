@@ -14,7 +14,7 @@
  *     You should have received a copy of the GNU General Public License 
  *     along with RozkladPKP.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.tyszecki.rozkladpkp;
+package org.tyszecki.rozkladpkp.pln;
 
 import java.io.UnsupportedEncodingException;
 import java.util.BitSet;
@@ -51,15 +51,16 @@ public class PLN {
 	private Station[] stations;
 	private Station dep,arr; 
 	private int totalConCnt = -1;
-	private int actualDaysCount = -1;
 	private HashMap<Integer,Availability> availabilities;
+	
+	private DayUtils dayUtils;
 	
 	public int conCnt;
 	private int tripCount = 0;
 	Boolean delayInfo = null;
 
-	byte[] data;
-	private android.text.format.Time sdate,edate,today;
+	public byte[] data;
+	public android.text.format.Time sdate,edate,today;
 	
 	class StringManager{
 		HashMap<Integer,String> cache = new HashMap<Integer, String>();
@@ -119,7 +120,7 @@ public class PLN {
 		}
 	}
 	
-	class Time{
+	public class Time{
 		int val;
 		int days;
 		public Time(int v) {
@@ -184,8 +185,9 @@ public class PLN {
 		}
 	}
 	
-	class Availability{
+	public class Availability{
 		private int length;
+		private int bsLen = -1;
 		private int card = 0;
 		public Availability(int m,int offset, int dayOffset, int len) {
 			msgOffset = m;
@@ -232,6 +234,13 @@ public class PLN {
 			return dOffset;
 		}
 		
+		public int bsLength()
+		{
+			if(bsLen == -1)
+				bsLen = days.length();
+			return bsLen;
+		}
+		
 		public String getMessage()
 		{
 			if(msg == null)
@@ -240,12 +249,14 @@ public class PLN {
 		}
 		private String msg;
 		private BitSet days;
-		private int dOffset,msgOffset;
+		int dOffset;
+		private int msgOffset;
 	}
 	
 	public class Station {
-		int x,y,id;
-		String name;
+		int x,y;
+		public int id;
+		public String name;
 		
 		public String toString()
 		{
@@ -254,10 +265,12 @@ public class PLN {
 	}
 	
 	public class Train {
-		Time deptime,arrtime;
+		public Time deptime;
+		public Time arrtime;
 		private int offset;
-		String number;
-		Station depstation,arrstation;
+		public String number;
+		public Station depstation;
+		public Station arrstation;
 		private String attr[] = null;
 		private String depplatform, arrplatform;
 		
@@ -309,16 +322,18 @@ public class PLN {
 	public class Message {
 		String start;
 		String end;
-		String brief,full;
+		public String brief;
+		public String full;
 	}
 	
 	public class TrainChange {
-		Time realdeptime,realarrtime;
+		public Time realdeptime;
+		public Time realarrtime;
 		String realdepplatform,realarrplatform;
 	}
 	
 	public class ConnectionChange {
-		int departureDelay;
+		public int departureDelay;
 	}
 	
 	public class Connection {
@@ -329,7 +344,7 @@ public class PLN {
 		private Time journeyTime = null;
 		private Train[] trains = null;
 		
-		Availability availability;
+		public Availability availability;
 		private ConnectionChange change;
 		
 		public Time getJourneyTime()
@@ -393,10 +408,10 @@ public class PLN {
 			date = d;
 			conidx = idx;
 		}
-		android.text.format.Time date;
-		Connection con;
+		public android.text.format.Time date;
+		public Connection con;
 		//FIXME: Wymyśleć, jak zastąpić to, żeby było ładnie.
-		int conidx;
+		public int conidx;
 	}
 	
 	public class TripIterator implements Iterator<Trip>{
@@ -558,25 +573,7 @@ public class PLN {
 		return totalConCnt;
 	}
 	
-	public int daysCount()
-	{
-		if(actualDaysCount == -1)
-		{
-			BitSet res = new BitSet();
-			for(Connection c : connections)
-			{
-				Availability a = c.availability;
-				int j = a.dOffset*8;
-				BitSet t = a.bitset();
-				
-				for(int i = 0; i < t.length(); i++,j++)
-					res.set(j,t.get(i));
-				
-			}
-			actualDaysCount = res.cardinality();
-		}
-		return actualDaysCount;
-	}
+	
 	
 	//Tak naprawdę, to jest to czytanie 'unsigned short' a nie 'int'.
 	//Jednak zwracamy int, ponieważ short javowy nie zmieści wszystkich wartości
@@ -836,7 +833,7 @@ public class PLN {
 		return ch;
 	}
 
-	boolean hasDelayInfo()
+	public boolean hasDelayInfo()
 	{
 		if(delayInfo == null)
 		{
@@ -874,7 +871,12 @@ public class PLN {
 		return false;
 	}
 	
-	
+	public DayUtils days()
+	{
+		if(dayUtils == null)
+			dayUtils = new DayUtils(this);
+		return dayUtils;
+	}
 	
 	public void addExternalDelayInfo(HashMap<String,Integer> delays)
 	{

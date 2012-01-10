@@ -563,6 +563,8 @@ containing a value of this type.
         public static final int Widget_Sherlock_ActionButton_Overflow=0x7f0a0008;
         public static final int Widget_Sherlock_Light_ActionBar_TabBar=0x7f0a000e;
         public static final int Widget_Sherlock_Light_ActionBar_TabText=0x7f0a0010;
+        /** <style name="Widget.Sherlock.Light.ActionBar.TabBar" parent="android:Widget.Holo.Light.ActionBar.TabBar"></style>
+         */
         public static final int Widget_Sherlock_Light_ActionBar_TabView=0x7f0a000f;
         public static final int Widget_Sherlock_Light_ActionButton=0x7f0a0011;
         public static final int Widget_Sherlock_Light_ActionButton_CloseMode=0x7f0a0016;

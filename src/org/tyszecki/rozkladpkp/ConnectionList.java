@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.tyszecki.rozkladpkp.pln.PLN;
 import org.tyszecki.rozkladpkp.servers.HafasServer;
 import org.tyszecki.rozkladpkp.servers.ServerManager;
 
@@ -16,6 +17,7 @@ public class ConnectionList {
 	private boolean isStatic = false;
 	private Thread thread;
 	private int attempts;
+	private int serverId = -1;
 	
 	private String date,time;
 	
@@ -27,7 +29,7 @@ public class ConnectionList {
 	private final int MAX_ATTEMPTS = 15;
 	
 	public interface ConnectionListCallback{
-		void contentReady(ConnectionList list, boolean error, boolean reserver);
+		void contentReady(ConnectionList list, boolean error);
 	}
 	
 	ConnectionListCallback callback;
@@ -73,7 +75,7 @@ public class ConnectionList {
 	    
 	    
 	    if(ret.callback != null)
-	    	ret.callback.contentReady(ret, false, false);
+	    	ret.callback.contentReady(ret, false);
 	    
 		return ret;
 	}
@@ -87,7 +89,7 @@ public class ConnectionList {
 		ret.pln = new PLN(array);
 		
 		if(ret.callback != null)
-	    	ret.callback.contentReady(ret, false, false);
+	    	ret.callback.contentReady(ret, false);
 		
 		return ret;
 	}
@@ -169,7 +171,8 @@ public class ConnectionList {
 						if(result == HafasServer.DOWNLOAD_OK)
 						{
 							pln = s.getPLN();
-							callback.contentReady(ConnectionList.this, false, i != 0);
+							ConnectionList.this.serverId = i;
+							callback.contentReady(ConnectionList.this, false);
 							return;
 						}
 						else if(result == HafasServer.DOWNLOAD_ERROR_SERVER_FAULT)
@@ -177,10 +180,24 @@ public class ConnectionList {
 						
 					}while((result != HafasServer.DOWNLOAD_OK) && --tries > 0);
 				}
-				callback.contentReady(ConnectionList.this, true, true);
+				callback.contentReady(ConnectionList.this, true);
 			}
 		});
 		thread.start();
+	}
+	
+	/**
+	 * 
+	 * @return Numer serwera, -1 jeśli nieznany.
+	 */
+	public int getServerId()
+	{
+		return serverId;
+	}
+	
+	public boolean scrollable()
+	{
+		return !isStatic;
 	}
 	
 	public PLN getPLN()

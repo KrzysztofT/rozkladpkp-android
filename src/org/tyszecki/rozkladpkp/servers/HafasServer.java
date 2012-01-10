@@ -11,8 +11,8 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.tyszecki.rozkladpkp.PLN;
 import org.tyszecki.rozkladpkp.SerializableNameValuePair;
+import org.tyszecki.rozkladpkp.pln.PLN;
 
 public abstract class HafasServer {
 	public static final int URL_CONNECTIONS = 0;

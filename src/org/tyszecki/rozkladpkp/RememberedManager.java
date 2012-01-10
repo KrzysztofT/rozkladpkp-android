@@ -16,8 +16,9 @@
  ******************************************************************************/
 package org.tyszecki.rozkladpkp;
 
-import org.tyszecki.rozkladpkp.PLN.Trip;
-import org.tyszecki.rozkladpkp.PLN.TripIterator;
+import org.tyszecki.rozkladpkp.pln.PLN;
+import org.tyszecki.rozkladpkp.pln.PLN.Trip;
+import org.tyszecki.rozkladpkp.pln.PLN.TripIterator;
 
 import android.content.ContentValues;
 import android.content.Context;

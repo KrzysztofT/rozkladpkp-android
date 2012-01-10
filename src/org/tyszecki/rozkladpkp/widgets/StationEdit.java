@@ -17,7 +17,7 @@
 package org.tyszecki.rozkladpkp.widgets;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -160,6 +160,8 @@ public class StationEdit extends  AutoCompleteTextView {
 		
 		private class StationFilter extends Filter{
 			
+			
+			
 			@Override
 			protected FilterResults performFiltering(CharSequence constraint) {
 				FilterResults results = new FilterResults();
@@ -172,6 +174,26 @@ public class StationEdit extends  AutoCompleteTextView {
 	            else
 	            {
 	            	ArrayList<String> al = tree.Autocomplete(constraint.toString()); 
+	            	//Wywal przystanki ZTM na koniec listy, resztę zostaw tak jak były
+	            	Collections.sort(al, new Comparator<String>() {
+						@Override
+						public int compare(String lhs, String rhs) {
+							boolean rc = rhs.contains("ZTM");
+							if(lhs.contains("ZTM"))
+							{
+								if(rc)
+									return 0;
+								else
+									return 1;
+							}
+							else{
+								if(rc)
+									return -1;
+								else 
+									return 0;
+							}
+						}
+					});
 	                results.values = al;
 	                results.count = al.size();
 	            }

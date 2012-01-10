@@ -104,6 +104,7 @@ public class TimetableActivity extends FragmentActivity {
 				{
 					Intent ni = new Intent(TimetableActivity.this, TimetableFormActivity.class);
 					ni.putExtra("Station",getIntent().getExtras().getString("Station"));
+					
 					startActivity(ni);
 				}
 				
@@ -177,6 +178,9 @@ public class TimetableActivity extends FragmentActivity {
 				TimetableActivity.this.finish();
 			}
 		});
+    	
+    	
+    	
     	alertDialog.show();
 	}
 	

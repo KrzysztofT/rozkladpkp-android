@@ -39,8 +39,7 @@ public class RozkladPKPApplication extends Application {
         
         context = getApplicationContext();
         reloadTheme();
-      
-        
+       
         StationEdit.initTree();
         LocationHelper.init();
     }

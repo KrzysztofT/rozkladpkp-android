@@ -15,7 +15,8 @@
  *     along with RozkladPKP.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.tyszecki.rozkladpkp;
-import org.tyszecki.rozkladpkp.PLN.Train;
+import org.tyszecki.rozkladpkp.pln.PLN;
+import org.tyszecki.rozkladpkp.pln.PLN.Train;
 
 import android.content.Context;
 import android.graphics.Color;

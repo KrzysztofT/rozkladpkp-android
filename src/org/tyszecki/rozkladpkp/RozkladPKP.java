@@ -18,8 +18,6 @@ package org.tyszecki.rozkladpkp;
 
 import java.util.ArrayList;
 
-import org.tyszecki.rozkladpkp.R;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -34,7 +32,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ActionBar.Tab;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
 public class RozkladPKP extends FragmentActivity  {
@@ -48,7 +45,7 @@ public class RozkladPKP extends FragmentActivity  {
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
-    	//setTheme(RozkladPKPApplication.getThemeId());
+    	setTheme(RozkladPKPApplication.getThemeId());
     	super.onCreate(savedInstanceState);
     	
     	setContentView(R.layout.actionbar_tabs_pager);

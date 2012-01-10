@@ -17,8 +17,9 @@
 package org.tyszecki.rozkladpkp;
 
 import org.tyszecki.rozkladpkp.R;
-import org.tyszecki.rozkladpkp.PLN.Train;
 import org.tyszecki.rozkladpkp.RouteFetcher.RouteParams;
+import org.tyszecki.rozkladpkp.pln.PLN;
+import org.tyszecki.rozkladpkp.pln.PLN.Train;
 import org.w3c.dom.Document;
 
 import android.app.Activity;

@@ -16,19 +16,9 @@
  ******************************************************************************/
 package org.tyszecki.rozkladpkp;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
-import org.tyszecki.rozkladpkp.R;
 import org.tyszecki.rozkladpkp.ConnectionList.ConnectionListCallback;
-import org.tyszecki.rozkladpkp.ConnectionListItem.ScrollItem;
-import org.tyszecki.rozkladpkp.ConnectionListItem.TripItem;
-import org.tyszecki.rozkladpkp.PLN.Trip;
-import org.tyszecki.rozkladpkp.PLN.TripIterator;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -37,18 +27,10 @@ import android.content.Intent;
 import android.content.DialogInterface.OnCancelListener;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.preference.PreferenceManager;
-import android.support.v4.app.ActionBar;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.view.MenuItem;
-import android.text.format.Time;
-import android.view.Gravity;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
 public class ConnectionListActivity extends FragmentActivity {
@@ -68,7 +50,6 @@ public class ConnectionListActivity extends FragmentActivity {
 	
 	public void onCreate(Bundle savedInstanceState) {
 		setTheme(RozkladPKPApplication.getThemeId());
-		//setTheme(Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(this).getString("defaultTheme", "0")) == 0 ? R.style.Theme_RozkladPKP : R.style.Theme_RozkladPKP_Dark);
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.connection_list);
 		
@@ -77,14 +58,14 @@ public class ConnectionListActivity extends FragmentActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         clistCallback = new ConnectionListCallback() {
 			@Override
-			public void contentReady(ConnectionList list, final boolean error, final boolean deutsch) {
+			public void contentReady(ConnectionList list, final boolean error) {
 				if(clist == null)
 					clist = list;
 				
 				Runnable uit = new Runnable() {
 					@Override
 					public void run() {
-						updateDisplayedPLN(error,deutsch);
+						updateDisplayedPLN(error);
 					}
 				};
 				runOnUiThread(uit);
@@ -107,65 +88,41 @@ public class ConnectionListActivity extends FragmentActivity {
 
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View v, int pos, long id) {
-
-				//Kiedy użytkownik użyje klawiatury do kliknięcia informacji o tym, że wyświetlają się zapisane połączenia,
-				//Wywoła się ten listener z id=-1...
-				if(id == -1)
-					newSearch();
-
-				final ConnectionListItem b =  adapter.getItem((int) id);
-				if(b == null)
-					return;
-
-				if(b instanceof TripItem){
-					int cix = adapter.getTripId((TripItem)b);
+				int type = adapter.getItemViewType(pos);
+				
+				if(type == ConnectionListItemAdapter.NORMAL){
+					int cix = adapter.getConnectionAt(pos);
 
 					//Błąd - nic nie robimy
-					if(cix == -1 || cix >= clist.getPLN().conCnt)
+					if(cix == -1)
 						return;
 					
 					Intent ni = new Intent(arg0.getContext(),ConnectionDetailsActivity.class);
 
 					ni.putExtra("seqnr", clist.getSeqNr());
 					ni.putExtra("PLNData", clist.getPLN().data);
-					ni.putExtra("ConnectionIndex",((TripItem)b).t.conidx);
-					ni.putExtra("ConnectionId", cix);
-					ni.putExtra("StartDate",((TripItem)b).t.date.format("%d.%m.%Y"));
+					ni.putExtra("ConnectionIndex",cix);
+					
+					ni.putExtra("StartDate",adapter.getDateForConnectionAt(pos).format("%d.%m.%Y"));
 					ni.putExtra("Attributes", extras.getSerializable("Attributes"));
 					ni.putExtra("Products", extras.getString("Products"));
 					startActivity(ni);
 				}
-				else if(b instanceof ScrollItem)
+				else if(type == ConnectionListItemAdapter.SCROLL)
 				{
 					showLoader();
-					clist.fetchMore(((ScrollItem)b).up);
+					clist.fetchMore(!(pos == adapter.getCount()-1));
 				}
+				else if(type == ConnectionListItemAdapter.WARNING && !clist.scrollable())
+					newSearch();
 			}
 		});
 	}
 
 	private void setupContents(Bundle savedInstanceState) {
 		if(extras.containsKey("PLNFilename"))
-		{
-			TextView t = new TextView(this);
-			t.setText("Oglądasz w tej chwili zapisane wyniki wyszukiwania. Dotknij tutaj, aby rozpocząć nowe wyszukiwanie.");
-			t.setPadding(6, 6, 6, 6);
-			t.setTextSize(15);
-			t.setGravity(Gravity.CENTER);
-
-			t.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					newSearch();
-				}
-			});
-
-			ListView lv = (ListView)findViewById(R.id.connection_list);
-			lv.addHeaderView(t);
-
-			adapter.setScrollingEnabled(false);
 			clist = ConnectionList.fromFile(clistCallback, extras.getString("PLNFilename"));
-		}
+		
 		else if(savedInstanceState != null && savedInstanceState.containsKey("PLNData")){
 
 			clist = ConnectionList.fromByteArray(clistCallback, commonFieldsList, savedInstanceState.getByteArray("PLNData"), savedInstanceState.getInt("SeqNr"));
@@ -234,7 +191,7 @@ public class ConnectionListActivity extends FragmentActivity {
     		m_ProgressDialog = null;
 		}
 	}
-	public void updateDisplayedPLN(boolean error, boolean deutsch)
+	public void updateDisplayedPLN(boolean error)
 	{
 		hideLoader();
 		
@@ -265,7 +222,7 @@ public class ConnectionListActivity extends FragmentActivity {
 		}
 		else
 		{
-			adapter.setPLN(clist.getPLN(), !hasFullTable, clist.getPLN().hasDelayInfo(), deutsch);
+			adapter.setConnectionList(clist);
 
 			//Zapisanie wyników
 			Bundle extras = ConnectionListActivity.this.getIntent().getExtras(); 

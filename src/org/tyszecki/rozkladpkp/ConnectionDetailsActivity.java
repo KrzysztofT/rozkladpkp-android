@@ -21,8 +21,9 @@ import java.io.InputStream;
 
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.tyszecki.rozkladpkp.PLN.Connection;
 import org.tyszecki.rozkladpkp.TimetableItem.TrainItem;
+import org.tyszecki.rozkladpkp.pln.PLN;
+import org.tyszecki.rozkladpkp.pln.PLN.Connection;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
