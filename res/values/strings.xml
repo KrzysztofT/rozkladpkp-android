@@ -18,8 +18,8 @@
 <resources>
     <string name="app_name">Rozkład PKP</string>
 	
-	<string name="progressTitle">Czekaj...</string>
-	<string name="progressBodyLocation">Trwa pobieranie lokalizacji...</string><string name="progressSearchingStation">Wyszukiwanie stacji...</string>
+	<string name="progressTitle">Czekaj…</string>
+	<string name="progressBodyLocation">Trwa pobieranie lokalizacji…</string><string name="progressSearchingStation">Wyszukiwanie stacji…</string>
 	
 	<string name="toastLocationError">Nie można wskazać Twojej lokalizacji. Sprawdź czy masz zaznaczoną opcję \"Lokalizacja/Skorzystaj z sieci bezprzewodowych" z ustawień systemowych i ponów próbę.</string>
 	
