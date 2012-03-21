@@ -18,7 +18,6 @@ package org.tyszecki.rozkladpkp;
 
 import java.util.ArrayList;
 
-import org.tyszecki.rozkladpkp.R;
 import org.tyszecki.rozkladpkp.LocationHelper.LocationState;
 import org.tyszecki.rozkladpkp.widgets.AttributesButton;
 import org.tyszecki.rozkladpkp.widgets.CarriersButton;
@@ -27,32 +26,29 @@ import org.tyszecki.rozkladpkp.widgets.DialogControl;
 import org.tyszecki.rozkladpkp.widgets.ProductsButton;
 import org.tyszecki.rozkladpkp.widgets.StationEdit;
 import org.tyszecki.rozkladpkp.widgets.StationSpinner;
-import org.tyszecki.rozkladpkp.widgets.TimeButton;
 import org.tyszecki.rozkladpkp.widgets.StationSpinner.onDataLoaded;
+import org.tyszecki.rozkladpkp.widgets.TimeButton;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
-import android.text.Editable;
-import android.text.Selection;
+import android.support.v4.app.SupportActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -73,7 +69,11 @@ public class ConnectionsFormFragment extends Fragment {
 	private int loading;
 	
 	private ProgressDialog progressDialog;
-	//private GetLocality task;
+	private onFormSubmitListener submitListener = null;
+	
+	public interface onFormSubmitListener{
+		public void onSubmit(Bundle values);
+	}
 	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -90,6 +90,12 @@ public class ConnectionsFormFragment extends Fragment {
     	else
     		clarify = false;
     }
+	
+	@Override
+	public void onAttach(SupportActivity activity) {
+		super.onAttach(activity);
+		try{submitListener = (onFormSubmitListener)activity;}catch (Exception e) {}
+	}
 	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
@@ -114,8 +120,6 @@ public class ConnectionsFormFragment extends Fragment {
 			
 			@Override
 			public void onClick(View arg0) {
-				Intent ni = null;
-				
 				Bundle arg = new Bundle();
 				
 				if(!clarify)
@@ -184,19 +188,25 @@ public class ConnectionsFormFragment extends Fragment {
 					arg.putString("arrName", arrSelect.getText());
 				}
 				
-				arg.putString("Time", timeButton.getTime());
+				arg.putString("PLNTimestamp", timeButton.getTime());
+				arg.putBoolean("Arrival", timeButton.isArrival());
 				arg.putString("Date", dateButton.getDate());
 				arg.putString("Products", productsButton.getProductString());
 				arg.putSerializable("Attributes", attributesButton.getParameters());
 				
 				if(carriersButton.isShown()) arg.putSerializable("Carriers", carriersButton.getParameters());
 				
-				SharedPreferences p = getActivity().getPreferences(Activity.MODE_PRIVATE);
+				SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(getActivity());
 				p.edit().putString("Products", productsButton.getProductString()).putInt("Attributes", attributesButton.settingsCode()).commit();
 				
-				Intent intent = new Intent(getActivity(),  arg.containsKey("clarify") ? ConnectionsFormActivity.class : ConnectionListActivity.class);
-				intent.putExtras(arg);
-				startActivity(intent);
+				if(submitListener == null)	
+				{
+					Intent intent = new Intent(getActivity(),  arg.containsKey("clarify") ? ConnectionsFormActivity.class : ConnectionListActivity.class);
+					intent.putExtras(arg);
+					startActivity(intent);
+				}
+				else
+					submitListener.onSubmit(arg);
 			}
 		});
         
@@ -245,11 +255,19 @@ public class ConnectionsFormFragment extends Fragment {
 	private void initializeControls()
 	{
 		EnhancedBundle a = new EnhancedBundle(getArguments());
-		SharedPreferences p = getActivity().getPreferences(Activity.MODE_PRIVATE);
+		SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(getActivity());
 			
-		//Przyciski
-		timeButton.setTime(a.getString("Time", null));
+		//Przyciski - ukryj datę i czas, jeśli okno zostąło wywołane do konfiguracji widżetu
+		if(a.containsKey("hideTime"))
+		{
+			timeButton.setVisibility(View.GONE);
+			dateButton.setVisibility(View.GONE);
+			attributesButton.setVisibility(View.GONE);
+		}
+		
+		timeButton.setTime(a.getString("PLNTimestamp", null));
 		dateButton.setDate(a.getString("Date", null));
+		
         productsButton.setProductString(p.getString("Products", "11110001111111"));
         
         if(a.containsKey("Attributes"))
@@ -397,44 +415,6 @@ public class ConnectionsFormFragment extends Fragment {
 		}
 		return false;
 	}
-	
-	
-	/*
-	@Override
-	protected void onPause() {
-		super.onPause();
-		
-		if(task != null)
-			task.cancel(true);
-	}*/
-	/*
-	private class GetLocality extends CommonUtils.GetLocalityTask{
-		ProgressDialog p;
-		
-		@Override
-		protected void onPreExecute() {
-			super.onPreExecute();
-			//TODO: Cancel listener
-			p = ProgressDialog.show(ConnectionsFormActivity.this, res.getString(R.string.progressTitle), res.getString(R.string.progressBodyLocation));
-		}
-		
-		@Override
-		protected void onPostExecute(String result) {
-			super.onPostExecute(result);
-			p.dismiss();
-
-			if(result == null)
-				Toast.makeText(getApplicationContext(), res.getText(R.string.toastLocationError), Toast.LENGTH_SHORT).show();
-			else
-			{
-				StationEdit ed = (StationEdit) findViewById(R.id.departure_edit);
-				ed.setText(result);
-				final Editable etext = ed.getText();
-				final int position = etext.length();
-				Selection.setSelection(etext, position);
-			}
-		}
-	}*/
 	
 	private class ButtonListener implements OnClickListener{
 

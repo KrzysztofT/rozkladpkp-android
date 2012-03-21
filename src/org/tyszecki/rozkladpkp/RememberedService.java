@@ -3,8 +3,6 @@ package org.tyszecki.rozkladpkp;
 import java.io.FileOutputStream;
 
 import org.tyszecki.rozkladpkp.pln.PLN;
-import org.tyszecki.rozkladpkp.pln.PLN.Trip;
-import org.tyszecki.rozkladpkp.pln.PLN.TripIterator;
 
 import android.app.IntentService;
 import android.content.Context;
@@ -30,6 +28,7 @@ public class RememberedService extends IntentService {
 		
 		String Sid = ex.getString("SID");
 		String Zid = null;
+		int cacheID = ex.containsKey("cacheID") ? ex.getInt("cacheID") : -1;
 		
 		if(ex.containsKey("ZID"))
 			Zid = ex.getString("ZID");
@@ -39,15 +38,18 @@ public class RememberedService extends IntentService {
 		{
 			PLN pln = new PLN(ex.getByteArray("pln"));
 			try{
+				/*pln.edate
 				TripIterator p = pln.tripIterator();
 				p.moveToLast();
 				Trip t1 = p.next();
-				Time time = new Time(t1.date);
+				*/
+				Time time = new Time(pln.edate);
 				time.monthDay++;
 				time.normalize(false);
 				t = time.format2445();
 				
-				String s = CommonUtils.ResultsHash(Sid, Zid, null);
+				String s = CommonUtils.ResultsHash(Sid, Zid, null, cacheID);
+				Log.w("RozkladPKP", "zapisuję... "+s);
 				try {
 					FileOutputStream fos = openFileOutput(s, Context.MODE_PRIVATE);
 					fos.write(pln.data);
@@ -59,13 +61,13 @@ public class RememberedService extends IntentService {
 			catch(Exception e){
 				return;
 			}
-			RememberedManager.addtoHistory(this, Sid, Zid, t);
+			RememberedManager.addtoHistory(this, Sid, Zid, t, cacheID);
 		}
 		else if(ex.containsKey("timetable"))
 		{
 			t = ex.getString("time");
 			
-			String s = CommonUtils.ResultsHash(Sid, null, ex.getBoolean("departure"));
+			String s = CommonUtils.ResultsHash(Sid, null, ex.getBoolean("departure"), cacheID);
 			
 			try {
 				FileOutputStream fos = openFileOutput(s, Context.MODE_PRIVATE);
@@ -74,7 +76,7 @@ public class RememberedService extends IntentService {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			RememberedManager.addtoHistory(this, Sid, ex.getBoolean("departure"), t);
+			RememberedManager.addtoHistory(this, Sid, ex.getBoolean("departure"), t, cacheID);
 		}
 		
 		

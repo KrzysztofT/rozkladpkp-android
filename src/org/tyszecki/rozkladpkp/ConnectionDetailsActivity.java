@@ -22,8 +22,8 @@ import java.io.InputStream;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.tyszecki.rozkladpkp.TimetableItem.TrainItem;
+import org.tyszecki.rozkladpkp.pln.UnboundConnection;
 import org.tyszecki.rozkladpkp.pln.PLN;
-import org.tyszecki.rozkladpkp.pln.PLN.Connection;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -80,16 +80,16 @@ public class ConnectionDetailsActivity extends FragmentActivity {
 			            @Override
 			            public void run() {
 			                try {
-			            		Connection c = pln.connections[conidx];
+			            		UnboundConnection c = pln.connections[conidx];
 			                	
 			                	String params;
 			                	params = "start="+Integer.toString(c.getTrain(0).depstation.id);
-			                	params += "&end="+Integer.toString(c.getTrain(c.getTrainCount()-1).arrstation.id);
+			                	params += "&end="+Integer.toString(c.getTrain(c.trainCount-1).arrstation.id);
 			                	params += "&date="+getIntent().getExtras().getString("StartDate");
 			                	params += "&time="+c.getTrain(0).deptime.toString();
 			                	params += "&trains=";
 			                	
-			                	int j = c.getTrainCount();
+			                	int j = c.trainCount;
 			                	for(int i = 0; i < j; ++i)
 			                	{
 			                		params += c.getTrain(i).number.trim();

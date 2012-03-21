@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.RozkladPKP" parent="@style/Theme.Sherlock.Light">
+    	<item name="abBackground">#292929</item>
+    	
+    	<item name="abTitleTextStyle">@style/RozkladABTitleTextStyle</item>
+    	<item name="abSubtitleTextStyle">@style/RozkladABSubtitleTextStyle</item>
+    	<item name="actionBarTabTextStyle">@style/RozkladABTabTextStyle</item>
+    	<item name="abLogo">@drawable/logo</item>
+    	
+    	<item name="android:autoCompleteTextViewStyle">@style/AutoCompleteTextViewLight</item>
+    	
+    	<item name="android:buttonStyle">@style/HoloButton</item>
+    	<item name="android:spinnerStyle">@style/MyHoloSpinner</item>
+    	<item name="android:spinnerItemStyle">@style/MyHoloSpinnerItem</item>
+    	<item name="android:spinnerDropDownItemStyle">@style/MyHoloSpinnerDropDownItem</item>
+    	
+    	<item name="android:textColor">#606060</item>
+    	<item name="WarningBgColor">#ffd3d3</item>
+    	<item name="StationEditColor">#000</item>
+    	
+    	<item name="android:dividerHeight">1px</item>
+    	
+    	<item name="DividerColor">#ddd</item>
+    </style>
+         
+    <style name="Theme.RozkladPKP.Dark" parent="@style/Theme.Sherlock">
+    	<item name="abBackground">#292929</item>
+    	<item name="abTitleTextStyle">@style/RozkladABTitleTextStyle</item>
+    	<item name="abSubtitleTextStyle">@style/RozkladABSubtitleTextStyle</item>
+    	<item name="actionBarTabTextStyle">@style/RozkladABTabTextStyle</item>
+    	<item name="abLogo">@drawable/logo</item>
+    	
+    	<item name="android:autoCompleteTextViewStyle">@style/AutoCompleteTextViewLight</item>
+    	
+    	<item name="android:buttonStyle">@style/HoloButton</item>
+    	<item name="android:spinnerStyle">@style/MyHoloSpinner</item>
+    	<item name="android:spinnerItemStyle">@style/MyHoloSpinnerItem</item>
+    	<item name="android:spinnerDropDownItemStyle">@style/MyHoloSpinnerDropDownItem</item>
+    	
+    	<item name="android:textColor">#cccccc</item>
+    	<item name="android:dividerHeight">1px</item>
+    	
+    	<item name="DividerColor">#444</item>
+    	<item name="WarningBgColor">#4c1515</item>
+    	<item name="StationEditColor">#fff</item>
+    </style>
+  
+    <style name="RozkladABTabTextStyle" parent="@style/Theme.Sherlock.Light">
+        <item name="android:textColor">#ffffff</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    
+    <style name="RozkladABTitleTextStyle" parent="@style/TextAppearance.Widget.Title">
+        <item name="android:textColor">#ffffff</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    
+    <style name="RozkladABSubtitleTextStyle" parent="@style/TextAppearance.Widget.Subtitle">
+        <item name="android:textColor">#ffffff</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+ 	
+    <style name="AutoCompleteTextViewLight" parent="@android:style/Widget.AutoCompleteTextView">
+		<item name="android:textColor">@android:color/primary_text_light</item>
+	</style>
+	
+    <style name="HoloButton" parent="@android:style/Widget.Button">
+        <item name="android:background">@drawable/button_ics_holo</item>
+        <item name="android:padding">12dp</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceMediumInverse</item>
+        <item name="android:textColor">#000</item>
+    </style>
+    
+    <style name="MyHoloSpinner" parent="@android:style/Widget.Spinner">
+        <item name="android:background">@drawable/spinner_ics_holo</item>
+        <item name="android:padding">12dp</item>
+    </style>
+    
+    <style name="MyHoloSpinnerItem">
+        <item name="android:textAppearance">?android:attr/textAppearanceMediumInverse</item>
+        <item name="android:textColor">#000</item>
+    </style>
+    
+    <style name="MyHoloSpinnerDropDownItem" parent="@android:style/Widget.DropDownItem.Spinner">
+        <item name="android:textColor">#000</item>
+    </style>
+</resources>

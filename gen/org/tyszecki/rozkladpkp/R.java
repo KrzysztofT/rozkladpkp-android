@@ -35,6 +35,15 @@ theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
          */
+        public static final int StationEditColor=0x7f010029;
+        /** <p>Must be a color value, in the form of "<code>#<i>rgb</i></code>", "<code>#<i>argb</i></code>",
+"<code>#<i>rrggbb</i></code>", or "<code>#<i>aarrggbb</i></code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+         */
         public static final int WarningBgColor=0x7f010027;
         /** <p>May be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
 or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
@@ -272,11 +281,10 @@ containing a value of this type.
         public static final int windowActionModeOverlay=0x7f010014;
     }
     public static final class color {
-        public static final int abs__item_bg=0x7f070002;
+        public static final int abs__item_bg=0x7f070001;
         public static final int abs__item_focused=0x7f070000;
-        public static final int abs__tab_text_color_dark=0x7f070003;
-        public static final int abs__tab_text_color_light=0x7f070004;
-        public static final int dupa=0x7f070001;
+        public static final int abs__tab_text_color_dark=0x7f070002;
+        public static final int abs__tab_text_color_light=0x7f070003;
     }
     public static final class drawable {
         public static final int abs__ab_stacked_transparent_dark_holo=0x7f020000;
@@ -319,57 +327,59 @@ containing a value of this type.
         public static final int abs__tab_unselected_holo=0x7f020025;
         public static final int abs__tab_unselected_pressed_focused_holo=0x7f020026;
         public static final int abs__tab_unselected_pressed_holo=0x7f020027;
-        public static final int arrival=0x7f020028;
-        public static final int back_bus=0x7f020029;
-        public static final int back_ec=0x7f02002a;
-        public static final int back_eic=0x7f02002b;
-        public static final int back_foot=0x7f02002c;
-        public static final int back_ir=0x7f02002d;
-        public static final int back_kdp=0x7f02002e;
-        public static final int back_re=0x7f02002f;
-        public static final int back_reg=0x7f020030;
-        public static final int back_skm=0x7f020031;
-        public static final int back_tlk=0x7f020032;
-        public static final int btn_default_disabled_focused_holo_light=0x7f020033;
-        public static final int btn_default_disabled_holo_light=0x7f020034;
-        public static final int btn_default_focused_holo_light=0x7f020035;
-        public static final int btn_default_normal_holo_light=0x7f020036;
-        public static final int btn_default_pressed_holo_light=0x7f020037;
-        public static final int button_ics_holo=0x7f020038;
-        public static final int changes=0x7f020039;
-        public static final int clock=0x7f02003a;
-        public static final int departure=0x7f02003b;
-        public static final int end_gray=0x7f02003c;
-        public static final int end_green=0x7f02003d;
-        public static final int ic_love=0x7f02003e;
-        public static final int ic_menu_change_order=0x7f02003f;
-        public static final int ic_menu_directions=0x7f020040;
-        public static final int ic_menu_forward=0x7f020041;
-        public static final int ic_menu_info_details=0x7f020042;
-        public static final int ic_menu_more=0x7f020043;
-        public static final int ic_menu_preferences=0x7f020044;
-        public static final int ic_menu_revert=0x7f020045;
-        public static final int ic_menu_share=0x7f020046;
-        public static final int ic_menu_show_list=0x7f020047;
-        public static final int ic_menu_today=0x7f020048;
-        public static final int ic_mylocation=0x7f020049;
-        public static final int icon=0x7f02004a;
-        public static final int info=0x7f02004b;
-        public static final int info_large=0x7f02004c;
-        public static final int logo=0x7f02004d;
-        public static final int saved=0x7f02004e;
-        public static final int spinner_default_focused_holo_light=0x7f02004f;
-        public static final int spinner_default_normal_holo_light=0x7f020050;
-        public static final int spinner_ics_holo=0x7f020051;
-        public static final int sta_gray=0x7f020052;
-        public static final int sta_graygreen=0x7f020053;
-        public static final int sta_green=0x7f020054;
-        public static final int sta_greengray=0x7f020055;
-        public static final int start_gray=0x7f020056;
-        public static final int start_green=0x7f020057;
-        public static final int taxity=0x7f020058;
-        public static final int time=0x7f020059;
-        public static final int walk=0x7f02005a;
+        public static final int action_about=0x7f020028;
+        public static final int action_settings=0x7f020029;
+        public static final int appwidget_bg=0x7f02002a;
+        public static final int arrival=0x7f02002b;
+        public static final int back_bus=0x7f02002c;
+        public static final int back_ec=0x7f02002d;
+        public static final int back_eic=0x7f02002e;
+        public static final int back_foot=0x7f02002f;
+        public static final int back_ir=0x7f020030;
+        public static final int back_kdp=0x7f020031;
+        public static final int back_re=0x7f020032;
+        public static final int back_reg=0x7f020033;
+        public static final int back_skm=0x7f020034;
+        public static final int back_tlk=0x7f020035;
+        public static final int btn_default_disabled_focused_holo_light=0x7f020036;
+        public static final int btn_default_disabled_holo_light=0x7f020037;
+        public static final int btn_default_focused_holo_light=0x7f020038;
+        public static final int btn_default_normal_holo_light=0x7f020039;
+        public static final int btn_default_pressed_holo_light=0x7f02003a;
+        public static final int button_ics_holo=0x7f02003b;
+        public static final int changes=0x7f02003c;
+        public static final int changes_2=0x7f02003d;
+        public static final int collections_go_to_today=0x7f02003e;
+        public static final int content_new=0x7f02003f;
+        public static final int content_split=0x7f020040;
+        public static final int content_swap=0x7f020041;
+        public static final int departure=0x7f020042;
+        public static final int device_access_location_found=0x7f020043;
+        public static final int device_access_time=0x7f020044;
+        public static final int end_gray=0x7f020045;
+        public static final int end_green=0x7f020046;
+        public static final int icon=0x7f020047;
+        public static final int ikona_xhdpi=0x7f020048;
+        public static final int info=0x7f020049;
+        public static final int info_large=0x7f02004a;
+        public static final int logo=0x7f02004b;
+        public static final int navigation_forward=0x7f02004c;
+        public static final int navigation_refresh=0x7f02004d;
+        public static final int rating_favorite=0x7f02004e;
+        public static final int saved=0x7f02004f;
+        public static final int social_share=0x7f020050;
+        public static final int spinner_default_focused_holo_light=0x7f020051;
+        public static final int spinner_default_normal_holo_light=0x7f020052;
+        public static final int spinner_ics_holo=0x7f020053;
+        public static final int sta_gray=0x7f020054;
+        public static final int sta_graygreen=0x7f020055;
+        public static final int sta_green=0x7f020056;
+        public static final int sta_greengray=0x7f020057;
+        public static final int start_gray=0x7f020058;
+        public static final int start_green=0x7f020059;
+        public static final int taxity=0x7f02005a;
+        public static final int time=0x7f02005b;
+        public static final int walk=0x7f02005c;
     }
     public static final class id {
         public static final int abs__action_bar=0x7f06001b;
@@ -392,16 +402,27 @@ containing a value of this type.
         public static final int abs__tab_custom=0x7f060017;
         public static final int abs__tab_icon=0x7f060015;
         public static final int abs__up=0x7f06000f;
+        public static final int arrivalCheckbox=0x7f06005b;
         public static final int arrival_edit=0x7f06002d;
         public static final int arrival_icon=0x7f060026;
-        public static final int arrival_label=0x7f060043;
+        public static final int arrival_label=0x7f060062;
         public static final int arrival_select=0x7f060036;
         public static final int arrival_station=0x7f060028;
         public static final int arrival_time=0x7f060027;
+        public static final int arrival_time_0=0x7f060043;
+        public static final int arrival_time_1=0x7f060048;
+        public static final int arrival_time_2=0x7f06004d;
+        public static final int arrival_time_3=0x7f060052;
+        public static final int arrival_time_4=0x7f060057;
         public static final int attributes_button=0x7f060031;
-        public static final int brief=0x7f06003e;
+        public static final int brief=0x7f06005d;
         public static final int carriers_button=0x7f060032;
         public static final int changes=0x7f060039;
+        public static final int changes_0=0x7f060045;
+        public static final int changes_1=0x7f06004a;
+        public static final int changes_2=0x7f06004f;
+        public static final int changes_3=0x7f060054;
+        public static final int changes_4=0x7f060059;
         public static final int changes_icon=0x7f060038;
         public static final int conn_header=0x7f06001e;
         public static final int connection_details=0x7f06001f;
@@ -409,53 +430,73 @@ containing a value of this type.
         public static final int date_button=0x7f06002f;
         public static final int departure_edit=0x7f06002a;
         public static final int departure_icon=0x7f060021;
-        public static final int departure_label=0x7f060044;
+        public static final int departure_label=0x7f060063;
         public static final int departure_select=0x7f060034;
         public static final int departure_station=0x7f060023;
         public static final int departure_time=0x7f060022;
+        public static final int departure_time_0=0x7f060042;
+        public static final int departure_time_1=0x7f060047;
+        public static final int departure_time_2=0x7f06004c;
+        public static final int departure_time_3=0x7f060051;
+        public static final int departure_time_4=0x7f060056;
         public static final int duration=0x7f060025;
         public static final int duration_icon=0x7f060024;
-        public static final int header=0x7f06004e;
+        public static final int header=0x7f06006d;
         public static final int homeAsUp=0x7f060006;
-        public static final int icon=0x7f06003d;
+        public static final int icon=0x7f06005c;
         public static final int info_icon=0x7f06003a;
-        public static final int item_about=0x7f060058;
-        public static final int item_carriers=0x7f060057;
-        public static final int item_continue_journey=0x7f060052;
-        public static final int item_delete=0x7f060059;
-        public static final int item_favourite=0x7f060050;
-        public static final int item_return=0x7f060055;
-        public static final int item_return_journey=0x7f060051;
-        public static final int item_settings=0x7f060054;
-        public static final int item_taxity=0x7f060053;
-        public static final int item_via=0x7f060056;
+        public static final int item_about=0x7f060077;
+        public static final int item_carriers=0x7f060076;
+        public static final int item_continue_journey=0x7f060071;
+        public static final int item_delete=0x7f060078;
+        public static final int item_favourite=0x7f06006f;
+        public static final int item_return=0x7f060074;
+        public static final int item_return_journey=0x7f060070;
+        public static final int item_settings=0x7f060073;
+        public static final int item_taxity=0x7f060072;
+        public static final int item_via=0x7f060075;
+        public static final int journey_time_0=0x7f060044;
+        public static final int journey_time_1=0x7f060049;
+        public static final int journey_time_2=0x7f06004e;
+        public static final int journey_time_3=0x7f060053;
+        public static final int journey_time_4=0x7f060058;
+        public static final int list=0x7f060040;
         public static final int listMode=0x7f060002;
         public static final int location_button=0x7f06002b;
+        public static final int main=0x7f06003d;
         public static final int normal=0x7f060001;
         public static final int ok_button=0x7f060033;
         public static final int pager=0x7f06001d;
         public static final int price=0x7f060020;
         public static final int products_button=0x7f060030;
-        public static final int progress=0x7f060046;
-        public static final int remembered_list=0x7f060040;
-        public static final int route=0x7f060042;
-        public static final int saved_icon=0x7f060041;
-        public static final int scrollitem_text=0x7f060047;
-        public static final int share=0x7f06004f;
+        public static final int progress=0x7f060065;
+        public static final int reload_button=0x7f06003e;
+        public static final int remembered_list=0x7f06005f;
+        public static final int return_button=0x7f06003f;
+        public static final int route=0x7f060061;
+        public static final int row_0=0x7f060041;
+        public static final int row_1=0x7f060046;
+        public static final int row_2=0x7f06004b;
+        public static final int row_3=0x7f060050;
+        public static final int row_4=0x7f060055;
+        public static final int saved_icon=0x7f060060;
+        public static final int scrollitem_text=0x7f060066;
+        public static final int share=0x7f06006e;
         public static final int showCustom=0x7f060008;
         public static final int showHome=0x7f060005;
         public static final int showTitle=0x7f060007;
-        public static final int station=0x7f060045;
-        public static final int station_edit=0x7f060049;
-        public static final int station_select=0x7f06004b;
+        public static final int station=0x7f060064;
+        public static final int station_edit=0x7f060068;
+        public static final int station_select=0x7f06006a;
         public static final int tabMode=0x7f060003;
-        public static final int text=0x7f06003f;
-        public static final int time=0x7f06004c;
+        public static final int text=0x7f06005e;
+        public static final int time=0x7f06006b;
+        public static final int timePicker=0x7f06005a;
         public static final int time_button=0x7f06002e;
-        public static final int timetable=0x7f060048;
+        public static final int timetable=0x7f060067;
         public static final int train_number=0x7f060029;
-        public static final int train_type=0x7f06004d;
-        public static final int type_button=0x7f06004a;
+        public static final int train_type=0x7f06006c;
+        public static final int type_button=0x7f060069;
         public static final int type_icons=0x7f06003c;
         public static final int useLogo=0x7f060004;
         public static final int via_edit=0x7f06002c;
@@ -488,21 +529,24 @@ containing a value of this type.
         public static final int connection_form_clarify=0x7f030012;
         public static final int connection_list=0x7f030013;
         public static final int connection_list_row=0x7f030014;
-        public static final int main=0x7f030015;
-        public static final int message_row=0x7f030016;
-        public static final int remembered_list=0x7f030017;
-        public static final int remembered_row=0x7f030018;
-        public static final int route=0x7f030019;
-        public static final int route_row=0x7f03001a;
-        public static final int scrollitem=0x7f03001b;
-        public static final int station_edit_item=0x7f03001c;
-        public static final int timetable=0x7f03001d;
-        public static final int timetable_form=0x7f03001e;
-        public static final int timetable_form_clarify=0x7f03001f;
-        public static final int timetable_row=0x7f030020;
-        public static final int train_details=0x7f030021;
-        public static final int train_details_header=0x7f030022;
-        public static final int warning_item=0x7f030023;
+        public static final int connection_list_widget=0x7f030015;
+        public static final int connection_list_widget_loading=0x7f030016;
+        public static final int extended_time_picker_dialog=0x7f030017;
+        public static final int main=0x7f030018;
+        public static final int message_row=0x7f030019;
+        public static final int remembered_list=0x7f03001a;
+        public static final int remembered_row=0x7f03001b;
+        public static final int route=0x7f03001c;
+        public static final int route_row=0x7f03001d;
+        public static final int scrollitem=0x7f03001e;
+        public static final int station_edit_item=0x7f03001f;
+        public static final int timetable=0x7f030020;
+        public static final int timetable_form=0x7f030021;
+        public static final int timetable_form_clarify=0x7f030022;
+        public static final int timetable_row=0x7f030023;
+        public static final int train_details=0x7f030024;
+        public static final int train_details_header=0x7f030025;
+        public static final int warning_item=0x7f030026;
     }
     public static final class menu {
         public static final int connection_details=0x7f0c0000;
@@ -539,11 +583,13 @@ containing a value of this type.
         public static final int toastViaEmpty=0x7f090009;
     }
     public static final class style {
+        public static final int AboutDialog=0x7f0a0028;
         public static final int AutoCompleteTextViewLight=0x7f0a0023;
         public static final int HoloButton=0x7f0a0024;
         public static final int Internal_Widget_Sherlock_ActionBar=0x7f0a001c;
         public static final int Internal_Widget_Sherlock_Light_ActionBar=0x7f0a001d;
         public static final int MyHoloSpinner=0x7f0a0025;
+        public static final int MyHoloSpinnerDropDownItem=0x7f0a0027;
         public static final int MyHoloSpinnerItem=0x7f0a0026;
         public static final int RozkladABSubtitleTextStyle=0x7f0a0022;
         public static final int RozkladABTabTextStyle=0x7f0a0020;
@@ -582,7 +628,8 @@ containing a value of this type.
         public static final int Widget_Sherlock_TextView_SpinnerItem_ActionBar=0x7f0a0009;
     }
     public static final class xml {
-        public static final int preferences=0x7f050000;
+        public static final int connections_widget=0x7f050000;
+        public static final int preferences=0x7f050001;
     }
     public static final class styleable {
         /** Attributes that can be used with a SherlockTheme.

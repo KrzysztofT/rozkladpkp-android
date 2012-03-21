@@ -32,8 +32,7 @@ public class PLN {
 	public static final int DATE_END = 2;
 	
 	
-	final int ConnectionOffset = 0x4a;
-	final int ConnectionSize = 12;
+	
 	int attributesStart,attributesEnd;
 	int stationsStart;
 	int stringStart,availabilitiesStart;
@@ -45,18 +44,17 @@ public class PLN {
 	
 	private StringManager strings;
 	private AttributeManager attributes;
-	private MessageManager messages;
+	MessageManager messages;
 	
-	public Connection[] connections;
+	public UnboundConnection[] connections;
 	private Station[] stations;
 	private Station dep,arr; 
 	private int totalConCnt = -1;
-	private HashMap<Integer,Availability> availabilities;
+	HashMap<Integer,Availability> availabilities;
 	
 	private DayUtils dayUtils;
 	
 	public int conCnt;
-	private int tripCount = 0;
 	Boolean delayInfo = null;
 
 	public byte[] data;
@@ -91,13 +89,20 @@ public class PLN {
 	}
 	
 	class MessageManager{
+		
+		private final int messagesOffset;
+		
 		private HashMap<Integer,Message[]> cache = new HashMap<Integer, Message[]>();
 		private SortedSet<Integer> offsets = new TreeSet<Integer>();
+		
+		public MessageManager() 
+		{
+			messagesOffset = readShort(attributesEnd+0x16);
+		}
 		
 		void addOffset(int offset)
 		{
 			offsets.add(offset);
-			Log.w("RozkladPKP",Integer.toString(offset));
 		}
 		
 		Message[] get(int offset)
@@ -118,70 +123,22 @@ public class PLN {
 			cache.put(offset, t);
 			return t;
 		}
-	}
-	
-	public class Time{
-		int val;
-		int days;
-		public Time(int v) {
-			val = v;
-			days = val/2400;
-			val %= 2400;
-		}
 		
-		public void normalize() {
-			if(val % 100 > 59)
-			{
-				val += 100;
-				val -= 60;
-				
-				if(val > 2400)
-				{
-					days++;
-					val -= 2400;
-				}
-			}
-		}
-		
-		public String toString() {
-			String t   = Integer.toString(val);
-			while(t.length() < 4)
-				t = '0'+t;
-			return t.substring(0, 2)+":"+t.substring(2);
-		}
-		
-		public String toLongString() {
-			return ((days>0)?(Integer.toString(days)+" dni "):"")+toString();
-		}
-		
-		public int intValue()
+		//Zwraca przesunięcie komunikatów dla konkretnego połączenia  
+		public int offsetForConnection(int connectionNumber)
 		{
-			return val+days*2400;
-		}
-		
-		public Time difference(Time b)
-		{
-			int va = val+days*2400;
-			int oldh, oldm, newh, newm, resh, resm;
+			if(messagesOffset <= 0)
+				return -1;
 			
-			oldh = va / 100;
-			oldm = va % 100;
+			int msg = readShort(messagesOffset+2*(connectionNumber+1));
 			
-			va = b.val+b.days*2400;
-			
-			newh = va / 100;
-			newm = va % 100;
-			
-			resh = oldh - newh;
-			resm = oldm - newm;
-			
-			if(resm < 0)
-			{
-				resh--;
-				resm = 60+resm;
+			if(msg > 0)
+			{	
+				msg += messagesOffset;
+				addOffset(msg);
+				return msg;
 			}
-			
-			return new Time(resh*100+resm);		
+			return -1;
 		}
 	}
 	
@@ -265,8 +222,8 @@ public class PLN {
 	}
 	
 	public class Train {
-		public Time deptime;
-		public Time arrtime;
+		public PLNTimestamp deptime;
+		public PLNTimestamp arrtime;
 		private int offset;
 		public String number;
 		public Station depstation;
@@ -274,7 +231,8 @@ public class PLN {
 		private String attr[] = null;
 		private String depplatform, arrplatform;
 		
-		private int changeOffset = -1, attributesOffset;
+		int changeOffset = -1;
+		private int attributesOffset;
 		private TrainChange change;
 		
 		public TrainChange getChange()
@@ -327,8 +285,8 @@ public class PLN {
 	}
 	
 	public class TrainChange {
-		public Time realdeptime;
-		public Time realarrtime;
+		public PLNTimestamp realdeptime;
+		public PLNTimestamp realarrtime;
 		String realdepplatform,realarrplatform;
 	}
 	
@@ -336,194 +294,17 @@ public class PLN {
 		public int departureDelay;
 	}
 	
-	public class Connection {
-		public int changes,trOffset;
-		
-		private int timeOffset, trainsOffset, trainCount, msgOffset = -1, changeOffset = -1;
-		
-		private Time journeyTime = null;
-		private Train[] trains = null;
-		
-		public Availability availability;
-		private ConnectionChange change;
-		
-		public Time getJourneyTime()
-		{
-			if(journeyTime == null)
-				journeyTime = new Time(readShort(timeOffset));
-			return journeyTime;
-		}
-		
-		public int getTrainCount()
-		{
-			return trainCount;
-		}
-		
-		public Train getTrain(int index)
-		{
-			if(trains == null)
-				trains = new Train[trainCount];
-			else if(trains[index] != null)
-				return trains[index];
-			
-			Train t = readTrain(trainsOffset + index*TrainSize);
-			trains[index] = t;
-			
-			if(changeOffset != -1)
-				t.changeOffset = changeOffset+8*(index+1);
-			
-			return t;
-		}
-		
-		public ConnectionChange getChange()
-		{
-			if(changeOffset == -1)
-				return null;
-			if(change != null)
-				return change;
-			
-			if(changeOffset != -1)
-				change = readConnectionChanges(changeOffset);
-			return change;
-		}
-		
-		public boolean hasMessages()
-		{
-			return (msgOffset > 0);
-		}
-		
-		public Message[] getMessages()
-		{
-			if(hasMessages())
-				return messages.get(msgOffset);
-			else
-				return null;
-		}
-	}
-	
-	public class Trip {
-		public Trip(Connection connection, int idx, android.text.format.Time d) {
-			con = connection;
-			
-			date = d;
-			conidx = idx;
-		}
-		public android.text.format.Time date;
-		public Connection con;
-		//FIXME: Wymyśleć, jak zastąpić to, żeby było ładnie.
-		public int conidx;
-	}
-	
-	public class TripIterator implements Iterator<Trip>{
-		int pos = 0;
-		int max = -1;
-		int dix = 0, ldix = 0;
-		int tripsLeft = tripCount;
-		android.text.format.Time time = new android.text.format.Time(sdate);
-		
-		public TripIterator()
-		{
-			time.allDay = true;
-			time.normalize(false);
-			
-			for(int i = 0; i < conCnt; ++i)
-				if(connections[i].availability.length() > max)
-					max = connections[i].availability.length();
-		}
-		
-		private boolean move(boolean forward)
-		{
-			//Nie ma żadnych połączeń
-			if(conCnt == 0) 
-				return false;
-			
-			if(!forward)
-			{
-				--pos;
-				tripsLeft++;
-			}
-			else if(tripsLeft == 0)
-				return false;
-			
-			int cix = pos%conCnt;
-			dix = pos/conCnt;
-			
-			while(dix <= max)
-			{
-				if(connections[cix].availability != null && connections[cix].availability.available(dix))
-					return true;
-				else
-				{
-					if(forward)
-						pos++;
-					else 
-						pos--;
-					
-					cix = pos%conCnt;
-					dix	= pos/conCnt;
-				}
-			}
-			
-			return false;
-		}
-		
-		@Override
-		public boolean hasNext() {
-			return move(true);
-		}
-
-		@Override
-		public Trip next() {
-			if(hasNext())
-			{
-				int cix = pos%conCnt;
-				
-				if(ldix != dix)
-				{
-					time.monthDay -= (ldix-dix);
-					time.normalize(false);
-					ldix = dix;
-				}
-				
-				pos++;
-				tripsLeft--;
-				time.hour = time.minute = time.second = 0;
-				return new Trip(connections[cix], cix, new android.text.format.Time(time));
-			}
-			else
-				return null;
-		}
-
-		public boolean advance(){
-			pos++;
-			return hasNext();
-		}
-		
-		public boolean back(){
-			return move(false);
-		}
-		public void moveToLast(){
-			//Przejdz do ostatniego połączenia
-			while(advance());
-			//Cofnij o jedno
-			back();
-		}
-		@Override
-		public void remove() {			
-		}
-	}
-	
 	public PLN(byte[] byte_data) {
-		
-		data = byte_data;Log.w("RozkladPKP","N: "+Integer.toString(data.length));
-		strings = new StringManager();
-		attributes = new AttributeManager();
-		messages = new MessageManager();
+		data = byte_data;
 		
 		stationsStart	= readShort(0x36);
 		attributesStart	= readShort(0x3a);
 		attributesEnd	= readShort(0x3e);
 		conCnt			= readShort(0x1e);
+		
+		strings = new StringManager();
+		attributes = new AttributeManager();
+		messages = new MessageManager();
 		
 		setupDates();
 		readStringTable();
@@ -531,11 +312,6 @@ public class PLN {
 		readHeaderStations();
 		readAvailabilities();
 		readConnections();
-	}
-
-
-	public TripIterator tripIterator(){
-		return new TripIterator();
 	}
 	
 	public Station departureStation(){
@@ -567,18 +343,17 @@ public class PLN {
 		if(totalConCnt == -1)
 		{
 			++totalConCnt;
-			for(Connection c : connections)
-				totalConCnt += c.availability.daysCount();
+			for(UnboundConnection c : connections)
+				totalConCnt += c.getAvailability().daysCount();
 		}
 		return totalConCnt;
 	}
 	
 	
-	
 	//Tak naprawdę, to jest to czytanie 'unsigned short' a nie 'int'.
 	//Jednak zwracamy int, ponieważ short javowy nie zmieści wszystkich wartości
 	//unsigned short
-	private int readShort(int pos)
+	int readShort(int pos)
 	{
 		int r =  (int) (data[pos] & 0x000000FF);
 		r += ((int) (data[pos+1] & 0x000000FF))*256;
@@ -627,21 +402,6 @@ public class PLN {
 		return "";
 	}
 	
-	private Connection readConnection(int pos)
-	{
-		Connection ret = new Connection();
-		int tcnt	= readShort(pos+6);
-		int toff	= readShort(pos+2);
-		ret.changes	= readShort(pos+8);
-		ret.timeOffset	= pos+10;
-		ret.trainsOffset = ConnectionOffset+toff;
-		ret.trainCount = tcnt;
-		
-		ret.availability = availabilities.get(readShort(pos));
-		tripCount += ret.availability.daysCount();
-		return ret;
-	}
-	
 	private void setupDates()
 	{
 		sdate = new android.text.format.Time();
@@ -661,14 +421,14 @@ public class PLN {
 		today.normalize(false);
 	}
 	
-	private Train readTrain(int pos)
+	Train readTrain(int pos)
 	{
 		Train r = new Train();
 		
 		r.offset = pos;
-		r.deptime	= new Time(readShort(pos));
+		r.deptime	= new PLNTimestamp(readShort(pos));
 		r.depstation = stations[readShort(pos+2)];
-		r.arrtime	= new Time(readShort(pos+4));
+		r.arrtime	= new PLNTimestamp(readShort(pos+4));
 		r.arrstation = stations[readShort(pos+6)];
 		r.number	= strings.get(readShort(pos+10));
 		
@@ -749,12 +509,12 @@ public class PLN {
 		return tab;
 	}
 
+	
 	private void readConnections() {
 		
-		connections = new Connection[conCnt];
+		connections = new UnboundConnection[conCnt];
 		
 		int chinfo = readShort(attributesEnd+0xe);
-		int msginfo = readShort(attributesEnd+0x16);
 		
 		boolean hasChanges = (chinfo != 0);
 		if(hasChanges)
@@ -762,22 +522,11 @@ public class PLN {
 		
 		for(int i = 0; i < conCnt; i++)
 		{
-			connections[i] = readConnection(ConnectionOffset+ConnectionSize*i);
+			connections[i] = new UnboundConnection(this, i);
 			if(hasChanges)
 			{
 				connections[i].changeOffset = chinfo;
 				chinfo += (connections[i].trainCount+1)*8;
-			}
-			
-			if(msginfo > 0)
-			{
-				int msg =  readShort(msginfo+2*(i+1));
-				if(msg > 0)
-				{	
-					msg += msginfo;
-					connections[i].msgOffset = msg;
-					messages.addOffset(msg);
-				}
 			}
 		}
 	}
@@ -795,8 +544,8 @@ public class PLN {
 		delayInfo = true;
 		
 		TrainChange tc = new TrainChange();
-		tc.realdeptime = (rd == 0xffff) ? null : new Time(rd);
-		tc.realarrtime = (ra == 0xffff) ? null : new Time(ra);
+		tc.realdeptime = (rd == 0xffff) ? null : new PLNTimestamp(rd);
+		tc.realarrtime = (ra == 0xffff) ? null : new PLNTimestamp(ra);
 		tc.realdepplatform = (rdp == 0) ? null : strings.get(rdp);
 		tc.realarrplatform = (rap == 0) ? null : strings.get(rap);
 		
@@ -820,7 +569,7 @@ public class PLN {
 		return r;
 	}
 
-	private ConnectionChange readConnectionChanges(int offset) {
+	ConnectionChange readConnectionChanges(int offset) {
 		int delay = readShort(offset+2);
 		if(delay == 255)
 			return null;
@@ -860,7 +609,7 @@ public class PLN {
 			for(int k = 0; k < 4; ++k)
 				if(data[p++] != -1) return true;
 			
-			for(int j = 0; j < connections[i].getTrainCount(); ++j)
+			for(int j = 0; j < connections[i].trainCount; ++j)
 			{
 				for(int k = 0; k < 4; ++k)
 					if(data[p++] != -1) return true;
@@ -882,8 +631,8 @@ public class PLN {
 	{
 		for(int i = 0; i < conCnt; i++)
 		{
-			Connection c = connections[i];
-			for(int j = 0; j < c.getTrainCount(); ++j)
+			UnboundConnection c = connections[i];
+			for(int j = 0; j < c.trainCount; ++j)
 			{
 				Train t = c.getTrain(j);
 				if(delays.containsKey(t.number))
@@ -897,7 +646,7 @@ public class PLN {
 					mindel -= hrs*60;
 					arr += mindel;
 					
-					Time real = new Time(arr);
+					PLNTimestamp real = new PLNTimestamp(arr);
 					real.normalize();
 					
 					saveShort(t.changeOffset+2, real.intValue());
@@ -906,7 +655,7 @@ public class PLN {
 					dep += hrs*100;
 					dep += mindel;
 					
-					real = new Time(dep);
+					real = new PLNTimestamp(dep);
 					real.normalize();
 					
 					saveShort(t.changeOffset, real.intValue());

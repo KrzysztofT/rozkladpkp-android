@@ -39,7 +39,7 @@ public class DateButton extends Button implements DialogControl {
 	
 	public DateButton(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		setCompoundDrawablesWithIntrinsicBounds(getContext().getResources().getDrawable(R.drawable.ic_menu_today), null, null, null);
+		setCompoundDrawablesWithIntrinsicBounds(getContext().getResources().getDrawable(R.drawable.collections_go_to_today), null, null, null);
 		time	= new Time();
 	}
 
@@ -115,6 +115,12 @@ public class DateButton extends Button implements DialogControl {
 	}
 	
 	public class DatePickerFragment extends DialogFragment{
+		@Override
+		public void onCreate(Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
+			setRetainInstance(true);
+		}
+		
 		public Dialog onCreateDialog(Bundle savedInstanceState) {
 			return new DatePickerDialog(getActivity(), mDateSetListener, year, month-1, day);
 		}

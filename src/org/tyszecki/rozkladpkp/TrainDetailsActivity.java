@@ -120,7 +120,7 @@ public class TrainDetailsActivity extends FragmentActivity {
 							it = adapter.getItem(pos);
 						}
 						if(time != null)
-							ni.putExtra("Time", time);
+							ni.putExtra("PLNTimestamp", time);
 						
 						startActivity(ni);
 					}

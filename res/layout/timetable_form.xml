@@ -31,11 +31,12 @@
 	        	    android:imeOptions="actionDone"
 		        	android:id="@+id/station_edit"
 		        	android:layout_width="fill_parent"
+		        	android:textColor="?StationEditColor"
 		        	android:layout_height="wrap_content"
 		        	android:layout_toLeftOf="@+id/location_button"/>
 				<ImageButton 
 				    style="@style/HoloButton"
-					android:src="@drawable/ic_mylocation"
+					android:src="@drawable/device_access_location_found"
 					android:id="@+id/location_button" 
 					android:layout_width="48dp"
 					android:layout_height="48dp"

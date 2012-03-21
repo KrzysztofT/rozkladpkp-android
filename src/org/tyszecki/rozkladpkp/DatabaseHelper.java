@@ -40,7 +40,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 
 	private static String DB_NAME = "rozkladpkp";
 
-	private final static int DB_VERSION = 4;
+	private final static int DB_VERSION = 5;
 	
 	private SQLiteDatabase myDataBase; 
 

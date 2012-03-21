@@ -224,14 +224,15 @@ public class CommonUtils {
 	}
 	
 	//Metoda używana do wygenerowania nazwy pliku z wynikami
-	public static String ResultsHash(String stationFrom, String stationTo, Boolean departure)
+	public static String ResultsHash(String stationFrom, String stationTo, Boolean departure, int cacheID)
 	{
 		StringBuilder b = new StringBuilder();
 		
 		b.append((stationFrom != null) ? stationFrom : "");
 		b.append((stationTo != null) ? stationTo : "");
 		b.append((departure != null) ? ((departure) ? "-1" : "-2") : "");
-		
+		b.append((cacheID > 0) ? Integer.toString(cacheID) : ""); 
+			
 		return b.toString();
 	}
 	

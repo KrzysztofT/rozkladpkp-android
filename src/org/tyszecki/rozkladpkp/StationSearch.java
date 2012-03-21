@@ -25,6 +25,9 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 
 import android.util.Log;
 
@@ -32,9 +35,13 @@ public class StationSearch {
 	private DefaultHttpClient client;
 	
 	public StationSearch() {
-		 client = new DefaultHttpClient();
-		 client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestExpectContinue.class);
-	     client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestUserAgent.class);
+		HttpParams params = new BasicHttpParams();
+		HttpConnectionParams.setConnectionTimeout(params, 2000);
+		HttpConnectionParams.setSoTimeout(params, 2000);
+		
+		client = new DefaultHttpClient(params);
+		client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestExpectContinue.class);
+	    client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestUserAgent.class);
 	}
 	
 	public InputStream search(String station) throws IllegalStateException, IOException {
@@ -43,21 +50,32 @@ public class StationSearch {
 		station = station.replaceAll("[^a-zA-Z0-9]", "");
 		
 		String url = "http://h2g.sitkol.pl/bin/query.exe/dn";
-		String data = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?><ReqC ver=\"1.1\" prod=\"String\" lang=\"DE\"><MLcReq><MLc n=\""+station+"\" t=\"ST\" /></MLcReq></ReqC>";
+		//String url = "http://railnavigator.bahn.de/bin/rnav/query.exe/pn";
+		String data = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?><ReqC ver=\"1.1\" prod=\"String\" lang=\"PL\"><MLcReq><MLc n=\""+station+"\" t=\"ST\" /></MLcReq></ReqC>";
         HttpPost request = new HttpPost(url);
         
 		request.setEntity(new StringEntity(data));	
-        request.addHeader("Content-Type", "text/plain");
+        request.addHeader("Content-Type", "text/plain;charset=UTF-8");
+        
         
         HttpResponse response = null;	
-		response = client.execute(request);
-		 
+        do{
+	        for(int i = 0; i < 5; i++)
+	        {
+	        	try{response = client.execute(request);}
+	        	catch(Exception e){continue;}
+	        	break;
+	        }
+	    }while(response == null);
         // Pull content stream from response
         HttpEntity entity = response.getEntity();
+        
+        Log.i("RozkladPKP","są wyniki ");
 		return entity.getContent();
 	}
 	public String searchResult(String station) throws IllegalStateException, IOException
 	{
+		
 		InputStream str = search(station);
 		byte[] sBuffer = new byte[512];
 		

@@ -34,10 +34,11 @@
 	        	android:layout_width="fill_parent"
 	        	android:layout_height="wrap_content"
 				android:layout_toLeftOf="@+id/location_button"
+				android:textColor="?StationEditColor"
 				/>
 			<ImageButton 
 			    style="@style/HoloButton"
-				android:src="@drawable/ic_mylocation"
+				android:src="@drawable/device_access_location_found"
 				android:id="@+id/location_button" 
 				android:layout_width="48dp"
 				android:layout_height="48dp"
@@ -47,22 +48,25 @@
 		<org.tyszecki.rozkladpkp.widgets.StationEdit
 		    android:imeOptions="actionDone"
         	android:id="@+id/via_edit"
-			android:visibility="gone"        	
+			android:visibility="gone"
         	android:layout_width="fill_parent"
+        	android:textColor="?StationEditColor"
         	android:layout_height="wrap_content"/>
         	
         <org.tyszecki.rozkladpkp.widgets.StationEdit
         	android:id="@+id/arrival_edit"
         	android:imeOptions="actionDone"
         	android:layout_width="fill_parent"
+        	android:textColor="?StationEditColor"
         	android:layout_height="wrap_content"/>
+       
         	
         <RelativeLayout 
         	android:layout_width="match_parent"
         	android:layout_height="wrap_content">
 	        <org.tyszecki.rozkladpkp.widgets.TimeButton
 	        	android:id="@+id/time_button"
-	        	android:layout_width="110dip"
+	        	android:layout_width="115dip"
 	        	android:layout_height="wrap_content"
 	        	android:layout_alignParentLeft="true"
 	        	/>

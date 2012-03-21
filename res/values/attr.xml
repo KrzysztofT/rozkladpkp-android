@@ -2,4 +2,5 @@
 <resources>
     <attr name="WarningBgColor" format="color"/>
     <attr name="DividerColor" format="color"/>
+    <attr name="StationEditColor" format="color"/>
 </resources>

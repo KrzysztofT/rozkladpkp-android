@@ -56,7 +56,7 @@
             android:layout_marginRight="13dip"/>
         <ImageView 
 	        android:id="@+id/changes_icon"   
-	        android:src="@drawable/changes"/>
+	        android:src="@drawable/changes_2"/>
         <TextView
             android:id="@+id/changes"
             android:textSize="16sp"

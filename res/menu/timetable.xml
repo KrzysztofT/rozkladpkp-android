@@ -17,6 +17,6 @@
 -->
 <menu
   xmlns:android="http://schemas.android.com/apk/res/android">
-<item android:title="Dodaj do zapamiętanych" android:id="@+id/item_favourite" android:icon="@drawable/ic_love"></item>
+<item android:title="Dodaj do zapamiętanych" android:id="@+id/item_favourite" android:icon="@drawable/rating_favorite"></item>
 <item android:title="Wezwij taksówkę" android:id="@+id/item_taxity" android:icon="@drawable/taxity"></item>
 </menu>

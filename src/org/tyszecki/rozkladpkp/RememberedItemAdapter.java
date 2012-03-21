@@ -194,7 +194,7 @@ public class RememberedItemAdapter extends BaseAdapter {
         			
         			if(Time.compare(itime, now) < 0)
         			{
-        				c.deleteFile(CommonUtils.ResultsHash(Integer.toString(r.SIDFrom), Integer.toString(r.SIDTo), null));
+        				c.deleteFile(CommonUtils.ResultsHash(Integer.toString(r.SIDFrom), Integer.toString(r.SIDTo), null, 0));
         				showSaved = false;
         				r.cacheValid = null;
         				
@@ -225,7 +225,7 @@ public class RememberedItemAdapter extends BaseAdapter {
         			
         			if(Time.compare(itime, now) < 0)
         			{
-        				c.deleteFile(CommonUtils.ResultsHash(Integer.toString(t.SID), null, null));
+        				c.deleteFile(CommonUtils.ResultsHash(Integer.toString(t.SID), null, null, 0));
         				showSaved = false;
         				t.cacheValid = null;
         				

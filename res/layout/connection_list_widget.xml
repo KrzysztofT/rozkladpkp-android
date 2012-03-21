@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/appwidget_bg"
+    android:padding="5dp"
+    android:id="@+id/main"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="2dp"
+        android:orientation="horizontal" >
+
+        <LinearLayout 
+        android:layout_width="wrap_content"
+    	android:layout_height="wrap_content"
+    	android:orientation="vertical">
+            <TextView android:layout_width="wrap_content"
+                	  android:textSize="17sp"
+                	  android:textColor="#000"
+                	  android:textStyle="bold" 
+                      android:layout_height="wrap_content"
+                	  android:id="@+id/departure_station"/>
+            <TextView android:layout_width="wrap_content"
+                	  android:layout_height="wrap_content"
+                	  android:textSize="14sp"
+                	  android:textColor="#000"
+                	  android:textStyle="bold"
+                      android:id="@+id/arrival_station"/>
+    	</LinearLayout>
+    	
+        <LinearLayout 
+        android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:orientation="horizontal"
+    	android:gravity="right">
+    	<ImageButton android:id="@+id/reload_button"
+	        	android:layout_width="40dip"
+	        	android:src="@drawable/navigation_refresh"
+	        	android:background="@null"
+	        	android:layout_height="wrap_content"/>
+
+    	<ImageButton
+    	    android:id="@+id/return_button"
+    	    android:layout_width="40dip"
+    	    android:layout_height="wrap_content"
+    	    android:background="@null"
+    	    android:src="@drawable/content_swap" />
+</LinearLayout>
+    </LinearLayout>
+    <LinearLayout 
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="2dp"
+        android:id="@+id/list"
+        android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:orientation="vertical"
+    	>
+        
+        <!-- Lista -->
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:layout_marginLeft="8dp"
+		    android:layout_marginTop="2dp"
+		    android:id="@+id/row_0"
+		    android:orientation="horizontal" >
+		
+		   	<TextView android:layout_width="wrap_content"
+		              android:layout_height="wrap_content"
+		              android:drawablePadding="3dp"
+		              android:paddingRight="13dp"
+		              android:textSize="16sp"
+		              android:textStyle="bold"
+		              android:textColor="#606060"
+		              android:drawableLeft="@drawable/departure"
+		              android:id="@+id/departure_time_0" />
+		   	<TextView android:layout_width="wrap_content"
+		              android:layout_height="wrap_content"
+		              android:drawablePadding="3dp"
+		              android:paddingRight="13dp"
+		              android:textSize="16sp"
+		              android:textStyle="bold"
+		              android:textColor="#606060"
+		              android:drawableLeft="@drawable/arrival"
+		              android:id="@+id/arrival_time_0" />
+		   	<TextView android:layout_width="wrap_content"
+		              android:layout_height="wrap_content"
+		              android:drawablePadding="3dp"
+		              android:paddingRight="13dp"
+		              android:textSize="16sp"
+		              android:textColor="#606060"
+		              android:drawableLeft="@drawable/time"
+		              android:id="@+id/journey_time_0" />
+		   	<TextView android:layout_width="wrap_content"
+		              android:layout_height="wrap_content"
+		              android:drawablePadding="3dp"
+		              android:paddingRight="13dp"
+		              android:textSize="16sp"
+		              android:textColor="#606060"
+		              android:drawableLeft="@drawable/changes"
+		              android:id="@+id/changes_0" />
+		</LinearLayout>
+		
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:layout_marginLeft="8dp"
+		    android:layout_marginTop="2dp"
+		    android:id="@+id/row_1"
+		    android:orientation="horizontal" >
+		
+		   	<TextView android:layout_width="wrap_content"
+		              android:layout_height="wrap_content"
+		              android:drawablePadding="3dp"
+		              android:paddingRight="13dp"
+		              android:textSize="16sp"
+		              android:textStyle="bold"
+		              android:textColor="#606060"
+		              android:drawableLeft="@drawable/departure"
+		              android:id="@+id/departure_time_1" />
+		   	<TextView android:layout_width="wrap_content"
+		              android:layout_height="wrap_content"
+		              android:drawablePadding="3dp"
+		              android:paddingRight="13dp"
+		              android:textSize="16sp"
+		              android:textStyle="bold"
+		              android:textColor="#606060"
+		              android:drawableLeft="@drawable/arrival"
+		              android:id="@+id/arrival_time_1" />
+		   	<TextView android:layout_width="wrap_content"
+		              android:layout_height="wrap_content"
+		              android:drawablePadding="3dp"
+		              android:paddingRight="13dp"
+		              android:textSize="16sp"
+		              android:textColor="#606060"
+		              android:drawableLeft="@drawable/time"
+		              android:id="@+id/journey_time_1" />
+		   	<TextView android:layout_width="wrap_content"
+		              android:layout_height="wrap_content"
+		              android:drawablePadding="3dp"
+		              android:paddingRight="13dp"
+		              android:textSize="16sp"
+		              android:textColor="#606060"
+		              android:drawableLeft="@drawable/changes"
+		              android:id="@+id/changes_1" />
+		</LinearLayout>
+		
+                <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:layout_marginLeft="8dp"
+		    android:layout_marginTop="2dp"
+		    android:id="@+id/row_2"
+		    android:orientation="horizontal" >
+		
+		   	<TextView android:layout_width="wrap_content"
+		              android:layout_height="wrap_content"
+		              android:drawablePadding="3dp"
+		              android:paddingRight="13dp"
+		              android:textSize="16sp"
+		              android:textStyle="bold"
+		              android:textColor="#606060"
+		              android:drawableLeft="@drawable/departure"
+		              android:id="@+id/departure_time_2" />
+		   	<TextView android:layout_width="wrap_content"
+		              android:layout_height="wrap_content"
+		              android:drawablePadding="3dp"
+		              android:paddingRight="13dp"
+		              android:textSize="16sp"
+		              android:textStyle="bold"
+		              android:textColor="#606060"
+		              android:drawableLeft="@drawable/arrival"
+		              android:id="@+id/arrival_time_2" />
+		   	<TextView android:layout_width="wrap_content"
+		              android:layout_height="wrap_content"
+		              android:drawablePadding="3dp"
+		              android:paddingRight="13dp"
+		              android:textSize="16sp"
+		              android:textColor="#606060"
+		              android:drawableLeft="@drawable/time"
+		              android:id="@+id/journey_time_2" />
+		   	<TextView android:layout_width="wrap_content"
+		              android:layout_height="wrap_content"
+		              android:drawablePadding="3dp"
+		              android:paddingRight="13dp"
+		              android:textSize="16sp"
+		              android:textColor="#606060"
+		              android:drawableLeft="@drawable/changes"
+		              android:id="@+id/changes_2" />
+		</LinearLayout>
+		
+                        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:layout_marginLeft="8dp"
+		    android:layout_marginTop="2dp"
+		    android:id="@+id/row_3"
+		    android:orientation="horizontal" >
+		
+		   	<TextView android:layout_width="wrap_content"
+		              android:layout_height="wrap_content"
+		              android:drawablePadding="3dp"
+		              android:paddingRight="13dp"
+		              android:textSize="16sp"
+		              android:textStyle="bold"
+		              android:textColor="#606060"
+		              android:drawableLeft="@drawable/departure"
+		              android:id="@+id/departure_time_3" />
+		   	<TextView android:layout_width="wrap_content"
+		              android:layout_height="wrap_content"
+		              android:drawablePadding="3dp"
+		              android:paddingRight="13dp"
+		              android:textSize="16sp"
+		              android:textStyle="bold"
+		              android:textColor="#606060"
+		              android:drawableLeft="@drawable/arrival"
+		              android:id="@+id/arrival_time_3" />
+		   	<TextView android:layout_width="wrap_content"
+		              android:layout_height="wrap_content"
+		              android:drawablePadding="3dp"
+		              android:paddingRight="13dp"
+		              android:textSize="16sp"
+		              android:textColor="#606060"
+		              android:drawableLeft="@drawable/time"
+		              android:id="@+id/journey_time_3" />
+		   	<TextView android:layout_width="wrap_content"
+		              android:layout_height="wrap_content"
+		              android:drawablePadding="3dp"
+		              android:paddingRight="13dp"
+		              android:textSize="16sp"
+		              android:textColor="#606060"
+		              android:drawableLeft="@drawable/changes"
+		              android:id="@+id/changes_3" />
+		</LinearLayout>
+		
+                                <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:layout_marginLeft="8dp"
+		    android:layout_marginTop="2dp"
+		    android:id="@+id/row_4"
+		    android:orientation="horizontal" >
+		
+		   	<TextView android:layout_width="wrap_content"
+		              android:layout_height="wrap_content"
+		              android:drawablePadding="3dp"
+		              android:paddingRight="13dp"
+		              android:textSize="16sp"
+		              android:textStyle="bold"
+		              android:textColor="#606060"
+		              android:drawableLeft="@drawable/departure"
+		              android:id="@+id/departure_time_4" />
+		   	<TextView android:layout_width="wrap_content"
+		              android:layout_height="wrap_content"
+		              android:drawablePadding="3dp"
+		              android:paddingRight="13dp"
+		              android:textSize="16sp"
+		              android:textStyle="bold"
+		              android:textColor="#606060"
+		              android:drawableLeft="@drawable/arrival"
+		              android:id="@+id/arrival_time_4" />
+		   	<TextView android:layout_width="wrap_content"
+		              android:layout_height="wrap_content"
+		              android:drawablePadding="3dp"
+		              android:paddingRight="13dp"
+		              android:textSize="16sp"
+		              android:textColor="#606060"
+		              android:drawableLeft="@drawable/time"
+		              android:id="@+id/journey_time_4" />
+		   	<TextView android:layout_width="wrap_content"
+		              android:layout_height="wrap_content"
+		              android:drawablePadding="3dp"
+		              android:paddingRight="13dp"
+		              android:textSize="16sp"
+		              android:textColor="#606060"
+		              android:drawableLeft="@drawable/changes"
+		              android:id="@+id/changes_4" />
+		</LinearLayout>
+		
+                                      
+        <!-- Koniec listy -->
+	</LinearLayout>
+</LinearLayout>

@@ -16,21 +16,21 @@
  ******************************************************************************/
 package org.tyszecki.rozkladpkp;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
 
-import org.tyszecki.rozkladpkp.ExternalDelayFetcher.ExternalDelayFetcherCallback;
+import org.tyszecki.rozkladpkp.pln.UnboundConnection;
 import org.tyszecki.rozkladpkp.pln.PLN;
-import org.tyszecki.rozkladpkp.pln.PLN.Connection;
 import org.tyszecki.rozkladpkp.pln.PLN.Train;
 import org.tyszecki.rozkladpkp.pln.PLN.TrainChange;
+import org.tyszecki.rozkladpkp.servers.HafasServer;
 
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.drawable.TransitionDrawable;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.TextPaint;
@@ -47,7 +47,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 
-public class ConnectionListItemAdapter extends BaseAdapter {
+public class ConnectionListItemAdapter extends BaseAdapter implements Observer{
 
 	public final static int HEADER = 0;
 	public final static int NORMAL = 1;
@@ -66,6 +66,7 @@ public class ConnectionListItemAdapter extends BaseAdapter {
 	private boolean scrolling = false;
 	private boolean delayInfo = false;
 	private String depStation;
+	private ConnectionList clist;
 	
 	private int dep_width,arr_width;
 	private int textSize;
@@ -86,34 +87,8 @@ public class ConnectionListItemAdapter extends BaseAdapter {
 	
 	public void setConnectionList(ConnectionList list)
 	{
-		pln = list.getPLN();
-		depStation = pln.departureStation().name;
-		scrolling = list.scrollable();
-		
-		backupServerWarning = list.getServerId() > 0;
-		
-		delayInfo = pln.hasDelayInfo();
-		if(delayInfo)
-			calculateTextSizes();
-			
-		
-		loadData();
-		
-		ExternalDelayFetcher.requestUpdate(new ExternalDelayFetcherCallback() {
-			
-			@Override
-			public void ready(HashMap<String, Integer> delays, boolean cached) {
-				
-				pln.addExternalDelayInfo(delays);
-				
-				if(pln.hasDelayInfo())
-				{
-					delayInfo = true;
-					calculateTextSizes();
-				}
-				loadData();
-			}
-		});
+		clist = list;
+		list.addObserver(this);
 	}
 	
 	private void calculateTextSizes() {
@@ -125,7 +100,7 @@ public class ConnectionListItemAdapter extends BaseAdapter {
          int t = 0;
          for(int i = 0; i < pln.connectionCount(); ++i)
          {
-        	 Connection c =  pln.connections[i];
+        	 UnboundConnection c =  pln.connections[i];
         	 if(c.getChange() != null && Math.abs(c.getChange().departureDelay) > t)
         		 t = Math.abs(c.getChange().departureDelay);
          }
@@ -137,7 +112,7 @@ public class ConnectionListItemAdapter extends BaseAdapter {
          t = -1000;
          for(int i = 0; i < pln.connectionCount(); ++i)
          {
-        	 Train tr =  pln.connections[i].getTrain(pln.connections[i].getTrainCount()-1);
+        	 Train tr =  pln.connections[i].getTrain(pln.connections[i].trainCount-1);
         	 TrainChange c =  tr.getChange();
         	 
         	 if(c != null && c.realarrtime != null && c.realarrtime.difference(tr.arrtime).intValue() > t)
@@ -152,6 +127,28 @@ public class ConnectionListItemAdapter extends BaseAdapter {
          }
          else
         	 arr_width = -1;
+	}
+	
+	Spannable delayText(String time, int delay)
+	{
+		ForegroundColorSpan span;
+		if(delay <= 0)
+    		span = greenSpan;
+    	else if(delay <= 5)
+    		span = yellowSpan;
+    	else
+    		span = redSpan;
+    	
+    	 
+    	time += (delay >= 0) ? " +" : " ";
+    	time += Integer.toString(delay);
+    	
+    	spanBuilder.clearSpans();
+    	spanBuilder.clear();
+    	spanBuilder.append(time);
+    	spanBuilder.setSpan(span, 6, time.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+    	
+    	return spanBuilder;
 	}
 
 	public View getView(int position, View v, ViewGroup parent) {
@@ -177,7 +174,7 @@ public class ConnectionListItemAdapter extends BaseAdapter {
 	}
 
 	private View fillConnectionItem(int connectionIndex, View view) {
-		Connection o = pln.connections[connectionIndex];
+		UnboundConnection o = pln.connections[connectionIndex];
 		
         TextView tt = (TextView) view.findViewById(R.id.departure_time);
         TextView bt = (TextView) view.findViewById(R.id.arrival_time);
@@ -185,7 +182,7 @@ public class ConnectionListItemAdapter extends BaseAdapter {
         ((ImageView) view.findViewById(R.id.info_icon)).setVisibility(o.hasMessages() ? View.VISIBLE : View.GONE);
         ((ImageView) view.findViewById(R.id.walk_icon)).setVisibility(o.getTrain(0).depstation.name.equals(depStation) ? View.GONE : View.VISIBLE);
         
-        int tl = o.getTrainCount();
+        int tl = o.trainCount;
         
         if(delayInfo)
         {
@@ -196,88 +193,22 @@ public class ConnectionListItemAdapter extends BaseAdapter {
         
         String deptime = o.getTrain(0).deptime.toString(); 
         if(o.getChange() != null && o.getChange().departureDelay != -1)
-        {
-        	
-        	int delay = o.getChange().departureDelay;
-        	ForegroundColorSpan span;
-        	
-        	if(delay <= 0)
-        		span = greenSpan;
-        	else if(delay <= 5)
-        		span = yellowSpan;
-        	else
-        		span = redSpan;
-        	
-        	 
-        	deptime += (delay >= 0) ? " +" : " ";
-        	deptime += Integer.toString(delay);
-        	
-        	spanBuilder.clearSpans();
-        	spanBuilder.clear();
-        	spanBuilder.append(deptime);
-        	spanBuilder.setSpan(span, 6, deptime.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
-        	tt.setText(spanBuilder);
-        }
+        	tt.setText(delayText(deptime, o.getChange().departureDelay));
         else 
         	tt.setText(deptime);
   
         Train last = o.getTrain(tl-1);
         String arrtime = last.arrtime.toString();
         if(last.getChange() != null && last.getChange().realarrtime != null)
-        {
-        	int delay = last.getChange().realarrtime.difference(last.arrtime).intValue();
-        	ForegroundColorSpan span;
-        	
-        	if(delay <= 0)
-        		span = greenSpan;
-        	else if(delay <= 5)
-        		span = yellowSpan;
-        	else
-        		span = redSpan;
-        	
-        	
-        	arrtime += (delay >= 0) ? " +" : " ";
-        	arrtime += Integer.toString(delay);
-        	
-        	spanBuilder.clearSpans();
-        	spanBuilder.clear();
-        	spanBuilder.append(arrtime);
-        	spanBuilder.setSpan(span, 6, arrtime.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
-        	
-        	bt.setText(spanBuilder);
-        }
+        	bt.setText(delayText(arrtime, last.getChange().realarrtime.difference(last.arrtime).intValue()));
         else 
         	bt.setText(arrtime);
-        	
-        
-        /*spanBuilder.clearSpans();
-    	spanBuilder.clear();
-    	
-    	
-    	LineBackgroundSpan ispan = new LineBackgroundSpan() {
-			
-			@Override
-			public void drawBackground(Canvas c, Paint p, int left, int right, int top,
-					int baseline, int bottom, CharSequence text, int start, int end,
-					int lnum) {
-				Log.i("RozkladPKP","maluje");
-	            d.setBounds(left, top, right, bottom);
-	            c.skew(10, 10);
-					d.draw(c);
-				
-			}
-		};
-    	String ts = Integer.toString(o.changes);
-    	spanBuilder.append("bla ");
-    	spanBuilder.append(ts);
-    	spanBuilder.append("bla");
-    	spanBuilder.setSpan(ispan, 1, 5, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
-*/            	
-        ((TextView) view.findViewById(R.id.changes)).setText(Integer.toString(o.changes));
-    	//((TextView) v.findViewById(R.id.changes)).setText(spanBuilder);
+      
+        ((TextView) view.findViewById(R.id.changes)).setText(Integer.toString(o.changesCount));
         ((TextView) view.findViewById(R.id.duration)).setText(o.getJourneyTime().toLongString());
         
         LinearLayout lay = (LinearLayout)view.findViewById(R.id.type_icons);
+        
         
         lay.removeAllViews();
         for(int i = 0; i < tl; i++)
@@ -288,24 +219,17 @@ public class ConnectionListItemAdapter extends BaseAdapter {
         	String s = CommonUtils.trainType(o.getTrain(i).number);
         	s = (s.length() > 0 ? s : "OS");
         	TextView t = new TextView(c);
-        	//Spannable str = new SpannableString(s.length() > 0 ? s : "OS");
-        	//str.setSpan(new BackgroundColorSpan(Color.BLUE), 0, str.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        	//str.setSpan(new AbsoluteSizeSpan(100), 0, str.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        	
         	t.setText(s);
         	t.setTextColor(Color.BLACK);
         	
         	t.setGravity(Gravity.CENTER_VERTICAL);
         	t.setSingleLine();
-        	//t.setAnimation(ranim);
-            
+        	
             t.setBackgroundResource(CommonUtils.drawableForTrainType(s));
         	lay.addView(t);
         }
-        
-        //TransitionDrawable transition = (TransitionDrawable) view.getBackground();
-        //transition.startTransition(500);
-        //transition.reverseTransition(500);
-        
+
         return view;
 	}
 
@@ -368,7 +292,7 @@ public class ConnectionListItemAdapter extends BaseAdapter {
 		int p = 0;
 		do{
 			p = items.get(position--);
-		}while(position >= 0 && p > 0);
+		}while(position >= 0 && p >= 0);
 		
 		return pln.days().getDay(-p-1);
 	}
@@ -434,24 +358,6 @@ public class ConnectionListItemAdapter extends BaseAdapter {
 		return headerItems() + footerItems();
 	}
 	
-	private void loadData() {
-		
-		items.clear();
-		
-		for(Map.Entry<Integer, List<Integer>> l : pln.days().getDaysMap().entrySet())
-		{
-			//Dni są oznaczone liczbami ujemnymi, zaczynając od -1
-			//Pierwszy dzień to -1, następny to -2, itd.
-			items.add(-l.getKey()-1);
-			
-			//Dodanie numerów połączeń
-			for(Integer i : l.getValue())
-				items.add(i);
-		}
-		
-		notifyDataSetChanged();
-	}
-	
 	String getContentForSharing()
 	{
 		String msg = pln.departureStation().name + " - " +  pln.arrivalStation().name+" ";
@@ -463,29 +369,60 @@ public class ConnectionListItemAdapter extends BaseAdapter {
 			
 			for(Integer c : l.getValue())
 			{
-				Connection con = pln.connections[c];
+				UnboundConnection con = pln.connections[c];
 				
-				if(con.changes == 0)
+				if(con.changesCount == 0)
 					msg += con.getTrain(0).deptime.toString()+",\n";
 				
 				else
 				{
 					msg += con.getTrain(0).deptime.toString();
-					msg += con.getTrainCount() > 2 ? " z przesiadkami (" :  " z przesiadką (";
+					msg += con.trainCount > 2 ? " z przesiadkami (" :  " z przesiadką (";
 					
-					for(int i = 1; i < con.getTrainCount(); ++i)
+					for(int i = 1; i < con.trainCount; ++i)
 					{
 						Train tr = con.getTrain(i);
 						msg += tr.depstation.name + " "+tr.deptime.toString();
 						
-						if(i < con.getTrainCount() -1 )
+						if(i < con.trainCount -1 )
 							msg += ", ";
 					}
 					msg += "),\n";
 				}
 			}
 		}
-		
 		return msg.substring(0,msg.length()-2)+'.';
+	}
+
+	@Override
+	public void update(Observable observable, Object data) {
+		if(clist.getLastError() != HafasServer.DOWNLOAD_OK || clist.getPLN() == null || clist.getPLN().conCnt == 0)
+			return;
+		
+		pln = clist.getPLN();
+		depStation = pln.departureStation().name;
+		scrolling = clist.scrollable();
+
+		backupServerWarning = clist.getServerId() > 0;
+
+		delayInfo = pln.hasDelayInfo();
+		if(delayInfo)
+			calculateTextSizes();
+		
+		
+		items.clear();
+			
+		for(Map.Entry<Integer, List<Integer>> l : pln.days().getDaysMap().entrySet())
+		{
+			//Dni są oznaczone liczbami ujemnymi, zaczynając od -1
+			//Pierwszy dzień to -1, następny to -2, itd.
+			items.add(-l.getKey()-1);
+
+			//Dodanie numerów połączeń
+			for(Integer i : l.getValue())
+				items.add(i);
+		}
+
+		notifyDataSetChanged();
 	}
 }

@@ -15,11 +15,11 @@
       along with RozkladPKP.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-<item android:title="Udostępnij" android:id="@+id/share" android:icon="@drawable/ic_menu_share"></item>
+<item android:title="Udostępnij" android:id="@+id/share" android:icon="@drawable/social_share"></item>
 <!-- <item android:title="Zapisz PLN" android:id="@+id/savepln"></item>-->
-<item android:title="Dodaj do zapamiętanych" android:id="@+id/item_favourite" android:icon="@drawable/ic_love"></item>
-<item android:title="Podróż powrotna" android:id="@+id/item_return_journey" android:icon="@drawable/ic_menu_revert" android:showAsAction="ifRoom"></item>
-<item android:title="Dalsza podróż" android:id="@+id/item_continue_journey" android:icon="@drawable/ic_menu_forward"></item>
+<item android:title="Dodaj do zapamiętanych" android:id="@+id/item_favourite" android:icon="@drawable/rating_favorite"></item>
+<item android:title="Podróż powrotna" android:id="@+id/item_return_journey" android:icon="@drawable/content_swap" android:showAsAction="ifRoom"></item>
+<item android:title="Dalsza podróż" android:id="@+id/item_continue_journey" android:icon="@drawable/navigation_forward"></item>
 <item android:title="Wezwij taksówkę" android:id="@+id/item_taxity" android:icon="@drawable/taxity"></item>
 
 </menu>

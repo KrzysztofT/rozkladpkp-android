@@ -5,54 +5,107 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Observable;
+import java.util.Observer;
 
+import org.tyszecki.rozkladpkp.ExternalDelayFetcher.ExternalDelayFetcherCallback;
 import org.tyszecki.rozkladpkp.pln.PLN;
 import org.tyszecki.rozkladpkp.servers.HafasServer;
 import org.tyszecki.rozkladpkp.servers.ServerManager;
 
-public class ConnectionList {
+import android.content.Context;
+import android.content.Intent;
+import android.os.AsyncTask;
+import android.text.format.Time;
+import android.util.Log;
+
+public class ConnectionList extends Observable{
 
 	private PLN pln;
 	private int seqnr = 0;
-	private boolean isStatic = false;
+	private boolean isStatic = false, notifyOnAdd = false;
 	private Thread thread;
 	private int attempts;
 	private int serverId = -1;
+	private int lastError = HafasServer.DOWNLOAD_OK;
 	
-	private String date,time;
+	
+	private String SID,ZID;
 	
 	private ArrayList<SerializableNameValuePair> common;
 	private byte[] sBuffer = new byte[512];
-	
-	
-	
 	private final int MAX_ATTEMPTS = 15;
 	
-	public interface ConnectionListCallback{
-		void contentReady(ConnectionList list, boolean error);
+	
+	enum CachePolicy{NoCached, CachedIfAvailable, OnlyCached}; 
+	
+	//CacheID: -1 = brak, 0 = podstawowy, 1 = dla widżetów 
+	public static ConnectionList forParameters(Context c, ArrayList<SerializableNameValuePair> commonFields, CachePolicy policy, int cacheID) {
+		ConnectionList ret = null;
+		
+		String S = null,Z = null;
+		for(SerializableNameValuePair p : commonFields)
+		{
+			if(p.name.equals("SID"))
+				S = CommonUtils.StationIDfromSID(p.value);
+			if(p.name.equals("ZID"))
+				Z = CommonUtils.StationIDfromSID(p.value);
+		}
+		
+		if(policy == CachePolicy.OnlyCached)
+		{
+			Log.i("RozkladPKP", "Pomijam sprawdzenie, wymuszenie zwracania z cache.");
+			return ConnectionList.fromFile(CommonUtils.ResultsHash(S, Z, null, cacheID));
+		}
+		
+		boolean cached = false;
+		if(policy != CachePolicy.NoCached)
+		{
+			Log.i("RozkladPKP", "Sprawdzam cache");
+			//Sprawdzmy, czy cache jest aktualny
+			String t = RememberedManager.cacheValidTime(c, S, Z, cacheID);
+			if(t != null)
+			{
+				try{
+					Time ct,n;
+					n = new Time();
+					n.setToNow();
+					ct = new Time();
+					ct.parse(t);
+        			
+        			if(Time.compare(ct, n) > 0)	
+        				cached = true;
+        			else
+        				invalidateCache(c,S,Z, cacheID); //Jeśli cache jest nieważny, usuń go.
+				}catch (Exception e) {
+					invalidateCache(c,S,Z, cacheID);
+				}
+			}
+			if(!cached)
+				Log.i("RozkladPKP", "Cache nieobecny/nieaktualny");
+		}
+			
+		if(!cached)
+		{
+			Log.i("RozkladPKP", "Pobieranie rozkładu z internetu");
+			ret = new ConnectionList();
+			ret.common = commonFields;
+			ret.SID = S;
+			ret.ZID = Z;
+			ret.fetch();
+			return ret;
+		}
+		else
+			return ConnectionList.fromFile(CommonUtils.ResultsHash(S, Z, null, cacheID));
 	}
 	
-	ConnectionListCallback callback;
-	
-	private ConnectionList(ConnectionListCallback callback) {
-		this.callback = callback;
+	private static void invalidateCache(Context c, String SID, String ZID, int cacheID) {
+		RememberedManager.removeCache(c, SID, ZID, cacheID);
 	}
-	
-	public static ConnectionList fromNetwork(ConnectionListCallback callback, ArrayList<SerializableNameValuePair> commonFields, String date, String time) {
-		
-		ConnectionList ret = new ConnectionList(callback);
-		
-		ret.common = commonFields;
-		ret.date = date;
-		ret.time = time;
-		
-		return ret;
-	}
-	
-	public static ConnectionList fromFile(ConnectionListCallback callback, String filename){
-		
-		ConnectionList ret = new ConnectionList(callback);
-		
+
+	private static ConnectionList fromFile(String filename){
+		ConnectionList ret = new ConnectionList();
 		FileInputStream fis;
 		try {
 			fis = RozkladPKPApplication.getAppContext().openFileInput(filename);
@@ -74,23 +127,19 @@ public class ConnectionList {
 	    ret.isStatic = true;
 	    
 	    
-	    if(ret.callback != null)
-	    	ret.callback.contentReady(ret, false);
-	    
+	    ret.contentReady();	    
 		return ret;
 	}
 	
-	public static ConnectionList fromByteArray(ConnectionListCallback callback, ArrayList<SerializableNameValuePair> commonFields, byte[] array, int seqnr)
+	public static ConnectionList fromByteArray(ArrayList<SerializableNameValuePair> commonFields, byte[] array, int seqnr)
 	{
-		ConnectionList ret = new ConnectionList(callback);
+		ConnectionList ret = new ConnectionList();
 		
 		ret.common = commonFields;
 		ret.seqnr = seqnr;
 		ret.pln = new PLN(array);
 		
-		if(ret.callback != null)
-	    	ret.callback.contentReady(ret, false);
-		
+		ret.contentReady();
 		return ret;
 	}
 	
@@ -104,10 +153,8 @@ public class ConnectionList {
 		data.addAll(common);
 		
 		data.add(new SerializableNameValuePair("ignoreMinuteRound", "yes"));
-		data.add(new SerializableNameValuePair("date", date));
-		data.add(new SerializableNameValuePair("time", time));
 		data.add(new SerializableNameValuePair("h2g-direct", "1"));
-		
+		data.add(new SerializableNameValuePair("start", "1"));
 		attempts = 1;
 		download(data);
 	}
@@ -146,11 +193,9 @@ public class ConnectionList {
 	
 	private void download(final ArrayList<SerializableNameValuePair> in)
 	{
-		thread = new Thread(new Runnable() {
-			
+		class DownloadTask extends AsyncTask<Void, Void, Void>{
 			@Override
-			public void run() {
-				
+			protected Void doInBackground(Void... params) {
 				for(int i = 0;;++i)
 				{
 					HafasServer s = ServerManager.getServer(i);
@@ -172,20 +217,89 @@ public class ConnectionList {
 						{
 							pln = s.getPLN();
 							ConnectionList.this.serverId = i;
-							callback.contentReady(ConnectionList.this, false);
-							return;
+							lastError = result;
+							return null;
 						}
 						else if(result == HafasServer.DOWNLOAD_ERROR_SERVER_FAULT)
-							break; //Następny serwer, jeśli ten nie działa.
+							break;
 						
 					}while((result != HafasServer.DOWNLOAD_OK) && --tries > 0);
+					lastError = result;
 				}
-				callback.contentReady(ConnectionList.this, true);
+				return null;
 			}
-		});
-		thread.start();
+			
+			@Override
+			protected void onPostExecute(Void result) {
+				contentReady();
+			}
+		}
+		new DownloadTask().execute();
 	}
 	
+	private void contentReady()
+	{
+		if(pln == null || pln.conCnt == 0)
+		{
+			notifyObservers(false);
+			return;
+		}
+		
+		//Dane są aktualne, nie pobieramy znów
+		if(ExternalDelayFetcher.isUpToDate())
+		{
+			pln.addExternalDelayInfo(ExternalDelayFetcher.getDelays());
+			notifyObservers(false);
+		}
+		else
+		{
+			//Powiadom dwa razy - od razu i po dostniu opóźnień.
+			notifyObservers(true);
+			
+			ExternalDelayFetcher.requestUpdate(new ExternalDelayFetcherCallback() {
+
+				@Override
+				public void ready(HashMap<String, Integer> delays, boolean cached) {
+					pln.addExternalDelayInfo(delays);
+					notifyObservers(false);
+				}
+			});
+		}
+	}
+	
+	@Override
+	public void addObserver(Observer observer) {
+		super.addObserver(observer);
+		
+		if(notifyOnAdd)
+			observer.update(this, null);
+	}
+	
+	public void notifyObservers(boolean willUpdate) {
+		notifyOnAdd = true;
+
+		setChanged(); //Metoda jest wywoływana tylko po modyfikacji
+		super.notifyObservers(new Boolean(willUpdate));
+	}
+	
+	public void saveInCache(Context c, int cacheID)
+	{
+		if(isStatic)
+			return;
+		
+		Intent in = new Intent(c,RememberedService.class);
+
+		if(pln != null)
+			in.putExtra("pln", pln.data);
+
+		if(SID == null || ZID == null)
+			return;
+		in.putExtra("SID", SID);
+		in.putExtra("ZID", ZID);
+		in.putExtra("cacheID", cacheID);
+		
+		c.startService(in);
+	}
 	/**
 	 * 
 	 * @return Numer serwera, -1 jeśli nieznany.
@@ -217,5 +331,10 @@ public class ConnectionList {
 			thread.interrupt();
 			thread = null;
 		}
+	}
+	
+	public int getLastError()
+	{
+		return lastError;
 	}
 }

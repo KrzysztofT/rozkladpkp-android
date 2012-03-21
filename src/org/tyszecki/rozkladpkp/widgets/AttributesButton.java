@@ -131,6 +131,12 @@ public class AttributesButton extends Button implements DialogControl {
 	}
 
 	public class AttributePickerFragment extends DialogFragment{
+		@Override
+		public void onCreate(Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
+			setRetainInstance(true);
+		}
+		
 		public Dialog onCreateDialog(Bundle savedInstanceState) {
 			AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 			builder.setTitle("Szczegóły połączenia");

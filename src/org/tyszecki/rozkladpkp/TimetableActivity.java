@@ -16,14 +16,12 @@
  ******************************************************************************/
 package org.tyszecki.rozkladpkp;
 
-import org.tyszecki.rozkladpkp.R;
 import org.tyszecki.rozkladpkp.CommonUtils.StationIDfromNameProgress;
 import org.tyszecki.rozkladpkp.TimetableItem.ScrollItem;
 import org.tyszecki.rozkladpkp.TimetableItem.TrainItem;
 import org.tyszecki.rozkladpkp.TimetableItem.WarningItem;
 import org.w3c.dom.NodeList;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -33,22 +31,21 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.text.format.Time;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ListView;
 
 public class TimetableActivity extends FragmentActivity {
 
-	private TimetableItemAdapter m_adapter;
+	private TimetableItemAdapter adapter;
 
 	private String SID;
-	private boolean dep, inFront = true, showNDDialog = false;
+	private boolean dep, showNDDialog = false;
 	NodeList destList = null;
 	TimetableItem item;
 	String startID = null,destID = null, xmlstring;
+	String station;
 	
 	TrainItem titem;
 	
@@ -63,27 +60,28 @@ public class TimetableActivity extends FragmentActivity {
         
         String stationID =  CommonUtils.StationIDfromSID(SID);
         
-        RememberedManager.addtoHistory(this, stationID, dep, null);
+        RememberedManager.addtoHistory(this, stationID, dep, null,0);
         
-        getSupportActionBar().setTitle(extras.getString("Station"));
+        station = extras.getString("Station");
+        getSupportActionBar().setTitle(station);
         getSupportActionBar().setSubtitle(dep?"Odjazdy":"Przyjazdy");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         
      
         if(extras.containsKey("Filename"))
-        	m_adapter = new TimetableItemAdapter(stationID, extras.getString("Products"), 
-            		CommonUtils.timeFromString(new Time(), extras.getString("Date"), extras.getString("Time")), !dep, this, extras.getString("Filename"));
+        	adapter = new TimetableItemAdapter(stationID, extras.getString("Products"), 
+            		CommonUtils.timeFromString(new Time(), extras.getString("Date"), extras.getString("PLNTimestamp")), !dep, this, extras.getString("Filename"));
         	
         else
         {
-	        m_adapter = new TimetableItemAdapter(stationID, extras.getString("Products"), 
-	        		CommonUtils.timeFromString(new Time(), extras.getString("Date"), extras.getString("Time")), !dep, this);
-	        m_adapter.fetch();
+	        adapter = new TimetableItemAdapter(stationID, extras.getString("Products"), 
+	        		CommonUtils.timeFromString(new Time(), extras.getString("Date"), extras.getString("PLNTimestamp")), !dep, this);
+	        adapter.fetch();
         }
         		
         
         ListView lv = (ListView)findViewById(R.id.timetable);
-        lv.setAdapter(this.m_adapter);
+        lv.setAdapter(this.adapter);
         
         
         //Włączanie informacji o pociągu - potrzebnego do tego są identyfikatory stacji.
@@ -93,12 +91,12 @@ public class TimetableActivity extends FragmentActivity {
 			public void onItemClick(final AdapterView<?> arg0, View arg1, int pos,
 					long id) {
 				
-				item = m_adapter.getItem(pos);
+				item = adapter.getItem(pos);
 				if(item instanceof TimetableItem.DateItem)
 					return;
 				
 				else if(item instanceof ScrollItem)
-					m_adapter.fetchMore(!((ScrollItem)item).up);
+					adapter.fetchMore(!((ScrollItem)item).up);
 				
 				else if(item instanceof WarningItem)
 				{
@@ -202,6 +200,12 @@ public class TimetableActivity extends FragmentActivity {
 		case R.id.item_taxity:
 			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.taxity")));
 			return true;
+		case R.id.share:
+			Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+			sharingIntent.setType("text/plain");
+			sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, (dep?"Odjazdy - ":"Przyjazdy - ") + station + "\n" + adapter.getContentForSharing());
+			startActivity(Intent.createChooser(sharingIntent, "Udostępnij przez..."));
+			return true;
 		}
 		return false;
 	}
@@ -209,7 +213,6 @@ public class TimetableActivity extends FragmentActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		inFront = true;
 		if(showNDDialog)
 		{
 			noDataAlert();
@@ -220,7 +223,6 @@ public class TimetableActivity extends FragmentActivity {
 	@Override
 	protected void onPause() {
 		super.onPause();
-		inFront = false;
 	}
 }
 

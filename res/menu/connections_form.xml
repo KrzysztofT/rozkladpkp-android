@@ -15,9 +15,9 @@
       along with RozkladPKP.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-<item android:id="@+id/item_settings" android:title="Ustawienia" android:icon="@drawable/ic_menu_preferences"></item>
-<item android:id="@+id/item_return" android:title="Podróż powrotna" android:icon="@drawable/ic_menu_revert" android:showAsAction="ifRoom"></item>
-<item android:id="@+id/item_via" android:title="@string/menuAddVia" android:icon="@drawable/ic_menu_directions" android:showAsAction="ifRoom"></item>
-<item android:id="@+id/item_carriers" android:icon="@drawable/ic_menu_more"></item>
-<item android:id="@+id/item_about" android:title="O programie" android:icon="@drawable/ic_menu_info_details"></item>
+<item android:id="@+id/item_settings" android:title="Ustawienia" android:icon="@drawable/action_settings"></item>
+<item android:id="@+id/item_return" android:title="Podróż powrotna" android:icon="@drawable/content_swap" android:showAsAction="ifRoom"></item>
+<item android:id="@+id/item_via" android:title="@string/menuAddVia" android:icon="@drawable/content_split" android:showAsAction="ifRoom"></item>
+<item android:id="@+id/item_carriers" android:icon="@drawable/content_new"></item>
+<item android:id="@+id/item_about" android:title="O programie" android:icon="@drawable/action_about"></item>
 </menu>

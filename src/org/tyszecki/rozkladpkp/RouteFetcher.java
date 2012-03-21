@@ -36,6 +36,7 @@ import org.xml.sax.InputSource;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 
 public class RouteFetcher extends AsyncTask<RouteFetcher.RouteParams, Void, Document> {
 	private static byte[] sBuffer = new byte[512];

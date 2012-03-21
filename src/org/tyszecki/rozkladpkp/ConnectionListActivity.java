@@ -16,24 +16,33 @@
  ******************************************************************************/
 package org.tyszecki.rozkladpkp;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
 
-import org.tyszecki.rozkladpkp.ConnectionList.ConnectionListCallback;
+import org.tyszecki.rozkladpkp.ConnectionList.CachePolicy;
+import org.tyszecki.rozkladpkp.servers.HafasServer;
+import org.tyszecki.rozkladpkp.widgets.StationEdit;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.DialogInterface.OnCancelListener;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ListView;
 
-public class ConnectionListActivity extends FragmentActivity {
+public class ConnectionListActivity extends FragmentActivity implements Observer {
 	
 	private ProgressDialog m_ProgressDialog;
 	private boolean hasFullTable = false;
@@ -46,7 +55,6 @@ public class ConnectionListActivity extends FragmentActivity {
 	
 	private ConnectionListItemAdapter adapter;
 	private ConnectionList clist;
-	private ConnectionListCallback clistCallback;
 	
 	public void onCreate(Bundle savedInstanceState) {
 		setTheme(RozkladPKPApplication.getThemeId());
@@ -56,28 +64,13 @@ public class ConnectionListActivity extends FragmentActivity {
         adapter = new ConnectionListItemAdapter(this); 
         extras = getIntent().getExtras();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        clistCallback = new ConnectionListCallback() {
-			@Override
-			public void contentReady(ConnectionList list, final boolean error) {
-				if(clist == null)
-					clist = list;
-				
-				Runnable uit = new Runnable() {
-					@Override
-					public void run() {
-						updateDisplayedPLN(error);
-					}
-				};
-				runOnUiThread(uit);
-			}
-		};
-		
 		getSupportActionBar().setTitle(extras.getString("depName")+" →");
 		getSupportActionBar().setSubtitle(extras.getString("arrName"));
         
         setupCommonFields();
 		setupContents(savedInstanceState);
         setupListView();
+        adapter.setConnectionList(clist);
 	}
 
 	private void setupListView() {
@@ -99,7 +92,6 @@ public class ConnectionListActivity extends FragmentActivity {
 					
 					Intent ni = new Intent(arg0.getContext(),ConnectionDetailsActivity.class);
 
-					ni.putExtra("seqnr", clist.getSeqNr());
 					ni.putExtra("PLNData", clist.getPLN().data);
 					ni.putExtra("ConnectionIndex",cix);
 					
@@ -121,19 +113,21 @@ public class ConnectionListActivity extends FragmentActivity {
 
 	private void setupContents(Bundle savedInstanceState) {
 		if(extras.containsKey("PLNFilename"))
-			clist = ConnectionList.fromFile(clistCallback, extras.getString("PLNFilename"));
+			clist = ConnectionList.forParameters(this, commonFieldsList, CachePolicy.OnlyCached, 0);
 		
 		else if(savedInstanceState != null && savedInstanceState.containsKey("PLNData")){
 
-			clist = ConnectionList.fromByteArray(clistCallback, commonFieldsList, savedInstanceState.getByteArray("PLNData"), savedInstanceState.getInt("SeqNr"));
+			clist = ConnectionList.fromByteArray(commonFieldsList, savedInstanceState.getByteArray("PLNData"), savedInstanceState.getInt("SeqNr"));
 			hasFullTable = savedInstanceState.getBoolean("hasFullTable");
 			timetableUrl = savedInstanceState.getString("timetableURL");
 		}
 		else
 		{
-			clist = ConnectionList.fromNetwork(clistCallback, commonFieldsList, extras.getString("Date"), extras.getString("Time"));	
+			clist = ConnectionList.forParameters(this, commonFieldsList, CachePolicy.NoCached, 0);
 			getConnections();
 		}
+		
+		clist.addObserver(this);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -151,7 +145,12 @@ public class ConnectionListActivity extends FragmentActivity {
         
         commonFieldsList.add(new SerializableNameValuePair("ZID", extras.getString("ZID")));
         commonFieldsList.add(new SerializableNameValuePair("REQ0JourneyProduct_prod_list_1",extras.getString("Products")));
-        commonFieldsList.add(new SerializableNameValuePair("start", "1"));
+        
+        commonFieldsList.add(new SerializableNameValuePair("date", extras.getString("Date")));
+        commonFieldsList.add(new SerializableNameValuePair("time", extras.getString("PLNTimestamp")));
+        
+        if(extras.containsKey("Arrival") && extras.getBoolean("Arrival"))
+        	commonFieldsList.add(new SerializableNameValuePair("timesel", "arrive"));
 	}
 	
 	public void newSearch()
@@ -191,53 +190,7 @@ public class ConnectionListActivity extends FragmentActivity {
     		m_ProgressDialog = null;
 		}
 	}
-	public void updateDisplayedPLN(boolean error)
-	{
-		hideLoader();
-		
-		if(error)
-		{
-			if(inFront)
-				serverErrorAlert();
-			else
-				showERDialog = true;
-			
-			return;
-		}
-		
-		if(clist == null || clist.getPLN() == null)
-			return;
-		
-		if(clist.getSeqNr() == 0 && clist.getPLN().conCnt == 0)
-		{
-			if(inFront)
-				noConnectionsAlert();
-			else
-				showNCDialog = true;
-		}
-		else if(clist.getSeqNr() > 0 && clist.getPLN().conCnt == 0)
-		{
-			if(inFront)
-				noMoreAlert();
-		}
-		else
-		{
-			adapter.setConnectionList(clist);
-
-			//Zapisanie wyników
-			Bundle extras = ConnectionListActivity.this.getIntent().getExtras(); 
-			Intent in = new Intent(ConnectionListActivity.this,RememberedService.class);
-
-			if(clist.getPLN() != null && !extras.containsKey("PLNFilename"))
-				in.putExtra("pln", clist.getPLN().data);
-
-			in.putExtra("SID", CommonUtils.StationIDfromSID(extras.getString("SID")));
-			in.putExtra("ZID", CommonUtils.StationIDfromSID(extras.getString("ZID")));
-
-			startService(in);
-		}
-	}
-      
+	
 	protected void noConnectionsAlert() {
 		//Pokazuje okno dialogowe informujące o braku połączeń i umożliwia powrót do wcześniejszej aktywności.
 		AlertDialog alertDialog;
@@ -252,6 +205,7 @@ public class ConnectionListActivity extends FragmentActivity {
 				ConnectionListActivity.this.finish();
 			}
 		});
+    	
     	alertDialog.show();
 	}
 	protected void serverErrorAlert() {
@@ -259,7 +213,7 @@ public class ConnectionListActivity extends FragmentActivity {
 		AlertDialog alertDialog;
     	alertDialog = new AlertDialog.Builder(this).create();
     	alertDialog.setTitle("Błąd serwera!");
-    	alertDialog.setMessage("Serwer systemu SITKOL obecnie nie działa. Odczekaj chwilę i ponów próbę.");
+    	alertDialog.setMessage("Wystąpił błąd, nie można pobrać rozkładu. Baza danych programu uległa uszkodzeniu, lub serwer systemu SITKOL obecnie nie działa. Odczekaj chwilę i ponów próbę, lub zresetuj bazę danych programu (Uwaga! Usunie to zapisane połączenia i rozkłady, ale może naprawić problem). W razie ciągłego występowania problemu, proszę o kontakt.");
     	alertDialog.setOnKeyListener(CommonUtils.getOnlyDPadListener());
     	alertDialog.setCancelable(false);
     	
@@ -268,17 +222,28 @@ public class ConnectionListActivity extends FragmentActivity {
 				ConnectionListActivity.this.finish();
 			}
 		});
+    	
+    	alertDialog.setButton2("Wyczyść dane", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface arg0, int arg1) {
+				deleteDatabase("rozkladpkp");
+				StationEdit.initTree();
+				PreferenceManager.getDefaultSharedPreferences(ConnectionListActivity.this).edit().remove("Attributes").remove("Products").commit();
+				//Reset aplikacji
+				Intent i = getBaseContext().getPackageManager().getLaunchIntentForPackage( getBaseContext().getPackageName() );
+	    		i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+	    		startActivity(i);
+			}
+		});
+    	    	
     	alertDialog.show();
 	}
-	
-	
+
 	protected void getConnections(){
 		
 		if(!CommonUtils.onlineCheck())
 			return;
 		
 		showLoader();
-		clist.fetch();
 	}
 	
 	private void noMoreAlert() {
@@ -332,7 +297,7 @@ public class ConnectionListActivity extends FragmentActivity {
 			}
 			return true;
 		*/case R.id.item_favourite:
-			RememberedManager.addtoHistory(ConnectionListActivity.this, CommonUtils.StationIDfromSID(extras.getString("SID")), CommonUtils.StationIDfromSID(extras.getString("ZID")),RememberedManager.getCacheString(clist.getPLN()));
+			RememberedManager.addtoHistory(ConnectionListActivity.this, CommonUtils.StationIDfromSID(extras.getString("SID")), CommonUtils.StationIDfromSID(extras.getString("ZID")),RememberedManager.getCacheString(clist.getPLN()), 0);
 			RememberedManager.saveRoute(ConnectionListActivity.this, CommonUtils.StationIDfromSID(extras.getString("SID")), CommonUtils.StationIDfromSID(extras.getString("ZID")));
 			return true;
 		
@@ -360,9 +325,6 @@ public class ConnectionListActivity extends FragmentActivity {
 			startActivity(Intent.createChooser(sharingIntent, "Udostępnij przez..."));
 			return true;
 		}
-		
-		
-			
 		
 		return false;
 	}
@@ -401,5 +363,35 @@ public class ConnectionListActivity extends FragmentActivity {
 		
 		hideLoader();
 		inFront = false;
+	}
+
+	@Override
+	public void update(Observable observable, Object data) {
+		hideLoader();
+		
+		if(clist.getLastError() == HafasServer.DOWNLOAD_ERROR_SERVER_FAULT)
+		{
+			if(inFront)
+				serverErrorAlert();
+			else
+				showERDialog = true;
+			return;
+		}
+		
+		
+		if(clist.getSeqNr() == 0 && clist.getPLN().conCnt == 0)
+		{
+			if(inFront)
+				noConnectionsAlert();
+			else
+				showNCDialog = true;
+		}
+		else if(clist.getSeqNr() > 0 && clist.getPLN().conCnt == 0)
+		{
+			if(inFront)
+				noMoreAlert();
+		}
+		else
+			clist.saveInCache(this, 0);
 	}
 }

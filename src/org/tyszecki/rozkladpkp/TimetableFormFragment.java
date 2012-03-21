@@ -130,7 +130,7 @@ public class TimetableFormFragment extends Fragment {
 				}
 				
 				//Wystartowanie wybranej aktywności
-				arg.putString("Time", timeButton.getTime());
+				arg.putString("PLNTimestamp", timeButton.getTime());
 				arg.putString("Date", dateButton.getDate());
 				arg.putString("Type", typeButton.getType());
 				arg.putString("Products", productsButton.getProductString());
@@ -208,7 +208,7 @@ public class TimetableFormFragment extends Fragment {
 		EnhancedBundle a = new EnhancedBundle(getArguments());
 		SharedPreferences p = getActivity().getPreferences(Activity.MODE_PRIVATE);
 		
-		timeButton.setTime(a.getString("Time", null));
+		timeButton.setTime(a.getString("PLNTimestamp", null));
 		dateButton.setDate(a.getString("Date", null));
         productsButton.setProductString(p.getString("Products", "11110001111111"));
         typeButton.setType(a.getString("Type", "dep"));

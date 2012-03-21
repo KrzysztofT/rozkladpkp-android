@@ -14,6 +14,8 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.tyszecki.rozkladpkp.SerializableNameValuePair;
 import org.tyszecki.rozkladpkp.pln.PLN;
 
+import android.util.Log;
+
 public abstract class HafasServer {
 	public static final int URL_CONNECTIONS = 0;
 	public static final int URL_TIMETABLE = 1;
@@ -50,10 +52,10 @@ public abstract class HafasServer {
 		client.removeRequestInterceptorByClass(org.apache.http.protocol.RequestUserAgent.class);
 
 
-		/*for(int i = 0; i < data.size(); ++i)
+		for(int i = 0; i < data.size(); ++i)
 	        {
 	        	Log.i("RozkladPKP", data.get(i).getName() + "="+ data.get(i).getValue());
-	        }*/
+	        }
 		
 		request.addHeader("Content-Type", "text/plain");
 		try {
@@ -85,7 +87,9 @@ public abstract class HafasServer {
 			return DOWNLOAD_ERROR_SERVER_FAULT;
 		}
 		
-		if(pln.conCnt > 0)
+		//Jeśli nie ma połączeń i jest to pierwsze żądanie, to znaczy że połączeń nie ma w ogóle 
+		//dla wybranych kryteriów, albo stacja jest nieczynna (jeśli nie ma filtrów). Jeśli jest to pierwsze żądanie, to ld == null
+		if(ld == null || pln.conCnt > 0)
 			return DOWNLOAD_OK;
 		
 		return DOWNLOAD_ERROR_WAIT;

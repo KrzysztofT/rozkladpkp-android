@@ -17,6 +17,7 @@
 package org.tyszecki.rozkladpkp.widgets;
 
 import org.tyszecki.rozkladpkp.R;
+import org.tyszecki.rozkladpkp.widgets.ExtendedTimePicker.OnExtendedTimeChanged;
 
 import android.app.Dialog;
 import android.app.TimePickerDialog;
@@ -33,12 +34,13 @@ import android.widget.TimePicker;
 public class TimeButton extends Button implements DialogControl {
 
 	private String txt = "";
+	boolean arrivalTime = false;
 	Integer minute,hour;
 	Time time;
 	
 	public TimeButton(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		setCompoundDrawablesWithIntrinsicBounds(getContext().getResources().getDrawable(R.drawable.clock), null, null, null);
+		setCompoundDrawablesWithIntrinsicBounds(getContext().getResources().getDrawable(R.drawable.device_access_time), null, null, null);
 		time	= new Time();
 	}
 	
@@ -46,19 +48,23 @@ public class TimeButton extends Button implements DialogControl {
 	    return new TimePickerFragment();
 	}
 	
-	private TimePickerDialog.OnTimeSetListener mTimeSetListener =
-	    new TimePickerDialog.OnTimeSetListener() {
-	        public void onTimeSet(TimePicker view, int hourOfDay, int sminute) {
-	            hour = hourOfDay;
+	private OnExtendedTimeChanged mTimeSetListener =
+	    new OnExtendedTimeChanged() {
+			
+			@Override
+			public void onTimeSet(TimePicker view, int hourOfDay, int sminute,
+					boolean arrival) {
+				hour = hourOfDay;
 	            minute = sminute;
+	            arrivalTime = arrival;
 	            updateTime();
-	        }
-	    };
+			}
+		};
 	
 	private void updateTime()
 	{
 		String min	= (minute < 10) ? "0" + minute.toString() : minute.toString();
-		setText(Html.fromHtml(txt+"<b>"+hour.toString()+":"+min+"</b>"));
+		setText(Html.fromHtml(txt+((arrivalTime)?"P:":"")+"<b>"+hour.toString()+":"+min+"</b>"));
 	}
 	
 	public void setToNow()
@@ -70,6 +76,17 @@ public class TimeButton extends Button implements DialogControl {
 		updateTime();
 	}
 
+	public void setArrival(boolean arr)
+	{
+		arrivalTime = arr;
+		updateTime();
+	}
+	
+	public boolean isArrival()
+	{
+		return arrivalTime;
+	}
+	
 	public void setTime(int hour, int minute)
 	{
 		this.minute = minute;
@@ -115,8 +132,14 @@ public class TimeButton extends Button implements DialogControl {
 	}
 	
 	public class TimePickerFragment extends DialogFragment{
+		@Override
+		public void onCreate(Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
+			setRetainInstance(true);
+		}
+		
 		public Dialog onCreateDialog(Bundle savedInstanceState) {
-			return new TimePickerDialog(getActivity(), mTimeSetListener, hour, minute, true);
+			return new ExtendedTimePicker(getActivity(), mTimeSetListener, hour, minute, arrivalTime);
 		}
 	}
 }

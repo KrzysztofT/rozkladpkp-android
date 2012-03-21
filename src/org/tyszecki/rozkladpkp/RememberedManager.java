@@ -17,8 +17,6 @@
 package org.tyszecki.rozkladpkp;
 
 import org.tyszecki.rozkladpkp.pln.PLN;
-import org.tyszecki.rozkladpkp.pln.PLN.Trip;
-import org.tyszecki.rozkladpkp.pln.PLN.TripIterator;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -49,7 +47,7 @@ public class RememberedManager {
 					SQL += ",";
 				
 				if(cur.getInt(3) == 2)
-					c.deleteFile(CommonUtils.ResultsHash(cur.getString(1), cur.getString(2), null));
+					c.deleteFile(CommonUtils.ResultsHash(cur.getString(1), cur.getString(2), null, 0));
 			}
 			SQL += ")";
 			
@@ -58,13 +56,25 @@ public class RememberedManager {
 		cur.close();
 	}
 	
+	public static void removeCache(Context c, String sidFrom, String sidTo, int cacheID)
+	{
+		try{
+		SQLiteDatabase db = DatabaseHelper.getDbRW(c);
+		if(db != null)
+			db.execSQL("UPDATE stored SET cacheValid='' WHERE sidFrom='"+sidFrom+"' AND sidTo='"+sidTo+"'");
+		}catch (Exception e) {}
+		
+		c.deleteFile(CommonUtils.ResultsHash(sidFrom, sidTo, null, cacheID));
+	}
 	//Przy dodawaniu do hstorii, należy sprawdzić czy już nie ma takiej pozycji.
 	//Jeśli jest, zwiększamy jej ID na największe w tabeli, dzięki czemu powędruje na górę listy
-	public static void addtoHistory(Context c, String stationSID, boolean departure, String cValid)
+	public static void addtoHistory(Context c, String stationSID, boolean departure, String cValid, int cacheID)
 	{
 		SQLiteDatabase db = DatabaseHelper.getDbRW(c);
 		
-		Cursor cur = db.query("stored", new String[]{"_id"}, "sidFrom=? AND type=?", new String[]{stationSID,departure?"0":"1"}, null, null, null);
+		String type = Integer.toString(((cacheID > 0) ? cacheID : 0)*10 + (departure ? 0 : 1));
+		
+		Cursor cur = db.query("stored", new String[]{"_id"}, "sidFrom=? AND type=?", new String[]{stationSID,type}, null, null, null);
 		
 		String id = null;
 		
@@ -79,7 +89,7 @@ public class RememberedManager {
 		{
 			ContentValues val = new ContentValues();
 			val.put("sidFrom", stationSID);
-			val.put("type", departure?0:1);
+			val.put("type", type);
 			val.put("cacheValid", cValid);
 			
 			db.insert("stored", null, val);
@@ -88,11 +98,13 @@ public class RememberedManager {
 		db.close();
 	}
 	
-	public static void addtoHistory(Context c, String fromSID, String toSID, String cValid)
+	public static void addtoHistory(Context c, String fromSID, String toSID, String cValid, int cacheID)
 	{
 		SQLiteDatabase db = DatabaseHelper.getDbRW(c);
 		
-		Cursor cur = db.query("stored", new String[]{"_id"}, "sidFrom=? AND sidTo=?", new String[]{fromSID,toSID}, null, null, null);
+		String type = Integer.toString(((cacheID > 0) ? cacheID : 0)*10 + 2);
+		
+		Cursor cur = db.query("stored", new String[]{"_id"}, "sidFrom=? AND sidTo=? AND type=?", new String[]{fromSID,toSID,type}, null, null, null);
 		String id = null;
 		
 		if(cur.moveToNext())
@@ -106,12 +118,33 @@ public class RememberedManager {
 			ContentValues val = new ContentValues();
 			val.put("sidFrom", fromSID);
 			val.put("sidTo", toSID);
-			val.put("type", 2);
+			val.put("type", type);
 			val.put("cacheValid", cValid);
 			db.insert("stored", null, val);
 			cleanupHistory(db,c);
 		}
 		db.close();
+	}
+	
+	public static String cacheValidTime(Context c, String fromSID, String toSID, int cacheID)
+	{
+		if(fromSID == null || toSID == null)
+			return "";
+		
+		SQLiteDatabase db = DatabaseHelper.getDbRW(c);
+		
+		String p1 = (cacheID > 0) ? Integer.toString(cacheID*10+2) : "2";
+		String p2 = (cacheID > 0) ? Integer.toString(cacheID*10+2) : "3";
+		
+		Cursor cur = db.query("stored", new String[]{"cacheValid"}, "sidFrom=? AND sidTo=? AND type IN (?,?)", new String[]{fromSID,toSID,p1,p2}, null, null, null);
+		String t = null;
+		
+		if(cur.moveToNext())
+			t = cur.getString(0);
+		cur.close();
+		db.close();
+		
+		return t;
 	}
 	
 	public static void saveStation(Context c, String stationSID, boolean departure)
@@ -163,10 +196,7 @@ public class RememberedManager {
 	public static String getCacheString(PLN pln)
 	{
 		try{
-			TripIterator p = pln.tripIterator(); //TODO: Ładniej, to jest na szybko.
-			p.moveToLast();
-			Trip t1 = p.next();
-			Time result = new Time(t1.date);
+			Time result = new Time(pln.edate);
 			result.allDay = false;
 			result.monthDay++;
 			result.normalize(false);

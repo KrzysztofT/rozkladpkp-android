@@ -434,5 +434,23 @@ public class TimetableItemAdapter  extends BaseAdapter {
 			return true;
 		
 		return !((ScrollItem) getItem(position)).inProgress;
-    }  
+    }
+
+	public String getContentForSharing() {
+		String ret = "";
+		for(TimetableItem i : items)
+		{
+			if(i instanceof DateItem)
+				ret += ((DateItem)i).date + "\n";
+			else if(i instanceof TrainItem)
+			{
+				TrainItem o = (TrainItem)i;
+				ret += o.time;
+				ret += " " + o.number;
+				ret += (arrival) ? " z " : " do ";
+				ret += o.station + "\n";
+			}
+		}
+		return ret;
+	}  
 }

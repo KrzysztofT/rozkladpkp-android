@@ -15,6 +15,7 @@
  *     along with RozkladPKP.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.tyszecki.rozkladpkp;
+import org.tyszecki.rozkladpkp.pln.UnboundConnection;
 import org.tyszecki.rozkladpkp.pln.PLN;
 import org.tyszecki.rozkladpkp.pln.PLN.Train;
 
@@ -42,7 +43,7 @@ public class ConnectionDetailsItemAdapter extends BaseAdapter {
 	Context c;
 	
 	
-	private PLN.Connection connection;
+	private UnboundConnection connection;
 	private int trainCount,messageCount;
 	
 	private String km,k1,k2;
@@ -56,7 +57,7 @@ public class ConnectionDetailsItemAdapter extends BaseAdapter {
 		c = context;
 		
 		connection = pln.connections[connectionIndex];
-		trainCount = connection.getTrainCount();
+		trainCount = connection.trainCount;
 		messageCount = connection.hasMessages() ? connection.getMessages().length : 0;
 		
 		notifyDataSetChanged();
@@ -151,7 +152,7 @@ public class ConnectionDetailsItemAdapter extends BaseAdapter {
 	}
 
 	private View fillAvailabilityInfo(View view) {
-    	String msg  = connection.availability.getMessage();
+    	String msg  = connection.getAvailability().getMessage();
     	
     	if(msg == null)
     		msg = "Brak informacji o kursowaniu.";

@@ -25,6 +25,7 @@ import org.tyszecki.rozkladpkp.RememberedItem.TimetableType;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -87,7 +88,7 @@ public class RememberedFragment extends Fragment {
 					ni = new Intent(arg0.getContext(), showForm ? TimetableFormActivity.class : TimetableActivity.class);
 					
 					if(showSaved)
-						ni.putExtra("Filename", CommonUtils.ResultsHash(Integer.toString(t.SID), null, t.type == TimetableType.Departure));
+						ni.putExtra("Filename", CommonUtils.ResultsHash(Integer.toString(t.SID), null, t.type == TimetableType.Departure, 0));
 					
 					ni.putExtra("Station", t.name);
 					ni.putExtra("SID",CommonUtils.SIDfromStationID(t.SID, t.name));
@@ -107,7 +108,7 @@ public class RememberedFragment extends Fragment {
 					ni = new Intent(arg0.getContext(),(showForm && !showSaved) ? ConnectionsFormActivity.class : ConnectionListActivity.class);
 					
 					if(showSaved)
-						ni.putExtra("PLNFilename", CommonUtils.ResultsHash(Integer.toString(t.SIDFrom), Integer.toString(t.SIDTo), null));
+						ni.putExtra("PLNFilename", CommonUtils.ResultsHash(Integer.toString(t.SIDFrom), Integer.toString(t.SIDTo), null, 0));
 					
 					ni.putExtra("ZID", CommonUtils.SIDfromStationID(t.SIDTo,t.toName));
 					ni.putExtra("SID", CommonUtils.SIDfromStationID(t.SIDFrom,t.fromName));
@@ -123,7 +124,7 @@ public class RememberedFragment extends Fragment {
 					Time time = new Time();
 					time.setToNow();
 					
-					ni.putExtra("Time", time.format("%H:%M"));
+					ni.putExtra("PLNTimestamp", time.format("%H:%M"));
 					ni.putExtra("Date", time.format("%d.%m.%Y"));
 					startActivity(ni);
 				}

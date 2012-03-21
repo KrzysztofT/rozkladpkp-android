@@ -23,9 +23,9 @@ import org.tyszecki.rozkladpkp.widgets.StationEdit;
 import android.app.Application;
 import android.content.Context;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
-@ReportsCrashes(formKey = "dFlJOVYyS1hYbENUWEVmQnE5azlKNFE6MQ")
-
+@ReportsCrashes(formUri = "http://www.bugsense.com/api/acra?api_key=3becb074", formKey="") 
 public class RozkladPKPApplication extends Application {
 	
 	private static Context context;
